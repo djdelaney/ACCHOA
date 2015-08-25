@@ -1,0 +1,15 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewBag.Title = "Submissions";
+}
+
+<h3>Submission</h3>
+@Model.Submission.FirstName @Model.Submission.LastName<br />
+@Model.Submission.Email <br />
+@Model.Submission.HouseNumber @Model.Submission.StreetName<br />
+<br />
+@Model.Submission.Description<br />
+<br />
+<b>Status:</b> @Model.Submission.Status

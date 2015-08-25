@@ -1,0 +1,45 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewBag.Title = "Submissions";
+}
+
+
+@if (Model.Submissions.Count > 0)
+{
+    <h4>Open Submissions</h4>
+    <table border="1">
+        <tbody>
+            @foreach (var submission in Model.Submissions)
+            {
+                <tr>
+                    <td>@submission.FirstName</td>
+                    <td>
+                        @submission.LastName
+                    </td>
+                    <td>@submission.Status</td>
+
+
+                    <td>
+                        @if(submission.Audits != null && submission.Audits.Count > 0)
+                        {
+                            @submission.Audits[0].Action
+
+                        }
+                        else
+                        {
+                            <b>No history</b>
+                        }
+
+                    </td>
+
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+<b>No active submissions</b>
+}
