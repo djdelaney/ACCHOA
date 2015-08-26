@@ -92,5 +92,42 @@ namespace HOA.Controllers
             return Content("Created");
             //return View();
         }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(CreateSubmissionViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+
+                var sub = new Submission()
+                {
+                    FirstName = model.FirstName,
+                    LastName = model.LastName,
+                    HouseNumber = model.HouseNumber,
+                    StreetName = model.StreetName,
+                    Email = model.Email,
+                    Description = model.Description,
+                    Status = Status.Submitted
+                };
+
+                _applicationDbContext.Submissions.Add(sub);
+                _applicationDbContext.SaveChanges();
+                
+                Console.WriteLine("Create");
+                return Content("Submission ID: " + sub.Id);
+            }
+
+            // If we got this far, something failed, redisplay form
+            return View(model);
+        }
     }
 }

@@ -1,0 +1,37 @@
+﻿@model HOA.Model.ViewModel.CreateSubmissionViewModel
+
+@{
+    ViewBag.Title = "New submission";
+}
+
+@using (Html.BeginForm())
+{
+
+@Html.AntiForgeryToken()
+
+@Html.ValidationSummary()
+
+@Html.LabelFor(model => model.FirstName)<br />
+@Html.TextBoxFor(model => model.FirstName)<br />
+<br />
+@Html.LabelFor(model => model.LastName)<br />
+@Html.TextBoxFor(model => model.LastName)<br />
+<br />
+@Html.LabelFor(model => model.HouseNumber)<br />
+@Html.TextBoxFor(model => model.HouseNumber)<br />
+<br />
+@Html.LabelFor(model => model.StreetName)<br />
+@Html.TextBoxFor(model => model.StreetName)<br />
+<br />
+@Html.LabelFor(model => model.Email)<br />
+@Html.TextBoxFor(model => model.Email)<br />
+<br />
+@Html.LabelFor(model => model.Description)<br />
+@Html.TextBoxFor(model => model.Description)<br />
+<br />
+
+<br />
+<br />
+<input type="submit" value="Create" />
+
+}
