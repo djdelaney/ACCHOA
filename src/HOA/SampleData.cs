@@ -56,6 +56,22 @@ namespace HOA
                 await _userManager.AddToRoleAsync(user, "HOALiaison");
             }
 
+            user = await _userManager.FindByNameAsync("CommunityManager");
+            if (user == null)
+            {
+                user = new ApplicationUser { UserName = "CommunityManager", Email = "CommunityManager@mailinator.com", FullName = "Community Manager", Role = ReviewRole.CommunityManager };
+                await _userManager.CreateAsync(user, "P@ssw0rd!");
+                await _userManager.AddToRoleAsync(user, "CommunityManager");
+            }
+
+            user = await _userManager.FindByNameAsync("BoardMember1");
+            if (user == null)
+            {
+                user = new ApplicationUser { UserName = "BoardMember1", Email = "BoardMember1@mailinator.com", FullName = "Board Member1", Role = ReviewRole.BoardMember };
+                await _userManager.CreateAsync(user, "P@ssw0rd!");
+                await _userManager.AddToRoleAsync(user, "BoardMember");
+            }
+
         }
     }
 }

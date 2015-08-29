@@ -1,0 +1,53 @@
+﻿@using System.Collections.Generic
+@using Microsoft.AspNet.Http
+@using Microsoft.AspNet.Http.Authentication
+@using Microsoft.AspNet.Identity
+@using HOA.Model
+@model HOA.Model.ViewModel.LoginViewModel
+@inject SignInManager<ApplicationUser> SignInManager
+
+@{
+    ViewData["Title"] = "Log in";
+}
+
+
+
+<h2>@ViewData["Title"].</h2>
+<div class="row">
+    <div class="col-md-8">
+        <section>
+            <form asp-controller="Account" asp-action="Login" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" class="form-horizontal" role="form">
+
+                @Html.AntiForgeryToken()
+
+                @Html.ValidationSummary()
+
+                <h4>Use a local account to log in.</h4>
+                <hr />
+
+
+
+                @Html.LabelFor(model => model.Username)<br />
+                @Html.TextBoxFor(model => model.Username)<br />
+
+                <br />
+
+                @Html.LabelFor(model => model.Password)<br />
+                @Html.PasswordFor(model => model.Password)<br />
+
+                <br />
+
+                @Html.LabelFor(model => model.RememberMe)<br />
+                @Html.CheckBoxFor(model => model.RememberMe)<br />
+
+                <input type="submit" value="Create" />
+                
+
+            </form>
+        </section>
+    </div>
+</div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}
