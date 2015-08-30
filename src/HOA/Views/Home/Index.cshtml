@@ -1,4 +1,7 @@
-﻿@*
+﻿@using System.Security.Claims
+
+
+@*
     For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 *@
 @{
@@ -6,4 +9,10 @@
 }
 
 
-Hello worllllld!
+<a href="/Submission/Create">Submit a review</a>
+<br />
+
+@if (User.Identity.IsAuthenticated)
+{
+    <a href="/Submission/List">Incoming reviews</a>
+}

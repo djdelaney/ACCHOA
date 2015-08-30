@@ -1,0 +1,48 @@
+﻿@using HOA.Model
+@using HOA.Model.ViewModel
+@model ApproveRejectViewModel
+@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewBag.Title = "Approve/Reject";
+}
+
+<h3>Submission</h3>
+@Model.Submission.FirstName @Model.Submission.LastName<br />
+@Model.Submission.Email <br />
+@Model.Submission.HouseNumber @Model.Submission.StreetName<br />
+<br />
+@Model.Submission.Description<br />
+<br />
+
+<b>Action</b>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary()
+
+    @Html.HiddenFor(model => model.SubmissionId)
+
+    @Html.LabelFor(model => model.Comments)
+    @Html.TextBoxFor(model => model.Comments)<br />
+
+    @Html.LabelFor(model => model.Approve)<br />
+    @Html.DropDownListFor(m => m.Approve, new SelectList(
+        new[]
+        {
+            new { Value = "true", Text = "Yes" },
+            new { Value = "false", Text = "No" },
+        },
+        "Value",
+        "Text",
+        Model.Approve
+    ))
+
+    <br />
+
+
+    <input type="submit" value="Submit" />
+
+}

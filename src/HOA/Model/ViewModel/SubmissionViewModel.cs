@@ -9,12 +9,27 @@ namespace HOA.Model.ViewModel
 {
     public class ViewSubmissionsViewModel
     {
-        public IList<Submission> Submissions { get; set; }
+        public IList<Submission> Submissions { get; set; }        
     }
 
     public class ViewSubmissionViewModel
     {
         public Submission Submission { get; set; }
+        public bool ApproveRejectEnabled { get; set; }
+    }
+
+    public class ApproveRejectViewModel
+    {
+        public Submission Submission { get; set; }
+
+        [Required]
+        public int SubmissionId { get; set; }
+
+        [Required]
+        public bool Approve { get; set; }
+
+        [Required]
+        public string Comments { get; set; }
     }
 
     public class CreateSubmissionViewModel

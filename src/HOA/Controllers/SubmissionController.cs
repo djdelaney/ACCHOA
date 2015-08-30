@@ -6,11 +6,13 @@ using Microsoft.AspNet.Mvc;
 using HOA.Model;
 using HOA.Model.ViewModel;
 using Microsoft.Data.Entity;
+using Microsoft.AspNet.Authorization;
 
 // For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace HOA.Controllers
 {
+    [Authorize]
     public class SubmissionController : Controller
     {
         private readonly ApplicationDbContext _applicationDbContext;
@@ -19,15 +21,32 @@ namespace HOA.Controllers
         {
             _applicationDbContext = applicationDbContext;
         }
+        
+        public IActionResult Incoming()
+        {
+            var sub = _applicationDbContext.Submissions.Where(s => s.Status == Status.Submitted).Include(s => s.Audits).ToList();
 
-        // GET: /<controller>/
+            return View(new ViewSubmissionsViewModel
+            {
+                Submissions = sub
+            });
+        }
+
+        //[Authorize(Roles = "CommunityManager")]
         public IActionResult List()
         {
-            var history = _applicationDbContext.Histories.Include(h => h.Submission).FirstOrDefault();
-            var sub = _applicationDbContext.Submissions.Include(s => s.Audits).FirstOrDefault();
-                //return Content("New submission, view submission");
+            var viewModel = new ViewSubmissionsViewModel();
 
-                return View(new ViewSubmissionsViewModel
+            if(User.IsInRole("CommunityManager"))
+            {
+                viewModel.Submissions = _applicationDbContext.Submissions.Where(s => s.Status == Status.Submitted).Include(s => s.Audits).ToList();
+            }
+
+            //var history = _applicationDbContext.Histories.Include(h => h.Submission).FirstOrDefault();
+            //var sub = _applicationDbContext.Submissions.Include(s => s.Audits).FirstOrDefault();
+            //return Content("New submission, view submission");
+
+            return View(new ViewSubmissionsViewModel
             {
                 Submissions = _applicationDbContext.Submissions.ToList()
             });
@@ -43,6 +62,8 @@ namespace HOA.Controllers
             {
                 Submission = submission
             };
+
+            model.ApproveRejectEnabled = true;
 
             return View(model);
         }
@@ -127,6 +148,41 @@ namespace HOA.Controllers
             }
 
             // If we got this far, something failed, redisplay form
+            return View(model);
+        }
+        
+        [HttpGet]
+        public IActionResult ApproveReject(int id)
+        {
+            var submission = _applicationDbContext.Submissions.FirstOrDefault(s => s.Id == id);
+            if (submission == null)
+                return HttpNotFound("Submission not found");
+
+            ApproveRejectViewModel model = new ApproveRejectViewModel
+            {
+                Submission = submission,
+                SubmissionId = submission.Id
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ApproveReject(ApproveRejectViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                /*
+                _applicationDbContext.Submissions.Add(sub);
+                _applicationDbContext.SaveChanges();
+
+                Console.WriteLine("Create");
+                return Content("Submission ID: " + sub.Id);*/
+            }
+
+            // If we got this far, something failed, redisplay form
+            model.Submission = _applicationDbContext.Submissions.FirstOrDefault(s => s.Id == model.SubmissionId);
             return View(model);
         }
     }

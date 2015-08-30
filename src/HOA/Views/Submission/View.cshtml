@@ -1,4 +1,5 @@
-﻿@*
+﻿@using HOA.Model
+@*
     For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 *@
 @{
@@ -13,3 +14,11 @@
 @Model.Submission.Description<br />
 <br />
 <b>Status:</b> @Model.Submission.Status
+
+<br />
+
+<b>Action</b>
+@if(Model.ApproveRejectEnabled)
+{
+    <a href="/Submission/ApproveReject/@Model.Submission.Id">Approve or Reject</a>
+}
