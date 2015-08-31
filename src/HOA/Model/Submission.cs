@@ -10,7 +10,9 @@ namespace HOA.Model
     {
         Submitted,
         Rejected,
+        ARBIncoming,
         UnderReview,
+        ARBFinal,
         ReviewComplete,
         Approved
     }
@@ -27,13 +29,10 @@ namespace HOA.Model
         [Required]
         [MaxLength(32)]
         public string LastName { get; set; }
-
-        [Required]
-        public int HouseNumber { get; set; }
-
+        
         [Required]
         [MaxLength(64)]
-        public string StreetName { get; set; }
+        public string Address { get; set; }
 
         [Required]
         [MaxLength(64)]

@@ -1,42 +1,24 @@
-﻿@*
+﻿@using HOA.Model
+@*
     For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 *@
 @{
     ViewBag.Title = "Submissions";
 }
 
-
-@if (Model.Submissions.Count > 0)
+<!-- Community manager completeness review -->
+@if (User.IsInRole(RoleNames.CommunityManager) && Model.NewSubmissions.Count > 0)
 {
-    <h4>Open Submissions</h4>
-    <table border="1">
+    <h4>New Submissions</h4>
+    <table border="1" cellpadding="4">
         <tbody>
-            @foreach (var submission in Model.Submissions)
+            @foreach (var submission in Model.NewSubmissions)
             {
                 <tr>
                     <td>@submission.FirstName</td>
-                    <td>
-                        @submission.LastName
-                    </td>
+                    <td>@submission.LastName</td>
                     <td>@submission.Status</td>
-
-
-                    <td>
-                        @if(submission.Audits != null && submission.Audits.Count > 0)
-                        {
-                            @submission.Audits[0].Action
-
-                        }
-                        else
-                        {
-                            <b>No history</b>
-                        }
-
-                    </td>
-                    <td>
-                        <a href="/Submission/View/@submission.Id">View</a>
-                    </td>
-
+                    <td><a href="/Submission/View/@submission.Id">View</a></td>
                 </tr>
             }
         </tbody>
@@ -44,5 +26,99 @@
 }
 else
 {
-<b>No active submissions</b>
+<b>No incoming submissions</b><br />
+}
+
+
+<!-- ARB chairman completeness review -->
+@if (User.IsInRole(RoleNames.BoardChairman) && Model.ARBIncoming.Count > 0)
+{
+    <h4>Chairman completeness check</h4>
+    <table border="1" cellpadding="4">
+        <tbody>
+            @foreach (var submission in Model.ARBIncoming)
+            {
+                <tr>
+                    <td>@submission.FirstName</td>
+                    <td>@submission.LastName</td>
+                    <td>@submission.Status</td>
+                    <td><a href="/Submission/View/@submission.Id">View</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <b>No incoming submissions</b><br />
+}
+
+
+<!-- ARB review -->
+@if (User.IsInRole(RoleNames.BoardMember) && Model.ForReview.Count > 0)
+{
+    <h4>Open for review</h4>
+    <table border="1" cellpadding="4">
+        <tbody>
+            @foreach (var submission in Model.ForReview)
+            {
+                <tr>
+                    <td>@submission.FirstName</td>
+                    <td>@submission.LastName</td>
+                    <td>@submission.Status</td>
+                    <td><a href="/Submission/View/@submission.Id">View</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <b>No review submissions</b><br />
+}
+
+<!-- ARB Vote tally -->
+@if (User.IsInRole(RoleNames.BoardChairman) && Model.ARBFinal.Count > 0)
+{
+    <h4>Reviews submitted</h4>
+    <table border="1" cellpadding="4">
+        <tbody>
+            @foreach (var submission in Model.ARBFinal)
+            {
+                <tr>
+                    <td>@submission.FirstName</td>
+                    <td>@submission.LastName</td>
+                    <td>@submission.Status</td>
+                    <td><a href="/Submission/View/@submission.Id">View</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <b>No reviews finished voting</b><br />
+}
+
+<!-- HOA final review -->
+@if (User.IsInRole(RoleNames.HOALiaison) && Model.FinalApproval.Count > 0)
+{
+    <h4>Final review</h4>
+    <table border="1" cellpadding="4">
+        <tbody>
+            @foreach (var submission in Model.FinalApproval)
+            {
+                <tr>
+                    <td>@submission.FirstName</td>
+                    <td>@submission.LastName</td>
+                    <td>@submission.Status</td>
+                    <td><a href="/Submission/View/@submission.Id">View</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <b>No final review items</b><br />
 }

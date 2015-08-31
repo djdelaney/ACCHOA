@@ -9,7 +9,7 @@
 <h3>Submission</h3>
 @Model.Submission.FirstName @Model.Submission.LastName<br />
 @Model.Submission.Email <br />
-@Model.Submission.HouseNumber @Model.Submission.StreetName<br />
+@Model.Submission.Address<br />
 <br />
 @Model.Submission.Description<br />
 <br />
@@ -17,8 +17,9 @@
 
 <br />
 
-<b>Action</b>
-@if(Model.ApproveRejectEnabled)
+<b>Action</b><br />
+@if((Model.Submission.Status == Status.Submitted && User.IsInRole(RoleNames.CommunityManager)) ||
+    (Model.Submission.Status == Status.ARBIncoming && User.IsInRole(RoleNames.BoardChairman)))
 {
-    <a href="/Submission/ApproveReject/@Model.Submission.Id">Approve or Reject</a>
+    <a href="/Submission/CheckCompleteness/@Model.Submission.Id">Check app</a>
 }

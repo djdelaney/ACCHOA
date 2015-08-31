@@ -11,13 +11,13 @@ using System.ComponentModel.DataAnnotations;
 
 namespace HOA.Model
 {
-    public enum ReviewRole
+    public static class RoleNames
     {
-        Admin,
-        CommunityManager,
-        BoardChairman,
-        BoardMember,
-        HOALiaison
+        public const string Administrator       = "Administrator";
+        public const string CommunityManager    = "CommunityManager";
+        public const string BoardChairman       = "BoardChairman";
+        public const string BoardMember         = "BoardMember";
+        public const string HOALiaison          = "HOALiaison";        
     }
 
     public class ApplicationUser : IdentityUser
@@ -25,8 +25,5 @@ namespace HOA.Model
         [Required]
         [MaxLength(20)]
         public string FullName { get; set; }
-
-        [Required]
-        public ReviewRole Role { get; set; }
     }
 }

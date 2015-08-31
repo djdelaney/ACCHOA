@@ -7737,7 +7737,8 @@
       "Microsoft.Framework.Configuration.Json >= 1.0.0-beta6",
       "Microsoft.Framework.Configuration.UserSecrets >= 1.0.0-beta6",
       "EntityFramework.Relational >= 7.0.0-beta6",
-      "EntityFramework.Relational.Design >= 7.0.0-beta6"
+      "EntityFramework.Relational.Design >= 7.0.0-beta6",
+      "Microsoft.AspNet.Identity >= 3.0.0-beta6"
     ],
     "DNX,Version=v4.5.1": [],
     "DNXCore,Version=v5.0": []

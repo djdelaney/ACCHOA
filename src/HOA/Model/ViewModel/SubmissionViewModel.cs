@@ -9,13 +9,16 @@ namespace HOA.Model.ViewModel
 {
     public class ViewSubmissionsViewModel
     {
-        public IList<Submission> Submissions { get; set; }        
+        public IList<Submission> NewSubmissions { get; set; }
+        public IList<Submission> ARBIncoming { get; set; }
+        public IList<Submission> ForReview { get; set; }
+        public IList<Submission> ARBFinal { get; set; }
+        public IList<Submission> FinalApproval { get; set; }
     }
 
     public class ViewSubmissionViewModel
     {
         public Submission Submission { get; set; }
-        public bool ApproveRejectEnabled { get; set; }
     }
 
     public class ApproveRejectViewModel
@@ -43,18 +46,14 @@ namespace HOA.Model.ViewModel
         public string LastName { get; set; }
 
         [Required]
-        [Display(Name = "House Number")]
-        public int HouseNumber { get; set; }
+        [Display(Name = "Address")]
+        public string Address { get; set; }
 
         [Required]
         [DataType(DataType.EmailAddress)]
         [EmailAddress]
         [Display(Name = "Email")]
         public string Email { get; set; }
-
-        [Required]
-        [Display(Name = "Street Name")]
-        public string StreetName { get; set; }
         
         [Required]
         public string Description { get; set; }
