@@ -61,4 +61,9 @@ namespace HOA.Model.ViewModel
         public string Description { get; set; }
     }
 
+    public class StatusViewModel
+    {
+        [Required]
+        public string Code{ get; set; }
+    }
 }

@@ -23,6 +23,9 @@ namespace HOA.Model
         public int Id { get; set; }
 
         [Required]
+        public string Code { get; set; }
+
+        [Required]
         [MaxLength(32)]
         public string FirstName { get; set; }
 

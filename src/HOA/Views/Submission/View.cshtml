@@ -7,6 +7,7 @@
 }
 
 <h3>Submission</h3>
+Code: @Model.Submission.Code<br />
 @Model.Submission.FirstName @Model.Submission.LastName<br />
 @Model.Submission.Email <br />
 @Model.Submission.Address<br />
@@ -18,7 +19,30 @@
 @if (Model.Submission.Status == Status.UnderReview)
 {
     @Model.Submission.Reviews.Count
-    @: review(s) submitted of @Model.ReviewerCount 
+    @: review(s) submitted of @Model.ReviewerCount  <br />
+    <br />
+}
+
+@if (Model.Submission.Status == Status.ARBFinal)
+{
+    @: <h3>Reviews:</h3>
+    @foreach (var review in Model.Submission.Reviews)
+    {
+        @review.Reviewer.FullName@:, @review.Created.ToString("MM/dd/yyyy") <br />
+
+        @if(review.Approved)
+        {
+            @: Approved
+        }
+        else
+        {
+            @:Rejected
+        }
+        <br />
+        @review.Comments<br />
+
+        <br />
+    }
 }
 
 <br />
@@ -30,11 +54,14 @@
     <a href="/Submission/CheckCompleteness/@Model.Submission.Id">Check app</a>
 }
 
-@if (Model.Submission.Status == Status.UnderReview && !Model.Reviewed)
+@if (Model.Submission.Status == Status.UnderReview)
 {
-    <a href="/Submission/Review/@Model.Submission.Id">Review</a>
-}
-else
-{
-    @: Already reviewed
+    @if(!Model.Reviewed)
+    {
+        <a href="/Submission/Review/@Model.Submission.Id">Review</a>
+    }
+    else
+    {
+        @: Already reviewed
+    }
 }

@@ -32,6 +32,23 @@ namespace HOA.Controllers
             return role.Users.Count;            
         }
 
+        private string GenerateUniqueCode()
+        {
+            string code = "";
+            var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            var random = new Random();
+
+            do
+            {                
+                code = new string(
+                    Enumerable.Repeat(chars, 5)
+                              .Select(s => s[random.Next(s.Length)])
+                              .ToArray());
+            }
+            while (_applicationDbContext.Submissions.Any(s => s.Code.Equals(code)));
+            return code;
+        }
+
         
         //[Authorize(Roles = "CommunityManager")]
         public IActionResult List()
@@ -84,7 +101,34 @@ namespace HOA.Controllers
 
             return View(model);
         }
-        
+
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult LookupStatus()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> LookupStatus(StatusViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var submission = _applicationDbContext.Submissions
+                    .Include(s => s.Reviews)
+                    .FirstOrDefault(s => s.Code.Equals(model.Code));
+
+                if (submission == null)
+                    return View("StatusNotFound");
+
+                return View("ViewStatus", submission);
+            }
+
+            //form not complete
+            return View(model);
+        }
 
         [HttpGet]
         [AllowAnonymous]
@@ -98,6 +142,8 @@ namespace HOA.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CreateSubmissionViewModel model)
         {
+            //http://stackoverflow.com/questions/15680629/mvc-4-razor-file-upload
+
             if (ModelState.IsValid)
             {
 
@@ -108,14 +154,14 @@ namespace HOA.Controllers
                     Address = model.Address,
                     Email = model.Email,
                     Description = model.Description,
-                    Status = Status.Submitted
+                    Status = Status.Submitted,
+                    Code = GenerateUniqueCode()
                 };
 
                 _applicationDbContext.Submissions.Add(sub);
                 _applicationDbContext.SaveChanges();
-                
-                Console.WriteLine("Create");
-                return Content("Submission ID: " + sub.Id);
+
+                return View("PostCreate", sub);
             }
 
             // If we got this far, something failed, redisplay form

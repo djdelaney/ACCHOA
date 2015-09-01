@@ -1,0 +1,45 @@
+﻿@using HOA.Model
+
+@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewBag.Title = "Status";
+}
+
+
+@if(Model.Status == Status.Submitted)
+{
+    @:Submitted to the Community manager
+}
+
+@if (Model.Status == Status.ARBIncoming ||
+    Model.Status == Status.UnderReview ||
+    Model.Status == Status.ARBFinal)
+{
+    @:Under review by the ARB
+}
+
+
+@if (Model.Status == Status.ReviewComplete)
+{
+    @: Under review by the HOA liaison
+}
+
+@if (Model.Status == Status.Approved)
+{
+    @: Approved
+}
+
+
+@if (Model.Status == Status.Rejected)
+{
+    @: Rejected
+}
+
+
+@if (@Model.Reviews != null && @Model.Reviews.Count > 0)
+{
+    @:Last update: @Model.Reviews.First().Created
+}
+
