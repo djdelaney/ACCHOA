@@ -19,6 +19,8 @@ namespace HOA.Model.ViewModel
     public class ViewSubmissionViewModel
     {
         public Submission Submission { get; set; }
+        public int ReviewerCount { get; set; }
+        public bool Reviewed { get; set; }
     }
 
     public class ApproveRejectViewModel

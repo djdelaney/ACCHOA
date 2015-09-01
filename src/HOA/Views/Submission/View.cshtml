@@ -13,7 +13,13 @@
 <br />
 @Model.Submission.Description<br />
 <br />
-<b>Status:</b> @Model.Submission.Status
+<b>Status:</b> @Model.Submission.Status<br />
+
+@if (Model.Submission.Status == Status.UnderReview)
+{
+    @Model.Submission.Reviews.Count
+    @: review(s) submitted of @Model.ReviewerCount 
+}
 
 <br />
 
@@ -22,4 +28,13 @@
     (Model.Submission.Status == Status.ARBIncoming && User.IsInRole(RoleNames.BoardChairman)))
 {
     <a href="/Submission/CheckCompleteness/@Model.Submission.Id">Check app</a>
+}
+
+@if (Model.Submission.Status == Status.UnderReview && !Model.Reviewed)
+{
+    <a href="/Submission/Review/@Model.Submission.Id">Review</a>
+}
+else
+{
+    @: Already reviewed
 }

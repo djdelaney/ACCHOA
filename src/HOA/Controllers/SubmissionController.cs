@@ -25,6 +25,13 @@ namespace HOA.Controllers
             _applicationDbContext = applicationDbContext;
             _userManager = userManager;
         }
+
+        private int GetReviewerCount()
+        {
+            var role = _applicationDbContext.Roles.Include(r => r.Users).FirstOrDefault(r => r.Name.Equals(RoleNames.BoardMember));
+            return role.Users.Count;            
+        }
+
         
         //[Authorize(Roles = "CommunityManager")]
         public IActionResult List()
@@ -61,13 +68,18 @@ namespace HOA.Controllers
 
         public ActionResult View(int? id)
         {
-            var submission = _applicationDbContext.Submissions.FirstOrDefault(s => s.Id == id);
+            var submission = _applicationDbContext.Submissions.Include(s => s.Reviews)
+                .ThenInclude(r => r.Reviewer)
+                .Include(s => s.Audits)
+                .FirstOrDefault(s => s.Id == id);
             if(submission == null)
                 return HttpNotFound("Submission not found");
-
+            
             var model = new ViewSubmissionViewModel()
             {
-                Submission = submission
+                Submission = submission,
+                ReviewerCount = GetReviewerCount(),
+                Reviewed = submission.Reviews.Any(r => r.Reviewer.Id == User.GetUserId())
             };
 
             return View(model);
@@ -140,7 +152,7 @@ namespace HOA.Controllers
         {
             if (ModelState.IsValid)
             {
-                var submission = _applicationDbContext.Submissions.FirstOrDefault(s => s.Id == model.SubmissionId);
+                var submission = _applicationDbContext.Submissions.Include(s => s.Audits).FirstOrDefault(s => s.Id == model.SubmissionId);
                 if (submission == null)
                     return HttpNotFound("Submission not found");
 
@@ -183,7 +195,7 @@ namespace HOA.Controllers
 
 
         [HttpGet]
-        public IActionResult ApproveReject(int id)
+        public IActionResult Review(int id)
         {
             var submission = _applicationDbContext.Submissions.FirstOrDefault(s => s.Id == id);
             if (submission == null)
@@ -200,16 +212,39 @@ namespace HOA.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ApproveReject(ApproveRejectViewModel model)
+        public async Task<IActionResult> Review(ApproveRejectViewModel model)
         {
             if (ModelState.IsValid)
             {
-                /*
-                _applicationDbContext.Submissions.Add(sub);
+                var submission = _applicationDbContext.Submissions.Include(s => s.Audits).Include(s => s.Reviews)
+                    .FirstOrDefault(s => s.Id == model.SubmissionId);
+                if (submission == null)
+                    return HttpNotFound("Submission not found");
+
+                var user = await _userManager.FindByIdAsync(User.GetUserId());
+
+                var review = new Review
+                {
+                    Reviewer = user,
+                    Approved = model.Approve,
+                    Created = DateTime.Now,
+                    Comments = model.Comments,
+                    Submission = submission
+                };
+
+                if (submission.Reviews == null)
+                    submission.Reviews = new List<Review>();
+                submission.Reviews.Add(review);
+                _applicationDbContext.Reviews.Add(review);
+
+                //Final review!
+                if (submission.Reviews.Count == GetReviewerCount())
+                {
+                    submission.Status = Status.ARBFinal;
+                }
                 _applicationDbContext.SaveChanges();
 
-                Console.WriteLine("Create");
-                return Content("Submission ID: " + sub.Id);*/
+                return RedirectToAction(nameof(View), new { id = submission.Id });
             }
 
             // If we got this far, something failed, redisplay form
