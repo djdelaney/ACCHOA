@@ -45,6 +45,19 @@ Code: @Model.Submission.Code<br />
     }
 }
 
+<!-- Audit history -->
+@if (Model.Submission.Audits != null && Model.Submission.Audits.Count > 0)
+{
+    @: <h3>History:</h3>
+    @foreach (var history in Model.Submission.Audits)
+    {
+        @history.User@:, @history.DateTime.ToString("MM/dd/yyyy hh:mm tt") <br />
+        @history.Action<br />
+        <br />
+    }
+}
+
+
 <br />
 
 <b>Action</b><br />

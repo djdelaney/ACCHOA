@@ -12,7 +12,7 @@ namespace HOA.Model
         public int Id { get; set; }
 
         [Required]
-        public ApplicationUser User { get; set; }
+        public String User { get; set; }
 
         [Required]
         public DateTime DateTime { get; set; }

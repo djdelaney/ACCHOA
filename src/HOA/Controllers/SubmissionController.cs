@@ -49,6 +49,21 @@ namespace HOA.Controllers
             return code;
         }
 
+        private void AddHistoryEntry(Submission s, string user, string action)
+        {
+            if (s.Audits == null)
+                s.Audits = new List<History>();
+
+            var history = new History
+            {
+                User = user,
+                DateTime = DateTime.Now,
+                Action = action,
+                Submission = s
+            };
+            s.Audits.Add(history);
+            _applicationDbContext.Histories.Add(history);
+        }
         
         //[Authorize(Roles = "CommunityManager")]
         public IActionResult List()
@@ -91,6 +106,8 @@ namespace HOA.Controllers
                 .FirstOrDefault(s => s.Id == id);
             if(submission == null)
                 return HttpNotFound("Submission not found");
+
+            submission.Audits = submission.Audits.OrderBy(a => a.DateTime).ToList();
             
             var model = new ViewSubmissionViewModel()
             {
@@ -117,8 +134,10 @@ namespace HOA.Controllers
             if (ModelState.IsValid)
             {
                 var submission = _applicationDbContext.Submissions
-                    .Include(s => s.Reviews)
+                    .Include(s => s.Audits)
                     .FirstOrDefault(s => s.Code.Equals(model.Code));
+
+                submission.Audits = submission.Audits.OrderBy(a => a.DateTime).ToList();
 
                 if (submission == null)
                     return View("StatusNotFound");
@@ -157,6 +176,8 @@ namespace HOA.Controllers
                     Status = Status.Submitted,
                     Code = GenerateUniqueCode()
                 };
+
+                AddHistoryEntry(sub, model.FirstName + " " + model.LastName, "Submitted");
 
                 _applicationDbContext.Submissions.Add(sub);
                 _applicationDbContext.SaveChanges();
@@ -216,20 +237,10 @@ namespace HOA.Controllers
                 else
                     submission.Status = Status.Rejected;
                 
+                var user = await _userManager.FindByIdAsync(User.GetUserId());                
+                string action = string.Format("marked{0} complete- {1}", model.Approve ? "" : " not", model.Comments);
+                AddHistoryEntry(submission, user.FullName, action);
 
-                var user = await _userManager.FindByIdAsync(User.GetUserId());
-
-                var history = new History
-                {
-                    User = user,
-                    DateTime = DateTime.Now,
-                    Action = model.Comments,
-                    Submission = submission
-                };
-                if (submission.Audits == null)
-                    submission.Audits = new List<History>();
-                submission.Audits.Add(history);
-                _applicationDbContext.Histories.Add(history);
                 _applicationDbContext.SaveChanges();
                 return RedirectToAction(nameof(View), new { id = submission.Id });
             }
@@ -281,12 +292,16 @@ namespace HOA.Controllers
                 if (submission.Reviews == null)
                     submission.Reviews = new List<Review>();
                 submission.Reviews.Add(review);
+
+                AddHistoryEntry(submission, user.FullName, "Submitted review");
+
                 _applicationDbContext.Reviews.Add(review);
 
                 //Final review!
                 if (submission.Reviews.Count == GetReviewerCount())
                 {
                     submission.Status = Status.ARBFinal;
+                    AddHistoryEntry(submission, "System", "All reviews in, sent to chairman");
                 }
                 _applicationDbContext.SaveChanges();
 

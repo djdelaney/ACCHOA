@@ -1,4 +1,5 @@
 ﻿@using HOA.Model
+@using System.Linq
 
 @*
     For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
@@ -36,10 +37,10 @@
 {
     @: Rejected
 }
+<br />
 
-
-@if (@Model.Reviews != null && @Model.Reviews.Count > 0)
+@if (@Model.Audits != null && @Model.Audits.Count > 0)
 {
-    @:Last update: @Model.Reviews.First().Created
+    @:Last update: @Model.Audits[@Model.Audits.Count-1].DateTime
 }
 
