@@ -62,7 +62,7 @@
     @Html.HiddenFor(model => model.SubmissionId)
 
     @Html.LabelFor(model => model.Comments)@: <br />
-    @Html.TextAreaFor(model => model.Comments)<br />
+    @Html.TextAreaFor(model => model.Comments, new { @class = "form-control" })<br />
     <br />
     @:Approve?<br />
 
@@ -78,7 +78,8 @@
         "Value",
         "Text",
         Model.Approve
-    ))
+    ),
+    new { @class = "form-control" })
     <br />
     <br />
 

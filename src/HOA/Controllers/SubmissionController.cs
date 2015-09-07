@@ -222,6 +222,8 @@ namespace HOA.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = RoleNames.CommunityManager)]
+        [Authorize(Roles = RoleNames.BoardChairman)]
         public async Task<IActionResult> CheckCompleteness(ApproveRejectViewModel model)
         {
             if (ModelState.IsValid)
@@ -277,6 +279,7 @@ namespace HOA.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = RoleNames.BoardMember)]
         public async Task<IActionResult> Review(ApproveRejectViewModel model)
         {
             if (ModelState.IsValid)
@@ -341,6 +344,7 @@ namespace HOA.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = RoleNames.BoardChairman)]
         public async Task<IActionResult> TallyVotes(ApproveRejectViewModel model)
         {
             if (ModelState.IsValid)
@@ -358,6 +362,54 @@ namespace HOA.Controllers
 
                 var user = await _userManager.FindByIdAsync(User.GetUserId());
                 string action = string.Format("{0}. Comments: {1}", model.Approve ? "Accepted" : "Rejected", model.Comments);
+                AddHistoryEntry(submission, user.FullName, action);
+
+                submission.LastModified = DateTime.Now;
+                _applicationDbContext.SaveChanges();
+                return RedirectToAction(nameof(View), new { id = submission.Id });
+            }
+
+            // If we got this far, something failed, redisplay form
+            model.Submission = _applicationDbContext.Submissions.FirstOrDefault(s => s.Id == model.SubmissionId);
+            return View(model);
+        }
+
+        [HttpGet]
+        [Authorize(Roles = RoleNames.HOALiaison)]
+        public IActionResult FinalCheck(int id)
+        {
+            var submission = _applicationDbContext.Submissions.FirstOrDefault(s => s.Id == id);
+            if (submission == null)
+                return HttpNotFound("Submission not found");
+            
+            ApproveRejectViewModel model = new ApproveRejectViewModel
+            {
+                Submission = submission,
+                SubmissionId = submission.Id
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> FinalCheck(ApproveRejectViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var submission = _applicationDbContext.Submissions.Include(s => s.Audits).FirstOrDefault(s => s.Id == model.SubmissionId);
+                if (submission == null)
+                    return HttpNotFound("Submission not found");
+
+                if (model.Approve)
+                {
+                    submission.Status = Status.Approved;
+                }
+                else
+                    submission.Status = Status.Rejected;
+
+                var user = await _userManager.FindByIdAsync(User.GetUserId());
+                string action = string.Format("Marked{0} approved. Comments: {1}", model.Approve ? "" : " not", model.Comments);
                 AddHistoryEntry(submission, user.FullName, action);
 
                 submission.LastModified = DateTime.Now;
