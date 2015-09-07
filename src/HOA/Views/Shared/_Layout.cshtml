@@ -1,21 +1,87 @@
-﻿<!DOCTYPE html>
+﻿@using System.Security.Claims
 
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
     <meta name="viewport" content="width=device-width" />
     <title>@ViewBag.Title</title>
+
+    <style>
+        body {
+            min-height: 2000px;
+            padding-top: 70px;
+        }
+    </style>
 </head>
 <body>
-    <a href="/">Home</a>
-    <div>
-        @await Html.PartialAsync("_LoginPartial")
-    </div>
-    <hr />
 
-    <div>
+    <!-- Header -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">HOA Submittal</a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="#">Home</a></li>
+
+@if (User.Identity.IsAuthenticated)
+{
+                    <li><a href="/Submission/List">Incoming</a></li>
+                    <li><a href="#contact">Overdue</a></li>
+}
+
+                </ul>
+
+@if (User.Identity.IsAuthenticated)
+{
+                <form action="/Account/LogOff" method="post" id="logoutForm">
+                    <p class="navbar-text navbar-right">Hello @User.GetUserName()!</p>
+                    <ul class="nav navbar-nav navbar-right">
+
+                        @Html.AntiForgeryToken()
+                        <li class="active"><a href="javascript:document.getElementById('logoutForm').submit()">Sign out</a></li>
+
+                    </ul>
+                </form>
+}
+else
+{
+
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="active"><a href="/Account/Login/">Sign in</a></li>
+                </ul>
+}
+
+
+            </div><!--/.nav-collapse -->
+        </div>
+    </nav>
+
+
+    <div class="container">
         @RenderBody()
-    </div>
 
-    @RenderSection("scripts", required: false)
+    </div> <!-- /container -->
+
+        @RenderSection("scripts", required: false)
 </body>
 </html>
+
+

@@ -174,6 +174,7 @@ namespace HOA.Controllers
                     Email = model.Email,
                     Description = model.Description,
                     Status = Status.Submitted,
+                    LastModified = DateTime.Now,
                     Code = GenerateUniqueCode()
                 };
 
@@ -241,6 +242,7 @@ namespace HOA.Controllers
                 string action = string.Format("marked{0} complete- {1}", model.Approve ? "" : " not", model.Comments);
                 AddHistoryEntry(submission, user.FullName, action);
 
+                submission.LastModified = DateTime.Now;
                 _applicationDbContext.SaveChanges();
                 return RedirectToAction(nameof(View), new { id = submission.Id });
             }
@@ -301,8 +303,10 @@ namespace HOA.Controllers
                 if (submission.Reviews.Count == GetReviewerCount())
                 {
                     submission.Status = Status.ARBFinal;
+                    submission.LastModified = DateTime.Now;
                     AddHistoryEntry(submission, "System", "All reviews in, sent to chairman");
                 }
+                
                 _applicationDbContext.SaveChanges();
 
                 return RedirectToAction(nameof(View), new { id = submission.Id });

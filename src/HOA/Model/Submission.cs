@@ -8,12 +8,12 @@ namespace HOA.Model
 {
     public enum Status
     {
-        Submitted,
-        Rejected,
+        Submitted,        
         ARBIncoming,
         UnderReview,
         ARBFinal,
         ReviewComplete,
+        Rejected,
         Approved
     }
 
@@ -47,6 +47,9 @@ namespace HOA.Model
 
         [Required]
         public Status Status { get; set; }
+
+        [Required]
+        public DateTime LastModified { get; set; }
 
         public virtual IList<Review> Reviews { get; set; }
 
