@@ -7,13 +7,27 @@
 }
 
 <h3>Submission</h3>
-Code: @Model.Submission.Code<br />
-@Model.Submission.FirstName @Model.Submission.LastName<br />
-@Model.Submission.Email <br />
-@Model.Submission.Address<br />
-<br />
-@Model.Submission.Description<br />
-<br />
+
+<div class="panel panel-default">
+    <div class="panel-heading">Details</div>
+    <div class="panel-body">
+        
+        
+        Code: @Model.Submission.Code<br />
+        <br />
+        @Model.Submission.FirstName @Model.Submission.LastName<br />
+        @Model.Submission.Email <br />
+        @Model.Submission.Address<br />
+        <br />
+        @Model.Submission.Description<br />
+
+
+
+
+
+    </div>
+</div>
+
 <b>Status:</b> @Model.Submission.Status<br />
 
 @if (Model.Submission.Status == Status.UnderReview)
@@ -60,14 +74,13 @@ Code: @Model.Submission.Code<br />
 
 <br />
 
-<b>Action</b><br />
+<h3>Action:</h3>
 @if((Model.Submission.Status == Status.Submitted && User.IsInRole(RoleNames.CommunityManager)) ||
     (Model.Submission.Status == Status.ARBIncoming && User.IsInRole(RoleNames.BoardChairman)))
 {
     <a href="/Submission/CheckCompleteness/@Model.Submission.Id">Check app</a>
 }
-
-@if (Model.Submission.Status == Status.UnderReview)
+else if (Model.Submission.Status == Status.UnderReview && User.IsInRole(RoleNames.BoardMember))
 {
     @if(!Model.Reviewed)
     {
@@ -77,4 +90,12 @@ Code: @Model.Submission.Code<br />
     {
         @: Already reviewed
     }
+}
+else if (Model.Submission.Status == Status.ARBFinal && User.IsInRole(RoleNames.BoardChairman))
+{
+    <a href="/Submission/TallyVotes/@Model.Submission.Id">Tally votes</a>
+}
+else
+{
+    @: None
 }

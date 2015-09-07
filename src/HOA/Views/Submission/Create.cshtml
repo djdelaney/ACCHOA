@@ -4,8 +4,10 @@
     ViewBag.Title = "New submission";
 }
 
-@using (Html.BeginForm())
+@using (Html.BeginForm("Submission", "Create", FormMethod.Post, new { @class = "form-horizontal" }))
 {
+
+<h3>Create</h3>
 
 @Html.AntiForgeryToken()
 
@@ -18,24 +20,51 @@
     </div>
 }
 
-@Html.LabelFor(model => model.FirstName)<br />
-@Html.TextBoxFor(model => model.FirstName)<br />
-<br />
-@Html.LabelFor(model => model.LastName)<br />
-@Html.TextBoxFor(model => model.LastName)<br />
-<br />
-@Html.LabelFor(model => model.Address)<br />
-@Html.TextBoxFor(model => model.Address)<br />
-<br />
-@Html.LabelFor(model => model.Email)<br />
-@Html.TextBoxFor(model => model.Email)<br />
-<br />
-@Html.LabelFor(model => model.Description)<br />
-@Html.TextBoxFor(model => model.Description)<br />
-<br />
 
-<br />
-<br />
-<input type="submit" value="Submit" />
+<div class="form-group">
+    <label class="control-label col-xs-3" for="inputPassword">
+        @Html.LabelFor(model => model.FirstName)
+    </label>
+    <div class="col-xs-9">
+        @Html.TextBoxFor(model => model.FirstName, new { @class = "form-control" })
+    </div>
+</div>
+<div class="form-group">
+    <label class="control-label col-xs-3" for="inputPassword">
+        @Html.LabelFor(model => model.LastName)
+    </label>
+    <div class="col-xs-9">
+        @Html.TextBoxFor(model => model.LastName, new { @class = "form-control" })
+    </div>
+</div>
+<div class="form-group">
+    <label class="control-label col-xs-3" for="inputPassword">
+        @Html.LabelFor(model => model.Address)
+    </label>
+    <div class="col-xs-9">
+        @Html.TextBoxFor(model => model.Address, new { @class = "form-control" })
+    </div>
+</div>
+<div class="form-group">
+    <label class="control-label col-xs-3" for="inputPassword">
+        @Html.LabelFor(model => model.Email)
+    </label>
+    <div class="col-xs-9">
+        @Html.TextBoxFor(model => model.Email, new { @class = "form-control" })
+    </div>
+</div>
+<div class="form-group">
+    <label class="control-label col-xs-3" for="inputPassword">
+        @Html.LabelFor(model => model.Description)
+    </label>
+    <div class="col-xs-9">
+        @Html.TextAreaFor(model => model.Description, new { @class = "form-control" })
+    </div>
+</div>
+<div class="form-group">
+    <div class="col-xs-offset-3 col-xs-9">
+        <input type="submit" value="Submit" class="btn btn-primary" />
+    </div>
+</div>
 
 }

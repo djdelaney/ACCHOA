@@ -7,137 +7,68 @@
     ViewBag.Section = "Incoming";
 }
 
-<!-- Community manager completeness review -->
-@if (User.IsInRole(RoleNames.CommunityManager))
+<div class="panel panel-default">
+    <!-- Default panel contents -->
+    <div class="panel-heading">Submissions</div>
+
+    <!-- Table -->
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Code</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Status</th>
+                <th>Last Modified</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+
+@if (Model.Submissions != null && Model.Submissions.Count > 0)
 {
-    @if(Model.NewSubmissions != null && Model.NewSubmissions.Count > 0)
-    { 
-    <h4>New Submissions</h4>
-    <table border="1" cellpadding="4">
-        <tbody>
-            @foreach (var submission in Model.NewSubmissions)
-            {
-                <tr>
-                    <td>@submission.FirstName</td>
-                    <td>@submission.LastName</td>
-                    <td>@submission.Status</td>
-                    <td><a href="/Submission/View/@submission.Id">View</a></td>
-                </tr>
-            }
-        </tbody>
+    @foreach (var submission in Model.Submissions)
+    {
+        <tr>
+            <td>@submission.Code</td>
+            <td>@submission.FirstName</td>
+            <td>@submission.LastName</td>
+            <td>                
+
+                @if (submission.Status == Status.Submitted)
+                {
+                    @:Submitted
+                }
+                else if (submission.Status == Status.ARBIncoming)
+                {
+                    @:Sent to ARB Chair
+                }
+                else if (submission.Status == Status.UnderReview)
+                {
+                    @:Being reviewed
+                }
+                else if (submission.Status == Status.ARBFinal)
+                {
+                    @:Tallying votes
+                }
+                else if (submission.Status == Status.ReviewComplete)
+                {
+                    @:Sent to HOA Liaison
+                }
+
+            </td>
+            <td>@submission.LastModified.ToString("MM/dd/yyyy")</td>
+            <td><a href="/Submission/View/@submission.Id">View</a></td>
+        </tr>
+    }
+}
+else
+{
+    <tr>
+        <td colspan="5">No open submissions</td>
+    </tr>
+}
+
+
     </table>
-    }
-    else
-    {
-        <b>No incoming submissions</b><br />
-    }
-}
+</div>
 
-
-
-<!-- ARB chairman completeness review -->
-@if (User.IsInRole(RoleNames.BoardChairman))
-{
-    @if (Model.ARBIncoming != null && Model.ARBIncoming.Count > 0)
-    { 
-    <h4>Chairman completeness check</h4>
-    <table border="1" cellpadding="4">
-        <tbody>
-            @foreach (var submission in Model.ARBIncoming)
-            {
-                <tr>
-                    <td>@submission.FirstName</td>
-                    <td>@submission.LastName</td>
-                    <td>@submission.Status</td>
-                    <td><a href="/Submission/View/@submission.Id">View</a></td>
-                </tr>
-            }
-        </tbody>
-    </table>
-    }
-    else
-    {
-        <b>No incoming submissions</b><br />
-    }
-}
-
-
-
-<!-- ARB review -->
-@if (User.IsInRole(RoleNames.BoardMember))
-{
-    @if (Model.ForReview != null && Model.ForReview.Count > 0)
-    {
-        <h4>Open for review</h4>
-        <table border="1" cellpadding="4">
-            <tbody>
-                @foreach (var submission in Model.ForReview)
-                {
-                    <tr>
-                        <td>@submission.FirstName</td>
-                        <td>@submission.LastName</td>
-                        <td>@submission.Status</td>
-                        <td><a href="/Submission/View/@submission.Id">View</a></td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    }
-    else
-    {
-        <b>No review submissions</b><br />
-    }
-}
-
-
-<!-- ARB Vote tally -->
-@if (User.IsInRole(RoleNames.BoardChairman))
-{
-    @if (Model.ARBFinal != null && Model.ARBFinal.Count > 0)
-    {
-        <h4>Reviews submitted</h4>
-        <table border="1" cellpadding="4">
-            <tbody>
-                @foreach (var submission in Model.ARBFinal)
-                {
-                    <tr>
-                        <td>@submission.FirstName</td>
-                        <td>@submission.LastName</td>
-                        <td>@submission.Status</td>
-                        <td><a href="/Submission/View/@submission.Id">View</a></td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    }
-    else
-    {
-        <b>No reviews finished voting</b><br />
-    }
-}
-
-<!-- HOA final review -->
-@if (User.IsInRole(RoleNames.HOALiaison))
-{
-    @if (Model.FinalApproval != null && Model.FinalApproval.Count > 0)
-    {
-        <h4>Final review</h4>
-        <table border="1" cellpadding="4">
-            <tbody>
-                @foreach (var submission in Model.FinalApproval)
-                {
-                    <tr>
-                        <td>@submission.FirstName</td>
-                        <td>@submission.LastName</td>
-                        <td>@submission.Status</td>
-                        <td><a href="/Submission/View/@submission.Id">View</a></td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    }
-    else
-    {
-        <b>No final review items</b><br />
-    }
-}

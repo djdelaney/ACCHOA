@@ -5,7 +5,7 @@
     For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 *@
 @{
-    ViewBag.Title = "Review";
+    ViewBag.Title = "Tally Votes";
 }
 
 <h3>Submission</h3>
@@ -15,6 +15,34 @@
 <br />
 @Model.Submission.Description<br />
 <br />
+
+<div class="panel panel-default">
+    <div class="panel-heading">Reviews</div>
+    <div class="panel-body">
+
+        @foreach (var review in Model.Submission.Reviews)
+        {
+            @review.Reviewer.FullName @Html.Raw(":")
+            
+            @if(review.Approved)
+            {
+                @: Approved
+            }
+            else
+            {
+                @: Rejected
+            }
+            <br />
+            @: Comments: @review.Comments
+            <hr />
+
+
+        }
+
+
+
+    </div>
+</div>
 
 <hr />
 
@@ -37,6 +65,8 @@
     @Html.TextAreaFor(model => model.Comments)<br />
     <br />
     @:Approve?<br />
+
+
 
 
     @Html.DropDownListFor(m => m.Approve, new SelectList(

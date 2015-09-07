@@ -16,18 +16,28 @@
 @Model.Submission.Description<br />
 <br />
 
-<b>Action</b>
+<hr />
 
 @using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
-    @Html.ValidationSummary()
+    
+
+    @if (!Html.ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger" role="alert">
+            <strong>Oh snap!</strong> Please fix the listed errors and try submitting again.
+
+            @Html.ValidationSummary()
+        </div>
+    }
+
 
     @Html.HiddenFor(model => model.SubmissionId)
-
-    @Html.LabelFor(model => model.Comments)
-    @Html.TextBoxFor(model => model.Comments)<br />
-
+    
+    @Html.LabelFor(model => model.Comments)@: <br />
+    @Html.TextAreaFor(model => model.Comments)<br />
+    <br />
     @:Application complete?<br />
 
     @Html.DropDownListFor(m => m.Approve, new SelectList(
@@ -40,10 +50,10 @@
         "Text",
         Model.Approve
     ))
-
+    <br />
     <br />
 
 
-    <input type="submit" value="Submit" />
+    <input type="submit" value="Submit" class="btn btn-primary" />
 
 }

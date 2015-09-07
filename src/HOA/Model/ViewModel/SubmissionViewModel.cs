@@ -9,11 +9,7 @@ namespace HOA.Model.ViewModel
 {
     public class ViewSubmissionsViewModel
     {
-        public IList<Submission> NewSubmissions { get; set; }
-        public IList<Submission> ARBIncoming { get; set; }
-        public IList<Submission> ForReview { get; set; }
-        public IList<Submission> ARBFinal { get; set; }
-        public IList<Submission> FinalApproval { get; set; }
+        public IList<Submission> Submissions { get; set; }
     }
 
     public class ViewSubmissionViewModel

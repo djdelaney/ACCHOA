@@ -46,7 +46,7 @@
     <div class="panel-body">
         @if (@Model.Audits != null && @Model.Audits.Count > 0)
         {
-            @:Last update: @Model.Audits[@Model.Audits.Count - 1].DateTime
+            @:Last update: @Model.Audits[@Model.Audits.Count - 1].DateTime.ToString("MM/dd/yyyy hh:mm tt")
         }
     </div>
 </div>

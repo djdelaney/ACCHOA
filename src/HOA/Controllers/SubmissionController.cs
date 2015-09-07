@@ -64,36 +64,42 @@ namespace HOA.Controllers
             s.Audits.Add(history);
             _applicationDbContext.Histories.Add(history);
         }
-        
+
         //[Authorize(Roles = "CommunityManager")]
         public IActionResult List()
         {
-            var viewModel = new ViewSubmissionsViewModel();
 
-            if(User.IsInRole(RoleNames.CommunityManager))
+
+            IQueryable<Submission> subs = _applicationDbContext.Submissions.Where(s => s.Status != Status.Approved && s.Status != Status.Rejected);
+
+            if (User.IsInRole(RoleNames.Administrator))
             {
-                viewModel.NewSubmissions = _applicationDbContext.Submissions.Where(s => s.Status == Status.Submitted).Include(s => s.Audits).ToList();
+            }
+            else if (User.IsInRole(RoleNames.CommunityManager))
+            {
+                subs = subs.Where(s => s.Status == Status.Submitted);
+            }
+            else if (User.IsInRole(RoleNames.BoardChairman))
+            {
+                subs = subs.Where(s => s.Status == Status.ARBIncoming);
+            }
+            else if (User.IsInRole(RoleNames.BoardMember))
+            {
+                subs = subs.Where(s => s.Status == Status.UnderReview);
+            }
+            else if (User.IsInRole(RoleNames.BoardChairman))
+            {
+                subs = subs.Where(s => s.Status == Status.ARBFinal);
+            }
+            else if (User.IsInRole(RoleNames.HOALiaison))
+            {
+                subs = subs.Where(s => s.Status == Status.ReviewComplete);
             }
 
-            if (User.IsInRole(RoleNames.BoardChairman))
+            var viewModel = new ViewSubmissionsViewModel()
             {
-                viewModel.ARBIncoming = _applicationDbContext.Submissions.Where(s => s.Status == Status.ARBIncoming).Include(s => s.Audits).ToList();
-            }
-
-            if (User.IsInRole(RoleNames.BoardMember))
-            {
-                viewModel.ForReview = _applicationDbContext.Submissions.Where(s => s.Status == Status.UnderReview).Include(s => s.Audits).ToList();
-            }
-
-            if (User.IsInRole(RoleNames.BoardChairman))
-            {
-                viewModel.ARBFinal = _applicationDbContext.Submissions.Where(s => s.Status == Status.ARBFinal).Include(s => s.Audits).ToList();
-            }
-
-            if (User.IsInRole(RoleNames.HOALiaison))
-            {
-                viewModel.FinalApproval = _applicationDbContext.Submissions.Where(s => s.Status == Status.ReviewComplete).Include(s => s.Audits).ToList();
-            }
+                Submissions = subs.Include(s => s.Audits).ToList()
+            };
 
             return View(viewModel);
         }
@@ -239,7 +245,7 @@ namespace HOA.Controllers
                     submission.Status = Status.Rejected;
                 
                 var user = await _userManager.FindByIdAsync(User.GetUserId());                
-                string action = string.Format("marked{0} complete- {1}", model.Approve ? "" : " not", model.Comments);
+                string action = string.Format("Marked{0} complete. Comments: {1}", model.Approve ? "" : " not", model.Comments);
                 AddHistoryEntry(submission, user.FullName, action);
 
                 submission.LastModified = DateTime.Now;
@@ -309,6 +315,53 @@ namespace HOA.Controllers
                 
                 _applicationDbContext.SaveChanges();
 
+                return RedirectToAction(nameof(View), new { id = submission.Id });
+            }
+
+            // If we got this far, something failed, redisplay form
+            model.Submission = _applicationDbContext.Submissions.FirstOrDefault(s => s.Id == model.SubmissionId);
+            return View(model);
+        }
+
+        [HttpGet]
+        public IActionResult TallyVotes(int id)
+        {
+            var submission = _applicationDbContext.Submissions.Include(s => s.Reviews).ThenInclude(r => r.Reviewer).FirstOrDefault(s => s.Id == id);
+            if (submission == null)
+                return HttpNotFound("Submission not found");
+
+            ApproveRejectViewModel model = new ApproveRejectViewModel
+            {
+                Submission = submission,
+                SubmissionId = submission.Id
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> TallyVotes(ApproveRejectViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var submission = _applicationDbContext.Submissions.Include(s => s.Audits).FirstOrDefault(s => s.Id == model.SubmissionId);
+                if (submission == null)
+                    return HttpNotFound("Submission not found");
+
+                if (model.Approve)
+                {
+                    submission.Status = Status.ReviewComplete;
+                }
+                else
+                    submission.Status = Status.Rejected;
+
+                var user = await _userManager.FindByIdAsync(User.GetUserId());
+                string action = string.Format("{0}. Comments: {1}", model.Approve ? "Accepted" : "Rejected", model.Comments);
+                AddHistoryEntry(submission, user.FullName, action);
+
+                submission.LastModified = DateTime.Now;
+                _applicationDbContext.SaveChanges();
                 return RedirectToAction(nameof(View), new { id = submission.Id });
             }
 
