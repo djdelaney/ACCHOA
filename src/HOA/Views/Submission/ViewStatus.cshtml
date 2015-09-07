@@ -8,7 +8,10 @@
     ViewBag.Title = "Status";
 }
 
+<div class="panel panel-info">
+    <div class="panel-heading">
 
+<h3 class="panel-title">
 @if(Model.Status == Status.Submitted)
 {
     @:Submitted to the Community manager
@@ -37,10 +40,13 @@
 {
     @: Rejected
 }
-<br />
+</h3>
 
-@if (@Model.Audits != null && @Model.Audits.Count > 0)
-{
-    @:Last update: @Model.Audits[@Model.Audits.Count-1].DateTime
-}
-
+    </div>
+    <div class="panel-body">
+        @if (@Model.Audits != null && @Model.Audits.Count > 0)
+        {
+            @:Last update: @Model.Audits[@Model.Audits.Count - 1].DateTime
+        }
+    </div>
+</div>

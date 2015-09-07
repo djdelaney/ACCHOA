@@ -6,16 +6,21 @@
 *@
 @{
     ViewBag.Title = "Home Page";
+    ViewBag.Section = "Home";
 }
 
 
-<a href="/Submission/Create">Submit a review</a><br />
-<br />
+<!-- Main component for a primary marketing message or call to action -->
+<div class="jumbotron">
+    <h1>HOA Reviews</h1>
+    <p>Welcome to the Applecross architectural review website. You can submit a new review for ARB approval, or check the sattus of an existing review.</p>
+    <p>
+        <a class="btn btn-lg btn-primary" href="/Submission/Create" role="button">Submit a review &raquo;</a>
+    </p>
+    <p>
 
-<a href="/Submission/LookupStatus">Check a submission's status</a><br />
-<br />
+        <a href="/Submission/LookupStatus">Check a submission's status</a><br />
+        <br />
 
-@if (User.Identity.IsAuthenticated)
-{
-    <a href="/Submission/List">Incoming reviews</a>
-}
+    </p>
+</div>

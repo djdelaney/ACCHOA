@@ -5,9 +5,13 @@
      ViewBag.Title = "Submitted";
 }
 
-<h2>Success!</h2>
-
-Your request has been submitted.<br />
 <br />
-
-Your code is "@Model.Code". Use this code to check the status of your submission.
+<div class="panel panel-success">
+    <div class="panel-heading">
+        <h3 class="panel-title"><strong>Success!</strong></h3>
+    </div>
+    <div class="panel-body">
+        <p>Your request has been submitted.</p>
+        <p>Your code is "<strong>@Model.Code</strong>". Use this code to check the status of your submission.</p>
+    </div>
+</div>

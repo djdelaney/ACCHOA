@@ -8,6 +8,8 @@
     ViewBag.Title = "Status";
 }
 
+<h3>Lookup submission status</h3>
+
 @using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
@@ -19,6 +21,6 @@
 
     <br />
     <br />
-    <input type="submit" value="Submit" />
+    <input type="submit" value="Lookup" class="btn btn-info" />
 
 }

@@ -1,0 +1,49 @@
+﻿@using System.Security.Claims
+
+<!-- Header -->
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">HOA Submittal</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li @if (ViewBag.Section == "Home") { @Html.Raw("class=\"active\"") }> <a href="/">Home</a></li>
+
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <li @if (ViewBag.Section == "Incoming") { @Html.Raw("class=\"active\"") }><a href="/Submission/List">Incoming</a></li>
+                    <li @if (ViewBag.Section == "Overdue") { @Html.Raw("class=\"active\"") }><a href="#contact">Overdue</a></li>
+                }
+            </ul>
+
+            @if (User.Identity.IsAuthenticated)
+            {
+                <form action="/Account/LogOff" method="post" id="logoutForm">
+                    <p class="navbar-text navbar-right">Hello @User.GetUserName()!</p>
+                    <ul class="nav navbar-nav navbar-right">
+
+                        @Html.AntiForgeryToken()
+                        <li class="active"><a href="javascript:document.getElementById('logoutForm').submit()">Sign out</a></li>
+
+                    </ul>
+                </form>
+            }
+            else
+            {
+
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="active"><a href="/Account/Login/">Sign in</a></li>
+                </ul>
+            }
+
+
+        </div><!--/.nav-collapse -->
+    </div>
+</nav>

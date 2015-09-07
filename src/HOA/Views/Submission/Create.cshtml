@@ -9,7 +9,14 @@
 
 @Html.AntiForgeryToken()
 
-@Html.ValidationSummary()
+@if (!Html.ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger" role="alert">
+        <strong>Oh snap!</strong> Please fix the listed errors and try submitting again.
+
+        @Html.ValidationSummary()
+    </div>
+}
 
 @Html.LabelFor(model => model.FirstName)<br />
 @Html.TextBoxFor(model => model.FirstName)<br />
