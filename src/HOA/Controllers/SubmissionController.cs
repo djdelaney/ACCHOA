@@ -96,7 +96,7 @@ namespace HOA.Controllers
 
             var viewModel = new ViewSubmissionsViewModel()
             {
-                Submissions = subs.Include(s => s.Audits).ToList()
+                Submissions = subs.Include(s => s.Audits).OrderBy(s => s.LastModified).ToList()
             };
 
             return View(viewModel);
