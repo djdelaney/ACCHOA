@@ -58,7 +58,7 @@ namespace HOA.Model.ViewModel
         public string Description { get; set; }
 
         [Required]
-        public IFormFile File { get; set; }
+        public IList<IFormFile> Files { get; set; }
     }
 
     public class StatusViewModel

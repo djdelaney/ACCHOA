@@ -68,8 +68,6 @@ namespace HOA.Controllers
         //[Authorize(Roles = "CommunityManager")]
         public IActionResult List()
         {
-
-
             IQueryable<Submission> subs = _applicationDbContext.Submissions.Where(s => s.Status != Status.Approved && s.Status != Status.Rejected);
 
             if (User.IsInRole(RoleNames.Administrator))
@@ -169,12 +167,7 @@ namespace HOA.Controllers
         public async Task<IActionResult> Create(CreateSubmissionViewModel model)
         {
             if (ModelState.IsValid)
-            {
-                var chunks = model.File.ContentDisposition.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
-                var nameChunk = chunks.FirstOrDefault(c => c.Contains("filename"));
-                var fileName = nameChunk.Split('=')[1].Trim(new char[] { '"' });
-
-                    
+            {       
                 var sub = new Submission()
                 {
                     FirstName = model.FirstName,
@@ -186,16 +179,23 @@ namespace HOA.Controllers
                     LastModified = DateTime.Now,
                     Code = GenerateUniqueCode(),
                     Files = new List<File>()
-                };
+                };                
 
-                var file = new File
+                foreach(var fileContent in model.Files)
                 {
-                    Name = fileName,
-                    BlobName = "TODO"                    
-                };
+                    var chunks = fileContent.ContentDisposition.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                    var nameChunk = chunks.FirstOrDefault(c => c.Contains("filename"));
+                    var fileName = nameChunk.Split('=')[1].Trim(new char[] { '"' });
 
-                sub.Files.Add(file);
-                _applicationDbContext.Files.Add(file);
+                    var file = new File
+                    {
+                        Name = fileName,
+                        BlobName = "TODO"
+                    };
+
+                    sub.Files.Add(file);
+                    _applicationDbContext.Files.Add(file);
+                }
 
                 AddHistoryEntry(sub, model.FirstName + " " + model.LastName, "Submitted");
 
