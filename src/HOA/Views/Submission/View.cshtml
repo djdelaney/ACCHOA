@@ -6,103 +6,124 @@
     ViewBag.Title = "Submissions";
 }
 
-<h3>Submission</h3>
+<div class="col-md-8">
 
-<div class="panel panel-default">
-    <div class="panel-heading">Details</div>
-    <div class="panel-body">
+    <h3>Submission</h3>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">Details</div>
+        <div class="panel-body">
         
         
-        <strong>Code</strong>: @Model.Submission.Code<br />
-        <br />
-        @Model.Submission.FirstName @Model.Submission.LastName<br />
-        @Model.Submission.Email <br />
-        @Model.Submission.Address<br />
-        <br />
-        @Model.Submission.Description<br />
+            <strong>Code</strong>: @Model.Submission.Code<br />
+            <br />
+            @Model.Submission.FirstName @Model.Submission.LastName<br />
+            @Model.Submission.Email <br />
+            @Model.Submission.Address<br />
+            <br />
+            @Model.Submission.Description<br />
 
-        <h5><strong>Files</strong></h5>
-        <ul>
-        @foreach(var file in Model.Submission.Files)
-        {
-            @:<li><a href="#">@file.Name</a></li>
-        }
-        </ul>
+            <h5><strong>Files</strong></h5>
+            <ul>
+            @foreach(var file in Model.Submission.Files)
+            {
+                @:<li><a href="#">@file.Name</a></li>
+            }
+            </ul>
 
 
+        </div>
     </div>
-</div>
 
-<b>Status:</b> @Model.Submission.Status<br />
+    <b>Status:</b> @Model.Submission.Status<br />
 
-@if (Model.Submission.Status == Status.UnderReview)
-{
-    @Model.Submission.Reviews.Count
-    @: review(s) submitted of @Model.ReviewerCount  <br />
-    <br />
-}
-
-@if (Model.Submission.Status == Status.ARBFinal)
-{
-    @: <h3>Reviews:</h3>
-    @foreach (var review in Model.Submission.Reviews)
+    @if (Model.Submission.Status == Status.UnderReview)
     {
-        @review.Reviewer.FullName@:, @review.Created.ToString("MM/dd/yyyy") <br />
+        @Model.Submission.Reviews.Count
+        @: review(s) submitted of @Model.ReviewerCount  <br />
+        <br />
+    }
 
-        @if(review.Approved)
+    @if (Model.Submission.Status == Status.ARBFinal)
+    {
+        @: <h3>Reviews:</h3>
+        @foreach (var review in Model.Submission.Reviews)
         {
-            @: Approved
+            @review.Reviewer.FullName@:, @review.Created.ToString("MM/dd/yyyy") <br />
+
+            @if(review.Approved)
+            {
+                @: Approved
+            }
+            else
+            {
+                @:Rejected
+            }
+            <br />
+            @review.Comments<br />
+
+            <br />
+        }
+    }
+
+
+    <h3>Action:</h3>
+    @if ((Model.Submission.Status == Status.Submitted && User.IsInRole(RoleNames.CommunityManager)) ||
+                    (Model.Submission.Status == Status.ARBIncoming && User.IsInRole(RoleNames.BoardChairman)))
+    {
+        <a href="/Submission/CheckCompleteness/@Model.Submission.Id">Check app</a>
+    }
+    else if (Model.Submission.Status == Status.UnderReview && User.IsInRole(RoleNames.BoardMember))
+    {
+        @if (!Model.Reviewed)
+        {
+            <a href="/Submission/Review/@Model.Submission.Id">Review</a>
         }
         else
         {
-            @:Rejected
-        }
-        <br />
-        @review.Comments<br />
-
-        <br />
+            @: Already reviewed
     }
-}
-
-<!-- Audit history -->
-@if (Model.Submission.Audits != null && Model.Submission.Audits.Count > 0)
-{
-    @: <h3>History:</h3>
-    @foreach (var history in Model.Submission.Audits)
-    {
-        @history.User@:, @history.DateTime.ToString("MM/dd/yyyy hh:mm tt") <br />
-        @history.Action<br />
-        <br />
     }
-}
-
-
-<h3>Action:</h3>
-@if((Model.Submission.Status == Status.Submitted && User.IsInRole(RoleNames.CommunityManager)) ||
-    (Model.Submission.Status == Status.ARBIncoming && User.IsInRole(RoleNames.BoardChairman)))
-{
-    <a href="/Submission/CheckCompleteness/@Model.Submission.Id">Check app</a>
-}
-else if (Model.Submission.Status == Status.UnderReview && User.IsInRole(RoleNames.BoardMember))
-{
-    @if(!Model.Reviewed)
+    else if (Model.Submission.Status == Status.ARBFinal && User.IsInRole(RoleNames.BoardChairman))
     {
-        <a href="/Submission/Review/@Model.Submission.Id">Review</a>
+        <a href="/Submission/TallyVotes/@Model.Submission.Id">Tally votes</a>
+    }
+    else if (Model.Submission.Status == Status.ReviewComplete && User.IsInRole(RoleNames.HOALiaison))
+    {
+        <a href="/Submission/FinalCheck/@Model.Submission.Id">Final check</a>
     }
     else
     {
-        @: Already reviewed
+        @: None
     }
-}
-else if (Model.Submission.Status == Status.ARBFinal && User.IsInRole(RoleNames.BoardChairman))
-{
-    <a href="/Submission/TallyVotes/@Model.Submission.Id">Tally votes</a>
-}
-else if (Model.Submission.Status == Status.ReviewComplete && User.IsInRole(RoleNames.HOALiaison))
-{
-    <a href="/Submission/FinalCheck/@Model.Submission.Id">Final check</a>
-}
-else
-{
-    @: None
-}
+</div>
+
+<div class="col-md-4">
+    <!-- Audit history -->
+    @if (Model.Submission.Audits != null && Model.Submission.Audits.Count > 0)
+    {
+        @: <h3>History</h3>
+        <div class="list-group">
+
+
+        @foreach (var history in Model.Submission.Audits)
+        {
+
+
+            <a href="#" class="list-group-item">
+                <h4 class="list-group-item-heading">@history.User</h4>
+                <p class="list-group-item-text">@history.DateTime.ToString("MM/dd/yyyy hh:mm tt").<br>
+                @history.Action
+                </p>
+            </a>
+            
+        }
+
+
+        </div>
+    }
+
+
+    
+
+</div>

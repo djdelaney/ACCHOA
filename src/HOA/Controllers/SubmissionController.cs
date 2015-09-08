@@ -114,7 +114,7 @@ namespace HOA.Controllers
             if(submission == null)
                 return HttpNotFound("Submission not found");
 
-            submission.Audits = submission.Audits.OrderBy(a => a.DateTime).ToList();
+            submission.Audits = submission.Audits.OrderByDescending(a => a.DateTime).ToList();
             
             var model = new ViewSubmissionViewModel()
             {
