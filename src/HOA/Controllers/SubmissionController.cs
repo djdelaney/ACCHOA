@@ -109,6 +109,7 @@ namespace HOA.Controllers
             var submission = _applicationDbContext.Submissions.Include(s => s.Reviews)
                 .ThenInclude(r => r.Reviewer)
                 .Include(s => s.Audits)
+                .Include(s => s.Files)
                 .FirstOrDefault(s => s.Id == id);
             if(submission == null)
                 return HttpNotFound("Submission not found");
@@ -167,11 +168,13 @@ namespace HOA.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CreateSubmissionViewModel model)
         {
-            //http://stackoverflow.com/questions/15680629/mvc-4-razor-file-upload
-
             if (ModelState.IsValid)
             {
+                var chunks = model.File.ContentDisposition.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                var nameChunk = chunks.FirstOrDefault(c => c.Contains("filename"));
+                var fileName = nameChunk.Split('=')[1].Trim(new char[] { '"' });
 
+                    
                 var sub = new Submission()
                 {
                     FirstName = model.FirstName,
@@ -181,8 +184,18 @@ namespace HOA.Controllers
                     Description = model.Description,
                     Status = Status.Submitted,
                     LastModified = DateTime.Now,
-                    Code = GenerateUniqueCode()
+                    Code = GenerateUniqueCode(),
+                    Files = new List<File>()
                 };
+
+                var file = new File
+                {
+                    Name = fileName,
+                    BlobName = "TODO"                    
+                };
+
+                sub.Files.Add(file);
+                _applicationDbContext.Files.Add(file);
 
                 AddHistoryEntry(sub, model.FirstName + " " + model.LastName, "Submitted");
 

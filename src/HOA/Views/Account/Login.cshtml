@@ -26,21 +26,32 @@
                 <hr />
 
 
-
-                @Html.LabelFor(model => model.Username)<br />
-                @Html.TextBoxFor(model => model.Username)<br />
-
-                <br />
-
-                @Html.LabelFor(model => model.Password)<br />
-                @Html.PasswordFor(model => model.Password)<br />
+                <div class="form-group">
+                    <label for="pwd">Username:</label>
+                    @Html.TextBoxFor(model => model.Username, new { @class = "form-control" })
+                </div>
 
                 <br />
+                
+                <div class="form-group">
+                    <label for="pwd">Password:</label>
+                    @Html.PasswordFor(model => model.Password, new { @class = "form-control" })
+                </div>
 
-                @Html.LabelFor(model => model.RememberMe)<br />
-                @Html.CheckBoxFor(model => model.RememberMe)<br />
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-10">
+                        <div class="checkbox">
+                            <label>@Html.CheckBoxFor(model => model.RememberMe) Remember me</label>
+                        </div>
+                    </div>
+                </div>
+                
 
-                <input type="submit" value="Log in" />
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-10">
+                        <button type="submit" class="btn btn-default">Submit</button>
+                    </div>
+                </div>
                 
 
             </form>

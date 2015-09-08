@@ -4,7 +4,7 @@
     ViewBag.Title = "New submission";
 }
 
-@using (Html.BeginForm("Submission", "Create", FormMethod.Post, new { @class = "form-horizontal" }))
+@using (Html.BeginForm("Submission", "Create", FormMethod.Post, new { @class = "form-horizontal", enctype = "multipart/form-data" }))
 {
 
 <h3>Create</h3>
@@ -22,7 +22,7 @@
 
 
 <div class="form-group">
-    <label class="control-label col-xs-3" for="inputPassword">
+    <label class="control-label col-xs-3">
         @Html.LabelFor(model => model.FirstName)
     </label>
     <div class="col-xs-9">
@@ -30,7 +30,7 @@
     </div>
 </div>
 <div class="form-group">
-    <label class="control-label col-xs-3" for="inputPassword">
+    <label class="control-label col-xs-3">
         @Html.LabelFor(model => model.LastName)
     </label>
     <div class="col-xs-9">
@@ -38,7 +38,7 @@
     </div>
 </div>
 <div class="form-group">
-    <label class="control-label col-xs-3" for="inputPassword">
+    <label class="control-label col-xs-3">
         @Html.LabelFor(model => model.Address)
     </label>
     <div class="col-xs-9">
@@ -46,7 +46,7 @@
     </div>
 </div>
 <div class="form-group">
-    <label class="control-label col-xs-3" for="inputPassword">
+    <label class="control-label col-xs-3">
         @Html.LabelFor(model => model.Email)
     </label>
     <div class="col-xs-9">
@@ -54,11 +54,19 @@
     </div>
 </div>
 <div class="form-group">
-    <label class="control-label col-xs-3" for="inputPassword">
+    <label class="control-label col-xs-3">
         @Html.LabelFor(model => model.Description)
     </label>
     <div class="col-xs-9">
         @Html.TextAreaFor(model => model.Description, new { @class = "form-control" })
+    </div>
+</div>
+<div class="form-group">
+    <label class="control-label col-xs-3">
+        @Html.LabelFor(model => model.File)
+    </label>
+    <div class="col-xs-9">
+        <input type="file" name="File" id="File" />
     </div>
 </div>
 <div class="form-group">

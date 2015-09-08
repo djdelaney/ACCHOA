@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNet.Mvc.Rendering;
+using Microsoft.AspNet.Http;
 
 namespace HOA.Model.ViewModel
 {
@@ -55,6 +56,9 @@ namespace HOA.Model.ViewModel
         
         [Required]
         public string Description { get; set; }
+
+        [Required]
+        public IFormFile File { get; set; }
     }
 
     public class StatusViewModel

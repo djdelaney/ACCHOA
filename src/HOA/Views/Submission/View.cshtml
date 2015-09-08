@@ -13,7 +13,7 @@
     <div class="panel-body">
         
         
-        Code: @Model.Submission.Code<br />
+        <strong>Code</strong>: @Model.Submission.Code<br />
         <br />
         @Model.Submission.FirstName @Model.Submission.LastName<br />
         @Model.Submission.Email <br />
@@ -21,8 +21,13 @@
         <br />
         @Model.Submission.Description<br />
 
-
-
+        <h5><strong>Files</strong></h5>
+        <ul>
+        @foreach(var file in Model.Submission.Files)
+        {
+            @:<li><a href="#">@file.Name</a></li>
+        }
+        </ul>
 
 
     </div>

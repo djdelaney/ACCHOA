@@ -54,5 +54,7 @@ namespace HOA.Model
         public virtual IList<Review> Reviews { get; set; }
 
         public virtual IList<History> Audits { get; set; }
+
+        public virtual IList<File> Files { get; set; }
     }
 }
