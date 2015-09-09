@@ -3,17 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Builder;
-using Microsoft.AspNet.Http;
-using Microsoft.Framework.DependencyInjection;
 using Microsoft.AspNet.Hosting;
-using Microsoft.Framework.Logging;
-using Microsoft.Framework.Logging.Console;
-using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
-using HOA.Model;
 using Microsoft.Data.Entity;
+using Microsoft.Dnx.Runtime;
 using Microsoft.Framework.Configuration;
-using Microsoft.Framework.Runtime;
+using Microsoft.Framework.DependencyInjection;
+using Microsoft.Framework.Logging;
+using HOA.Model;
 
 namespace HOA
 {

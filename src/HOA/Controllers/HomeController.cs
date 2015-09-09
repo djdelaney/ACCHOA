@@ -52,7 +52,7 @@ namespace HOA.Controllers
             if (!_databaseChecked)
             {
                 _databaseChecked = true;
-                context.Database.ApplyMigrations();
+                context.Database.Migrate();
             }
         }
 
