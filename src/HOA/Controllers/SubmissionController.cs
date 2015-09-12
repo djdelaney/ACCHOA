@@ -9,6 +9,7 @@ using Microsoft.Data.Entity;
 using Microsoft.AspNet.Authorization;
 using Microsoft.AspNet.Identity;
 using System.Security.Claims;
+using HOA.Services;
 
 // For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -19,11 +20,13 @@ namespace HOA.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ApplicationDbContext _applicationDbContext;
+        private readonly IEmailSender _email;
 
-        public SubmissionController(ApplicationDbContext applicationDbContext, UserManager<ApplicationUser> userManager)
+        public SubmissionController(ApplicationDbContext applicationDbContext, UserManager<ApplicationUser> userManager, IEmailSender emailSender)
         {
             _applicationDbContext = applicationDbContext;
             _userManager = userManager;
+            _email = emailSender;
         }
 
         private int GetReviewerCount()

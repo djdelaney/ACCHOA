@@ -1,9 +1,6 @@
 ﻿using HOA.Model;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace HOA
@@ -23,23 +20,41 @@ namespace HOA
 
         public void InitializeData()
         {
-            if (_ctx.Database.EnsureCreated())
-            {
-
-                CreateRoles().Wait();
-                CreateUsers().Wait();
-                //CreateSampleData();
-            }
+            CreateRoles().Wait();
+            CreateUsers().Wait();
         }
 
         private async Task CreateRoles()
         {
-            //_roleManager.RoleExistsAsync
-            await _roleManager.CreateAsync(new IdentityRole(RoleNames.Administrator));
-            await _roleManager.CreateAsync(new IdentityRole(RoleNames.CommunityManager));
-            await _roleManager.CreateAsync(new IdentityRole(RoleNames.BoardChairman));
-            await _roleManager.CreateAsync(new IdentityRole(RoleNames.BoardMember));
-            await _roleManager.CreateAsync(new IdentityRole(RoleNames.HOALiaison));
+            var role = await _roleManager.FindByNameAsync(RoleNames.Administrator);
+            if (role == null)
+            {
+                await _roleManager.CreateAsync(new IdentityRole(RoleNames.Administrator));
+            }
+
+            role = await _roleManager.FindByNameAsync(RoleNames.CommunityManager);
+            if (role == null)
+            {
+                await _roleManager.CreateAsync(new IdentityRole(RoleNames.CommunityManager));
+            }
+
+            role = await _roleManager.FindByNameAsync(RoleNames.BoardChairman);
+            if (role == null)
+            {
+                await _roleManager.CreateAsync(new IdentityRole(RoleNames.BoardChairman));
+            }
+
+            role = await _roleManager.FindByNameAsync(RoleNames.BoardMember);
+            if (role == null)
+            {
+                await _roleManager.CreateAsync(new IdentityRole(RoleNames.BoardMember));
+            }
+
+            role = await _roleManager.FindByNameAsync(RoleNames.HOALiaison);
+            if (role == null)
+            {
+                await _roleManager.CreateAsync(new IdentityRole(RoleNames.HOALiaison));
+            }
         }
 
         private async Task CreateUsers()

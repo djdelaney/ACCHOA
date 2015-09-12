@@ -12,6 +12,7 @@ using Microsoft.AspNet.Mvc.Rendering;
 using Microsoft.Data.Entity;
 using HOA.Model;
 using HOA.Model.ViewModel;
+using Microsoft.AspNet.Identity.EntityFramework;
 
 // For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -23,15 +24,18 @@ namespace HOA.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly ApplicationDbContext _applicationDbContext;
+        private RoleManager<IdentityRole> _roleManager;
 
         public AccountController(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
-            ApplicationDbContext applicationDbContext)
+            ApplicationDbContext applicationDbContext,
+            RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _applicationDbContext = applicationDbContext;
+            _roleManager = roleManager;
         }
 
         // GET: /<controller>/
@@ -60,6 +64,10 @@ namespace HOA.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null)
         {
+            //Remove later - Add Sample Data
+            var sampleData = new SampleData(_applicationDbContext, _userManager, _roleManager);
+            sampleData.InitializeData();
+
             ViewData["ReturnUrl"] = returnUrl;
             if (ModelState.IsValid)
             {

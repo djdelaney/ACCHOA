@@ -11,6 +11,8 @@ using Microsoft.Framework.Configuration;
 using Microsoft.Framework.DependencyInjection;
 using Microsoft.Framework.Logging;
 using HOA.Model;
+using HOA.Services;
+using Microsoft.AspNet.Diagnostics.Entity;
 
 namespace HOA
 {
@@ -35,11 +37,12 @@ namespace HOA
             Configuration = builder.Build();
         }
 
+        public IConfigurationRoot Configuration { get; set; }
+
+        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             // Add Entity Framework services to the services container.
-            var CS = Configuration["Data:DefaultConnection:ConnectionString"];
-
             services.AddEntityFramework()
                 .AddSqlServer()
                 .AddDbContext<ApplicationDbContext>(options =>
@@ -49,18 +52,19 @@ namespace HOA
             services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
-
-
+            
             // Add MVC services to the services container.
             services.AddMvc();
+
+            services.AddTransient<IEmailSender, MockEmail>();
         }
 
-        public IConfiguration Configuration { get; set; }
-
+        // Configure is called after ConfigureServices is called.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
-            loggerFactory.MinimumLevel = LogLevel.Information;
+            loggerFactory.MinimumLevel = LogLevel.Debug;
             loggerFactory.AddConsole();
+            loggerFactory.AddDebug();
 
             // Configure the HTTP request pipeline.
 
@@ -69,7 +73,7 @@ namespace HOA
             {
                 app.UseBrowserLink();
                 app.UseErrorPage();
-                //app.UseDatabaseErrorPage(DatabaseErrorPageOptions.ShowAll);
+                app.UseDatabaseErrorPage(DatabaseErrorPageOptions.ShowAll);
             }
             else
             {
@@ -101,11 +105,6 @@ namespace HOA
                 // Uncomment the following line to add a route for porting Web API 2 controllers.
                 // routes.MapWebApiRoute("DefaultApi", "api/{controller}/{id?}");
             });
-
-
-            //Remove later - Add Sample Data
-            var sampleData = ActivatorUtilities.CreateInstance<SampleData>(app.ApplicationServices);
-            sampleData.InitializeData();
         }
     }
 }
