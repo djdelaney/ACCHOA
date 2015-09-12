@@ -18,4 +18,10 @@ namespace HOA.Model.ViewModel
         [Display(Name = "Remember me?")]
         public bool RememberMe { get; set; }
     }
+
+    public class ManageViewModel
+    {
+        public List<ApplicationUser> Users { get; set; }
+    }
+
 }

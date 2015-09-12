@@ -112,5 +112,21 @@ namespace HOA.Controllers
                 return RedirectToAction(nameof(HomeController.Index), "Home");
             }
         }
+
+        [Authorize(Roles = RoleNames.Administrator)]
+        public IActionResult ManageUsers(string returnUrl = null)
+        {
+            var users = _applicationDbContext.Users.Include(u => u.Roles).ToList();
+
+            var model = new ManageViewModel
+            {
+                Users = users
+            };
+
+            //users.FirstOrDefault().LockoutEnabled
+
+            return View(model);
+        }
+
     }
 }
