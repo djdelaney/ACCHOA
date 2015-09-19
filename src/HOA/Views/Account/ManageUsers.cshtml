@@ -10,7 +10,7 @@
 
 <div class="panel panel-default">
     <!-- Default panel contents -->
-    <div class="panel-heading">Submissions</div>
+    <div class="panel-heading">Users</div>
 
     <!-- Table -->
     <table class="table">
@@ -26,7 +26,7 @@
 
     @foreach (var user in Model.Users)
     {
-        <tr>
+        <tr @if (!user.Enabled) { @Html.Raw("class=\"danger\"") } >
             <td>@user.UserName</td>
             <td>@user.FullName</td>
             <td>@user.Roles</td>
@@ -45,8 +45,9 @@
             </td>
         </tr>
     }
-
-
-
     </table>
 </div>
+
+<a href="/Account/CreateUser" class="btn btn-default">Add new user <span class="glyphicon glyphicon-plus" aria-hidden="true"></span></a>
+
+

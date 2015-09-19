@@ -125,7 +125,7 @@ namespace HOA.Controllers
         [Authorize(Roles = RoleNames.Administrator)]
         public IActionResult ManageUsers(string returnUrl = null)
         {
-            var users = _applicationDbContext.Users.Include(u => u.Roles).ToList();
+            var users = _applicationDbContext.Users.Include(u => u.Roles).OrderBy(u => u.FullName).ToList();
 
             var model = new ManageViewModel
             {
@@ -193,6 +193,55 @@ namespace HOA.Controllers
             _applicationDbContext.SaveChanges();
 
             return RedirectToAction(nameof(AccountController.ManageUsers), "Account");
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        [Authorize(Roles = RoleNames.Administrator)]
+        public IActionResult CreateUser()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = RoleNames.Administrator)]
+        public async Task<IActionResult> CreateUser(CreateUserViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var existing = _userManager.FindByEmailAsync(model.Email).Result;
+                if (existing != null)
+                {
+                    ModelState.AddModelError("Email", "A user with that email already exists");
+                    return View(model);
+                }
+
+                existing = _userManager.FindByNameAsync(model.UserName).Result;
+                if (existing != null)
+                {
+                    ModelState.AddModelError("UserName", "A user with that username already exists");
+                    return View(model);
+                }
+
+                var user = new ApplicationUser
+                {
+                    UserName = model.UserName,
+                    Email = model.Email,
+                    FullName = model.FullName,
+                    Enabled = true
+                };
+                await _userManager.CreateAsync(user, model.Password);
+                await _userManager.AddToRoleAsync(user, model.Role);
+
+                _applicationDbContext.SaveChanges();
+
+                return RedirectToAction(nameof(AccountController.ManageUsers), "Account");
+            }
+
+            // If we got this far, something failed, redisplay form
+            return View(model);
         }
 
     }
