@@ -25,10 +25,6 @@ namespace HOA.Controllers
 
         public IActionResult Index()
         {
-            EnsureDatabaseCreated(_applicationDbContext);
-
-            InitData(_userManager, _applicationDbContext);
-
             return View();
         }
 
@@ -37,38 +33,6 @@ namespace HOA.Controllers
             
             return Content("ERROR");
             //return View("~/Views/Shared/Error.cshtml");
-        }
-
-        
-
-        // The following code creates the database and schema if they don't exist.
-        // This is a temporary workaround since deploying database through EF migrations is
-        // not yet supported in this release.
-        // Please see this http://go.microsoft.com/fwlink/?LinkID=615859 for more information on how to do deploy the database
-        // when publishing your application.
-        private static bool _databaseChecked;
-        private static void EnsureDatabaseCreated(ApplicationDbContext context)
-        {
-            if (!_databaseChecked)
-            {
-                _databaseChecked = true;
-                context.Database.Migrate();
-            }
-        }
-
-        private static async void InitData(UserManager<ApplicationUser> userManager, ApplicationDbContext context)
-        {
-            if (context.Users.Count() > 0)
-                return;
-
-            var user = new ApplicationUser
-            {
-                UserName = "dan",
-                FullName = "Daniel"
-            };
-
-            IdentityResult result = await userManager.CreateAsync(user, "Bentley2015!");
-
         }
     }
 }

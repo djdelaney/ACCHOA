@@ -10,6 +10,7 @@ using Microsoft.AspNet.Authorization;
 using Microsoft.AspNet.Identity;
 using System.Security.Claims;
 using HOA.Services;
+using Microsoft.AspNet.Identity.EntityFramework;
 
 // For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -21,18 +22,22 @@ namespace HOA.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ApplicationDbContext _applicationDbContext;
         private readonly IEmailSender _email;
+        private RoleManager<IdentityRole> _roleManager;
 
-        public SubmissionController(ApplicationDbContext applicationDbContext, UserManager<ApplicationUser> userManager, IEmailSender emailSender)
+        public SubmissionController(ApplicationDbContext applicationDbContext, UserManager<ApplicationUser> userManager, IEmailSender emailSender, RoleManager<IdentityRole> roleManager)
         {
             _applicationDbContext = applicationDbContext;
             _userManager = userManager;
             _email = emailSender;
+            _roleManager = roleManager;
         }
 
         private int GetReviewerCount()
         {
             var role = _applicationDbContext.Roles.Include(r => r.Users).FirstOrDefault(r => r.Name.Equals(RoleNames.BoardMember));
-            return role.Users.Count;            
+            List<string> userIds = role.Users.Select(u => u.UserId).ToList();
+            var users = _applicationDbContext.Users.Where(u => userIds.Contains(u.Id) && u.Enabled);
+            return users.Count();
         }
 
         private string GenerateUniqueCode()

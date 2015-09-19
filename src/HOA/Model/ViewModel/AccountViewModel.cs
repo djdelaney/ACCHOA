@@ -21,7 +21,17 @@ namespace HOA.Model.ViewModel
 
     public class ManageViewModel
     {
-        public List<ApplicationUser> Users { get; set; }
+        public List<UserViewModel> Users { get; set; }
     }
+
+    public class UserViewModel
+    {
+        public string UserName { get; set; }
+        public string FullName { get; set; }
+        public bool Enabled { get; set; }
+        public string Roles { get; set; }
+        public string UserId { get; set; }
+    }
+
 
 }

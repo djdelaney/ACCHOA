@@ -71,6 +71,15 @@ namespace HOA.Controllers
             ViewData["ReturnUrl"] = returnUrl;
             if (ModelState.IsValid)
             {
+                //User not enabled
+                var user = _applicationDbContext.Users.FirstOrDefault(u => u.UserName.Equals(model.Username));
+                if (user != null && !user.Enabled)
+                {
+                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                    return View(model);
+                }
+
+
                 // This doesn't count login failures towards account lockout
                 // To enable password failures to trigger account lockout, set lockoutOnFailure: true
                 var result = await _signInManager.PasswordSignInAsync(model.Username, model.Password, model.RememberMe, lockoutOnFailure: false);
@@ -120,12 +129,70 @@ namespace HOA.Controllers
 
             var model = new ManageViewModel
             {
-                Users = users
+                Users = new List<UserViewModel>()
             };
 
-            //users.FirstOrDefault().LockoutEnabled
+            foreach (var user in users)
+            {
+                List<string> roles = new List<string>();
 
+                
+                foreach (var role in user.Roles)
+                {
+                    var roleName = _roleManager.FindByIdAsync(role.RoleId).Result.Name;
+
+                    if (roleName.Equals(RoleNames.Administrator))
+                        roleName = "Administrator";
+                    else if (roleName.Equals(RoleNames.CommunityManager))
+                        roleName = "Community Manager";
+                    else if (roleName.Equals(RoleNames.BoardChairman))
+                        roleName = "Board Chairman";
+                    else if (roleName.Equals(RoleNames.BoardMember))
+                        roleName = "Board Member";
+                    else if (roleName.Equals(RoleNames.HOALiaison))
+                        roleName = "HOA Liaison";
+
+                    roles.Add(roleName);
+                }
+
+                var u = new UserViewModel
+                {
+                    UserName = user.UserName,
+                    Enabled = user.Enabled,
+                    FullName = user.FullName,
+                    Roles = string.Join(", ", roles),
+                    UserId = user.Id
+                };
+
+                model.Users.Add(u);
+            }
             return View(model);
+        }
+
+        [Authorize(Roles = RoleNames.Administrator)]
+        public IActionResult EnableUser(string id)
+        {
+            var user = _applicationDbContext.Users.FirstOrDefault(u => u.Id.Equals(id));
+            if (user == null)
+                return HttpNotFound("User not found");
+
+            user.Enabled = true;
+            _applicationDbContext.SaveChanges();
+
+            return RedirectToAction(nameof(AccountController.ManageUsers), "Account");
+        }
+
+        [Authorize(Roles = RoleNames.Administrator)]
+        public IActionResult DisableUser(string id)
+        {
+            var user = _applicationDbContext.Users.FirstOrDefault(u => u.Id.Equals(id));
+            if (user == null)
+                return HttpNotFound("User not found");
+
+            user.Enabled = false;
+            _applicationDbContext.SaveChanges();
+
+            return RedirectToAction(nameof(AccountController.ManageUsers), "Account");
         }
 
     }

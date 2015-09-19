@@ -62,7 +62,7 @@ namespace HOA
             var user = await _userManager.FindByNameAsync("admin");
             if (user == null)
             {
-                user = new ApplicationUser { UserName = "admin", Email = "admin@mailinator.com", FullName = "Site Admin" };
+                user = new ApplicationUser { UserName = "admin", Email = "admin@mailinator.com", FullName = "Site Admin", Enabled = true };
                 await _userManager.CreateAsync(user, "P@ssw0rd!");
                 await _userManager.AddToRoleAsync(user, RoleNames.Administrator);
                 await _userManager.AddToRoleAsync(user, RoleNames.CommunityManager);
@@ -74,7 +74,7 @@ namespace HOA
             user = await _userManager.FindByNameAsync("CommunityManager");
             if (user == null)
             {
-                user = new ApplicationUser { UserName = "CommunityManager", Email = "CommunityManager@mailinator.com", FullName = "Community Manager" };
+                user = new ApplicationUser { UserName = "CommunityManager", Email = "CommunityManager@mailinator.com", FullName = "Community Manager", Enabled = true };
                 await _userManager.CreateAsync(user, "P@ssw0rd!");
                 await _userManager.AddToRoleAsync(user, RoleNames.CommunityManager);
             }
@@ -82,7 +82,7 @@ namespace HOA
             user = await _userManager.FindByNameAsync("BoardMember1");
             if (user == null)
             {
-                user = new ApplicationUser { UserName = "BoardMember1", Email = "BoardMember1@mailinator.com", FullName = "Board Member1" };
+                user = new ApplicationUser { UserName = "BoardMember1", Email = "BoardMember1@mailinator.com", FullName = "Board Member1", Enabled = true };
                 await _userManager.CreateAsync(user, "P@ssw0rd!");
                 await _userManager.AddToRoleAsync(user, RoleNames.BoardMember);
             }

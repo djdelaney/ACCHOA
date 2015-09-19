@@ -25,5 +25,8 @@ namespace HOA.Model
         [Required]
         [MaxLength(20)]
         public string FullName { get; set; }
+
+        [Required]
+        public bool Enabled { get; set; }
     }
 }

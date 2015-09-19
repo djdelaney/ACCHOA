@@ -19,7 +19,7 @@
                 <th>Username</th>
                 <th>Name</th>
                 <th>Role</th>
-                <th>Locked</th>
+                <th>Enabled</th>
                 <th>Action</th>
             </tr>
         </thead>
@@ -29,9 +29,20 @@
         <tr>
             <td>@user.UserName</td>
             <td>@user.FullName</td>
-            <td>@user.Roles[0]</td>
-            <td>@user.LockoutEnabled</td>
-            <td>action</td>
+            <td>@user.Roles</td>
+            <td>@user.Enabled</td>
+            <td>
+                @if(user.Enabled)
+                {
+                    <a href="/Account/DisableUser/@user.UserId">Disable</a>
+                }
+                else
+                {
+                    <a href="/Account/EnableUser/@user.UserId">Enable</a>
+                }
+
+
+            </td>
         </tr>
     }
 
