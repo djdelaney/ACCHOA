@@ -74,36 +74,56 @@ namespace HOA.Controllers
         }
 
         //[Authorize(Roles = "CommunityManager")]
-        public IActionResult List()
+
+        [Route("Submission/List/{filter?}")]
+        public IActionResult List(string filter)
         {
             IQueryable<Submission> subs = _applicationDbContext.Submissions.Where(s => s.Status != Status.Approved && s.Status != Status.Rejected);
 
-            if (User.IsInRole(RoleNames.Administrator))
+            if(string.IsNullOrEmpty(filter))
             {
+                filter = "Incoming";
             }
-            else if (User.IsInRole(RoleNames.CommunityManager))
+
+            if (filter.Equals("Incoming"))
             {
-                subs = subs.Where(s => s.Status == Status.Submitted);
+                if (User.IsInRole(RoleNames.Administrator))
+                {
+                }
+                else if (User.IsInRole(RoleNames.CommunityManager))
+                {
+                    subs = subs.Where(s => s.Status == Status.Submitted);
+                }
+                else if (User.IsInRole(RoleNames.BoardChairman))
+                {
+                    subs = subs.Where(s => s.Status == Status.ARBIncoming);
+                }
+                else if (User.IsInRole(RoleNames.BoardMember))
+                {
+                    subs = subs.Where(s => s.Status == Status.UnderReview);
+                }
+                else if (User.IsInRole(RoleNames.BoardChairman))
+                {
+                    subs = subs.Where(s => s.Status == Status.ARBFinal);
+                }
+                else if (User.IsInRole(RoleNames.HOALiaison))
+                {
+                    subs = subs.Where(s => s.Status == Status.ReviewComplete);
+                }
             }
-            else if (User.IsInRole(RoleNames.BoardChairman))
+            else if (filter.Equals("Approved"))
             {
-                subs = subs.Where(s => s.Status == Status.ARBIncoming);
+                subs = subs.Where(s => s.Status == Status.Approved);
             }
-            else if (User.IsInRole(RoleNames.BoardMember))
+            else if (filter.Equals("Rejected"))
             {
-                subs = subs.Where(s => s.Status == Status.UnderReview);
+                subs = subs.Where(s => s.Status == Status.Rejected);
             }
-            else if (User.IsInRole(RoleNames.BoardChairman))
-            {
-                subs = subs.Where(s => s.Status == Status.ARBFinal);
-            }
-            else if (User.IsInRole(RoleNames.HOALiaison))
-            {
-                subs = subs.Where(s => s.Status == Status.ReviewComplete);
-            }
+            //deault to all
 
             var viewModel = new ViewSubmissionsViewModel()
             {
+                Filter = filter,
                 Submissions = subs.Include(s => s.Audits).OrderBy(s => s.LastModified).ToList()
             };
 

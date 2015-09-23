@@ -10,6 +10,7 @@ namespace HOA.Model.ViewModel
 {
     public class ViewSubmissionsViewModel
     {
+        public string Filter { get; set; }
         public IList<Submission> Submissions { get; set; }
     }
 
