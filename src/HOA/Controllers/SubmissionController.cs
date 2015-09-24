@@ -11,6 +11,7 @@ using Microsoft.AspNet.Identity;
 using System.Security.Claims;
 using HOA.Services;
 using Microsoft.AspNet.Identity.EntityFramework;
+using HOA.Util;
 
 // For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -40,23 +41,6 @@ namespace HOA.Controllers
             return users.Count();
         }
 
-        private string GenerateUniqueCode()
-        {
-            string code = "";
-            var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-            var random = new Random();
-
-            do
-            {                
-                code = new string(
-                    Enumerable.Repeat(chars, 5)
-                              .Select(s => s[random.Next(s.Length)])
-                              .ToArray());
-            }
-            while (_applicationDbContext.Submissions.Any(s => s.Code.Equals(code)));
-            return code;
-        }
-
         private void AddHistoryEntry(Submission s, string user, string action)
         {
             if (s.Audits == null)
@@ -78,7 +62,7 @@ namespace HOA.Controllers
         [Route("Submission/List/{filter?}")]
         public IActionResult List(string filter)
         {
-            IQueryable<Submission> subs = _applicationDbContext.Submissions.Where(s => s.Status != Status.Approved && s.Status != Status.Rejected);
+            IQueryable<Submission> subs = _applicationDbContext.Submissions;
 
             if(string.IsNullOrEmpty(filter))
             {
@@ -87,6 +71,8 @@ namespace HOA.Controllers
 
             if (filter.Equals("Incoming"))
             {
+                subs = subs.Where(s => s.Status != Status.Approved && s.Status != Status.Rejected);
+
                 if (User.IsInRole(RoleNames.Administrator))
                 {
                 }
@@ -205,9 +191,9 @@ namespace HOA.Controllers
                     Description = model.Description,
                     Status = Status.Submitted,
                     LastModified = DateTime.Now,
-                    Code = GenerateUniqueCode(),
+                    Code = DBUtil.GenerateUniqueCode(_applicationDbContext),
                     Files = new List<File>()
-                };                
+                };
 
                 foreach(var fileContent in model.Files)
                 {
@@ -300,7 +286,6 @@ namespace HOA.Controllers
             model.Submission = _applicationDbContext.Submissions.FirstOrDefault(s => s.Id == model.SubmissionId);
             return View(model);
         }
-
 
         [HttpGet]
         public IActionResult Review(int id)

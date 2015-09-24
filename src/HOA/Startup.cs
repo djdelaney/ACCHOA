@@ -49,7 +49,16 @@ namespace HOA
                     options.UseSqlServer(Configuration["Data:DefaultConnection:ConnectionString"]));
 
             // Add Identity services to the services container.
-            services.AddIdentity<ApplicationUser, IdentityRole>()
+            services.AddIdentity<ApplicationUser, IdentityRole>
+                (
+                    options => 
+                    {
+                        /*options.Password.RequiredLength = 6;
+                        options.Password.RequireUppercase = false;
+                        options.Password.RequireNonLetterOrDigit = false;
+                        options.User.RequireUniqueEmail = true;*/
+                    }
+                )
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
             
