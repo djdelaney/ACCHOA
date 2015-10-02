@@ -6,6 +6,14 @@ using System.Threading.Tasks;
 
 namespace HOA.Model
 {
+    public enum ReviewStatus
+    {
+        Approved,
+        Rejected,
+        ConditionallyApproved,
+        MissingInformation
+    }
+
     public class Review
     {
         [Required]
@@ -15,7 +23,7 @@ namespace HOA.Model
         public ApplicationUser Reviewer { get; set; }
 
         [Required]
-        public bool Approved { get; set; }
+        public ReviewStatus Status { get; set; }
 
         [Required]
         public DateTime Created { get; set; }

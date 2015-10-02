@@ -14,7 +14,9 @@ namespace HOA.Model
         ARBFinal,
         ReviewComplete,
         Rejected,
-        Approved
+        MissingInformation,
+        Approved,
+        ConditionallyApproved
     }
 
     public class Submission
@@ -49,11 +51,16 @@ namespace HOA.Model
         public Status Status { get; set; }
 
         [Required]
+        public int Revision { get; set; }
+
+        [Required]
         public DateTime LastModified { get; set; }
 
         public virtual IList<Review> Reviews { get; set; }
 
         public virtual IList<History> Audits { get; set; }
+
+        public virtual IList<Response> Responses { get; set; }
 
         public virtual IList<File> Files { get; set; }
     }

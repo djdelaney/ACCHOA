@@ -71,7 +71,7 @@ namespace HOA.Controllers
 
             if (filter.Equals("Incoming"))
             {
-                subs = subs.Where(s => s.Status != Status.Approved && s.Status != Status.Rejected);
+                subs = subs.Where(s => s.Status != Status.Approved && s.Status != Status.Rejected && s.Status != Status.ConditionallyApproved && s.Status != Status.MissingInformation);
 
                 if (User.IsInRole(RoleNames.Administrator))
                 {
@@ -99,11 +99,11 @@ namespace HOA.Controllers
             }
             else if (filter.Equals("Approved"))
             {
-                subs = subs.Where(s => s.Status == Status.Approved);
+                subs = subs.Where(s => s.Status == Status.Approved || s.Status == Status.ConditionallyApproved);
             }
             else if (filter.Equals("Rejected"))
             {
-                subs = subs.Where(s => s.Status == Status.Rejected);
+                subs = subs.Where(s => s.Status == Status.Rejected || s.Status == Status.MissingInformation);
             }
             //deault to all
 
@@ -192,7 +192,8 @@ namespace HOA.Controllers
                     Status = Status.Submitted,
                     LastModified = DateTime.Now,
                     Code = DBUtil.GenerateUniqueCode(_applicationDbContext),
-                    Files = new List<File>()
+                    Files = new List<File>(),
+                    Revision = 1
                 };
 
                 foreach(var fileContent in model.Files)
@@ -271,10 +272,10 @@ namespace HOA.Controllers
                     }
                 }
                 else
-                    submission.Status = Status.Rejected;
+                    submission.Status = Status.MissingInformation;
                 
                 var user = await _userManager.FindByIdAsync(User.GetUserId());                
-                string action = string.Format("Marked{0} complete. Comments: {1}", model.Approve ? "" : " not", model.Comments);
+                string action = string.Format("Marked {0}. Comments: {1}", model.Approve ? "complete" : "missing information", model.Comments);
                 AddHistoryEntry(submission, user.FullName, action);
 
                 submission.LastModified = DateTime.Now;
@@ -294,7 +295,7 @@ namespace HOA.Controllers
             if (submission == null)
                 return HttpNotFound("Submission not found");
 
-            ApproveRejectViewModel model = new ApproveRejectViewModel
+            ReviewSubmissionViewModel model = new ReviewSubmissionViewModel
             {
                 Submission = submission,
                 SubmissionId = submission.Id
@@ -306,7 +307,7 @@ namespace HOA.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = RoleNames.BoardMember)]
-        public async Task<IActionResult> Review(ApproveRejectViewModel model)
+        public async Task<IActionResult> Review(ReviewSubmissionViewModel model)
         {
             if (ModelState.IsValid)
             {
@@ -320,7 +321,7 @@ namespace HOA.Controllers
                 var review = new Review
                 {
                     Reviewer = user,
-                    Approved = model.Approve,
+                    Status = (ReviewStatus)Enum.Parse(typeof(ReviewStatus), model.Status),
                     Created = DateTime.Now,
                     Comments = model.Comments,
                     Submission = submission
@@ -359,7 +360,7 @@ namespace HOA.Controllers
             if (submission == null)
                 return HttpNotFound("Submission not found");
 
-            ApproveRejectViewModel model = new ApproveRejectViewModel
+            ReviewSubmissionViewModel model = new ReviewSubmissionViewModel
             {
                 Submission = submission,
                 SubmissionId = submission.Id
@@ -371,7 +372,7 @@ namespace HOA.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = RoleNames.BoardChairman)]
-        public async Task<IActionResult> TallyVotes(ApproveRejectViewModel model)
+        public async Task<IActionResult> TallyVotes(ReviewSubmissionViewModel model)
         {
             if (ModelState.IsValid)
             {
@@ -379,15 +380,23 @@ namespace HOA.Controllers
                 if (submission == null)
                     return HttpNotFound("Submission not found");
 
-                if (model.Approve)
+                var status = (ReviewStatus)Enum.Parse(typeof(ReviewStatus), model.Status);
+
+                if (status == ReviewStatus.Approved || status == ReviewStatus.ConditionallyApproved)
                 {
                     submission.Status = Status.ReviewComplete;
                 }
+                else if (status == ReviewStatus.MissingInformation)
+                {
+                    submission.Status = Status.MissingInformation;
+                }
                 else
+                {
                     submission.Status = Status.Rejected;
+                }
 
                 var user = await _userManager.FindByIdAsync(User.GetUserId());
-                string action = string.Format("{0}. Comments: {1}", model.Approve ? "Accepted" : "Rejected", model.Comments);
+                string action = string.Format("{0}. Comments: {1}", model.Status, model.Comments);
                 AddHistoryEntry(submission, user.FullName, action);
 
                 submission.LastModified = DateTime.Now;
@@ -407,8 +416,8 @@ namespace HOA.Controllers
             var submission = _applicationDbContext.Submissions.FirstOrDefault(s => s.Id == id);
             if (submission == null)
                 return HttpNotFound("Submission not found");
-            
-            ApproveRejectViewModel model = new ApproveRejectViewModel
+
+            ReviewSubmissionViewModel model = new ReviewSubmissionViewModel
             {
                 Submission = submission,
                 SubmissionId = submission.Id
@@ -419,7 +428,7 @@ namespace HOA.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> FinalCheck(ApproveRejectViewModel model)
+        public async Task<IActionResult> FinalCheck(ReviewSubmissionViewModel model)
         {
             if (ModelState.IsValid)
             {
@@ -427,15 +436,27 @@ namespace HOA.Controllers
                 if (submission == null)
                     return HttpNotFound("Submission not found");
 
-                if (model.Approve)
+                var status = (Status)Enum.Parse(typeof(Status), model.Status);
+
+                if (status == Status.Approved)
                 {
                     submission.Status = Status.Approved;
                 }
+                else if (status == Status.ConditionallyApproved)
+                {
+                    submission.Status = Status.ConditionallyApproved;
+                }
+                else if (status == Status.MissingInformation)
+                {
+                    submission.Status = Status.MissingInformation;
+                }
                 else
+                {
                     submission.Status = Status.Rejected;
+                }
 
                 var user = await _userManager.FindByIdAsync(User.GetUserId());
-                string action = string.Format("Marked{0} approved. Comments: {1}", model.Approve ? "" : " not", model.Comments);
+                string action = string.Format("Marked {0}. Comments: {1}", model.Status, model.Comments);
                 AddHistoryEntry(submission, user.FullName, action);
 
                 submission.LastModified = DateTime.Now;

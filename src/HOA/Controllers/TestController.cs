@@ -73,7 +73,8 @@ namespace HOA.Controllers
                 LastModified = DateTime.Now,
                 Code = DBUtil.GenerateUniqueCode(_applicationDbContext),
                 Files = new List<File>(),
-                Audits = new List<History>()
+                Audits = new List<History>(),
+                Revision = 1
             };
 
             var file = new File
@@ -113,7 +114,7 @@ namespace HOA.Controllers
                 var review = new Review
                 {
                     Reviewer = user,
-                    Approved = true,
+                    Status = ReviewStatus.Approved,
                     Created = DateTime.Now,
                     Comments = "BLAH",
                     Submission = sub

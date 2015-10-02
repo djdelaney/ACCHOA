@@ -34,12 +34,21 @@
 {
     @: Approved
 }
-
-
+@if (Model.Status == Status.ConditionallyApproved)
+{
+    @: Conditionally Approved
+}
 @if (Model.Status == Status.Rejected)
 {
     @: Rejected
 }
+@if (Model.Status == Status.MissingInformation)
+{
+    @: Missing Information
+}
+
+
+
 </h3>
 
     </div>

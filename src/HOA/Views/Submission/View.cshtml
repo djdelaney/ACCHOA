@@ -44,20 +44,28 @@
         <br />
     }
 
-    @if (Model.Submission.Status == Status.ARBFinal)
+    @if (Model.Submission.Reviews != null && Model.Submission.Reviews.Count > 0)
     {
         @: <h3>Reviews:</h3>
         @foreach (var review in Model.Submission.Reviews)
         {
             @review.Reviewer.FullName@:, @review.Created.ToString("MM/dd/yyyy") <br />
 
-            @if(review.Approved)
+            @if (review.Status == ReviewStatus.Approved)
             {
                 @: Approved
             }
-            else
+            else if(review.Status == ReviewStatus.Rejected)
             {
-                @:Rejected
+                @: Rejected
+            }
+            else if (review.Status == ReviewStatus.ConditionallyApproved)
+            {
+                @: Conditionally Approved
+            }
+            else if (review.Status == ReviewStatus.MissingInformation)
+            {
+                @: Missing Information
             }
             <br />
             @review.Comments<br />

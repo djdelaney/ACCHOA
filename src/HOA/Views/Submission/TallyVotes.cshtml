@@ -1,6 +1,6 @@
 ﻿@using HOA.Model
 @using HOA.Model.ViewModel
-@model ApproveRejectViewModel
+@model ReviewSubmissionViewModel
 @*
     For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 *@
@@ -24,13 +24,21 @@
         {
             @review.Reviewer.FullName @Html.Raw(":")
             
-            @if(review.Approved)
+            @if (review.Status == ReviewStatus.Approved)
             {
                 @: Approved
             }
-            else
+            else if (review.Status == ReviewStatus.Rejected)
             {
                 @: Rejected
+            }
+            else if (review.Status == ReviewStatus.ConditionallyApproved)
+            {
+                @: Conditionally Approved
+            }
+            else if (review.Status == ReviewStatus.MissingInformation)
+            {
+                @: Missing Information
             }
             <br />
             @: Comments: @review.Comments
@@ -69,15 +77,17 @@
 
 
 
-    @Html.DropDownListFor(m => m.Approve, new SelectList(
+    @Html.DropDownListFor(m => m.Status, new SelectList(
         new[]
         {
-            new { Value = "true", Text = "Yes" },
-            new { Value = "false", Text = "No" },
+            new { Value = "Approved", Text = "Approve" },
+            new { Value = "Rejected", Text = "Reject" },
+            new { Value = "ConditionallyApproved", Text = "Conditionally Approve" },
+            new { Value = "MissingInformation", Text = "Missing Info" },
         },
         "Value",
         "Text",
-        Model.Approve
+        Model.Status
     ),
     new { @class = "form-control" })
     <br />

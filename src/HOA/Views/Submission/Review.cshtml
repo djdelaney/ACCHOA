@@ -1,6 +1,6 @@
 ﻿@using HOA.Model
 @using HOA.Model.ViewModel
-@model ApproveRejectViewModel
+@model ReviewSubmissionViewModel
 @*
     For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 *@
@@ -36,18 +36,20 @@
     @Html.LabelFor(model => model.Comments)@: <br />
     @Html.TextAreaFor(model => model.Comments, new { @class = "form-control" })<br />
     <br />
-    @:Approve?<br />
+    @:Status:<br />
 
 
-    @Html.DropDownListFor(m => m.Approve, new SelectList(
+    @Html.DropDownListFor(m => m.Status, new SelectList(
         new[]
         {
-            new { Value = "true", Text = "Yes" },
-            new { Value = "false", Text = "No" },
+            new { Value = "Approved", Text = "Approve" },
+            new { Value = "Rejected", Text = "Reject" },
+            new { Value = "ConditionallyApproved", Text = "Conditionally Approve" },
+            new { Value = "MissingInformation", Text = "Missing Info" },
         },
         "Value",
         "Text",
-        Model.Approve
+        Model.Status
     ),
     new { @class = "form-control" })
     <br />

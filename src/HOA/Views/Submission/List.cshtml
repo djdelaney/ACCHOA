@@ -70,9 +70,17 @@
                 {
                     @:Approved
                 }
+                else if (submission.Status == Status.ConditionallyApproved)
+                {
+                    @:Conditionally Approved
+                }
                 else if (submission.Status == Status.Rejected)
                 {
                     @:Rejected
+                }
+                else if (submission.Status == Status.MissingInformation)
+                {
+                    @:Missing Information
                 }
 
             </td>

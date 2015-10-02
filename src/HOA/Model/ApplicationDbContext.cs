@@ -14,6 +14,7 @@ namespace HOA.Model
         public DbSet<History> Histories { get; set; }
         public DbSet<Review> Reviews { get; set; }
         public DbSet<File> Files { get; set; }
+        public DbSet<Response> Responses { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -23,6 +24,7 @@ namespace HOA.Model
             builder.Entity<Review>().Key(v => v.Id);
             builder.Entity<Submission>().Key(v => v.Id);
             builder.Entity<File>().Key(v => v.Id);
+            builder.Entity<Response>().Key(v => v.Id);
 
             builder.Entity<Submission>().Collection(s => s.Audits).InverseReference(h => h.Submission).Required(false);
 
