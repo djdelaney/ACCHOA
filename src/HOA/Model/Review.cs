@@ -11,7 +11,8 @@ namespace HOA.Model
         Approved,
         Rejected,
         ConditionallyApproved,
-        MissingInformation
+        MissingInformation,
+        Abstain
     }
 
     public class Review
