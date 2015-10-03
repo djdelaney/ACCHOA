@@ -22,6 +22,11 @@
 
         @foreach (var review in Model.Submission.Reviews)
         {
+            if (review.SubmissionRevision != Model.Submission.Revision)
+            {
+                continue;
+            }
+
             @review.Reviewer.FullName @Html.Raw(":")
             
             @if (review.Status == ReviewStatus.Approved)

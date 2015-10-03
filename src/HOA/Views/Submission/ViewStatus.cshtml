@@ -46,7 +46,7 @@
 {
     @: Missing Information
 }
-
+    
 
 
 </h3>
@@ -55,7 +55,15 @@
     <div class="panel-body">
         @if (@Model.Audits != null && @Model.Audits.Count > 0)
         {
-            @:Last update: @Model.Audits[@Model.Audits.Count - 1].DateTime.ToString("MM/dd/yyyy hh:mm tt")
+            <p>
+            Last update: @Model.Audits[@Model.Audits.Count - 1].DateTime.ToString("MM/dd/yyyy hh:mm tt")
+            </p>
+        }
+
+
+        @if (Model.Status == Status.MissingInformation || Model.Status == Status.Rejected)
+        {
+            <a class="btn btn-primary" href="/Submission/Resubmit/@Model.Id" role="button">Resubmit &raquo;</a>
         }
     </div>
 </div>

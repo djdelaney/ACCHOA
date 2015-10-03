@@ -34,5 +34,8 @@ namespace HOA.Model
 
         [Required]
         public Submission Submission { get; set; }
+
+        [Required]
+        public int SubmissionRevision { get; set; }
     }
 }

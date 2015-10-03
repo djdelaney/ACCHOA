@@ -117,7 +117,8 @@ namespace HOA.Controllers
                     Status = ReviewStatus.Approved,
                     Created = DateTime.Now,
                     Comments = "BLAH",
-                    Submission = sub
+                    Submission = sub,
+                    SubmissionRevision = sub.Revision
                 };
 
                 sub.Reviews = new List<Review>();

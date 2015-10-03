@@ -18,6 +18,7 @@ namespace HOA.Model.ViewModel
     {
         public Submission Submission { get; set; }
         public int ReviewerCount { get; set; }
+        public int CurrentReviewCount { get; set; }
         public bool Reviewed { get; set; }
     }
 
@@ -80,5 +81,18 @@ namespace HOA.Model.ViewModel
     {
         [Required]
         public string Code{ get; set; }
+    }
+
+    public class ResubmitViewModel
+    {
+        public Submission Submission { get; set; }
+
+        [Required]
+        public int SubmissionId { get; set; }
+
+        [Required]
+        public string Description { get; set; }
+        
+        public IList<IFormFile> Files { get; set; }
     }
 }

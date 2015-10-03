@@ -21,7 +21,10 @@
             @Model.Submission.Email <br />
             @Model.Submission.Address<br />
             <br />
-            @Model.Submission.Description<br />
+            <span style="white-space: pre-line">
+                @Model.Submission.Description
+            </span>
+            <br />
 
             <h5><strong>Files</strong></h5>
             <ul>
@@ -39,7 +42,7 @@
 
     @if (Model.Submission.Status == Status.UnderReview)
     {
-        @Model.Submission.Reviews.Count
+        @Model.CurrentReviewCount
         @: review(s) submitted of @Model.ReviewerCount  <br />
         <br />
     }
@@ -49,6 +52,11 @@
         @: <h3>Reviews:</h3>
         @foreach (var review in Model.Submission.Reviews)
         {
+            if (review.SubmissionRevision != Model.Submission.Revision)
+            {
+                continue;
+            }
+
             @review.Reviewer.FullName@:, @review.Created.ToString("MM/dd/yyyy") <br />
 
             @if (review.Status == ReviewStatus.Approved)

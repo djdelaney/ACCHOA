@@ -132,7 +132,8 @@ namespace HOA.Controllers
             {
                 Submission = submission,
                 ReviewerCount = GetReviewerCount(),
-                Reviewed = submission.Reviews.Any(r => r.Reviewer.Id == User.GetUserId())
+                CurrentReviewCount = submission.Reviews.Count(r => r.SubmissionRevision == submission.Revision),
+                Reviewed = submission.Reviews.Any(r => r.Reviewer.Id == User.GetUserId() && r.SubmissionRevision == submission.Revision)
             };
 
             return View(model);
@@ -161,11 +162,25 @@ namespace HOA.Controllers
                 if (submission == null)
                     return View("StatusNotFound");
 
-                return View("ViewStatus", submission);
+                return RedirectToAction(nameof(ViewStatus), new { id = submission.Code });
             }
 
             //form not complete
             return View(model);
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult ViewStatus(string id)
+        {
+            var submission = _applicationDbContext.Submissions
+                    .Include(s => s.Audits)
+                    .FirstOrDefault(s => s.Code.Equals(id));
+
+            if (submission == null)
+                return HttpNotFound("Submission not found");
+
+            return View(submission);
         }
 
         [HttpGet]
@@ -324,7 +339,8 @@ namespace HOA.Controllers
                     Status = (ReviewStatus)Enum.Parse(typeof(ReviewStatus), model.Status),
                     Created = DateTime.Now,
                     Comments = model.Comments,
-                    Submission = submission
+                    Submission = submission,
+                    SubmissionRevision = submission.Revision
                 };
 
                 if (submission.Reviews == null)
@@ -336,7 +352,7 @@ namespace HOA.Controllers
                 _applicationDbContext.Reviews.Add(review);
 
                 //Final review!
-                if (submission.Reviews.Count == GetReviewerCount())
+                if (submission.Reviews.Where(r => r.SubmissionRevision == submission.Revision).Count() == GetReviewerCount())
                 {
                     submission.Status = Status.ARBFinal;
                     submission.LastModified = DateTime.Now;
@@ -468,5 +484,74 @@ namespace HOA.Controllers
             model.Submission = _applicationDbContext.Submissions.FirstOrDefault(s => s.Id == model.SubmissionId);
             return View(model);
         }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult Resubmit(int id)
+        {
+            var submission = _applicationDbContext.Submissions.FirstOrDefault(s => s.Id == id && (s.Status  == Status.Rejected || s.Status == Status.MissingInformation));
+            if (submission == null)
+                return HttpNotFound("Submission not found");
+
+            ResubmitViewModel model = new ResubmitViewModel
+            {
+                Submission = submission,
+                SubmissionId = submission.Id
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [AllowAnonymous]
+        public async Task<IActionResult> Resubmit(ResubmitViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var submission = _applicationDbContext.Submissions.Include(s => s.Audits).Include(s => s.Reviews).Include(s => s.Files)
+                    .FirstOrDefault(s => s.Id == model.SubmissionId && (s.Status == Status.Rejected || s.Status == Status.MissingInformation));
+                if (submission == null)
+                    return HttpNotFound("Submission not found");
+
+                //Add new comments
+                submission.Description = string.Format("{0}\n\nResubmitted {1}:\n\n{2}", submission.Description, DateTime.Now.ToString("MM/dd/yyyy hh:mm tt"), model.Description);
+
+                //any new files
+                if (model.Files != null)
+                {
+                    foreach (var fileContent in model.Files)
+                    {
+                        var chunks = fileContent.ContentDisposition.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                        var nameChunk = chunks.FirstOrDefault(c => c.Contains("filename"));
+                        var fileName = nameChunk.Split('=')[1].Trim(new char[] { '"' });
+
+                        var file = new File
+                        {
+                            Name = fileName,
+                            BlobName = "TODO"
+                        };
+
+                        submission.Files.Add(file);
+                        _applicationDbContext.Files.Add(file);
+                    }
+                }
+
+                //Increment revision
+                submission.Revision = submission.Revision + 1;
+                submission.Status = Status.Submitted;
+
+                AddHistoryEntry(submission, submission.FirstName + " " + submission.LastName, "Resubmitted");
+
+                _applicationDbContext.SaveChanges();
+
+                return RedirectToAction(nameof(ViewStatus), new { id = submission.Code });
+            }
+
+            // If we got this far, something failed, redisplay form
+            model.Submission = _applicationDbContext.Submissions.FirstOrDefault(s => s.Id == model.SubmissionId && (s.Status == Status.Rejected || s.Status == Status.MissingInformation));
+            return View(model);
+        }
+
     }
 }
