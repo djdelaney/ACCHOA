@@ -23,6 +23,10 @@
             padding-top: 70px;
         }
     </style>
+
+
+    @RenderSection("HeaderExtras", required: false)
+
 </head>
 <body>
     @await Html.PartialAsync("_Navbar")

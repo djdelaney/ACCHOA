@@ -71,6 +71,7 @@ namespace HOA.Model.ViewModel
         public string Email { get; set; }
         
         [Required]
+        [Display(Name = "Brief Description")]
         public string Description { get; set; }
 
         [Required]

@@ -4,6 +4,33 @@
     ViewBag.Title = "New submission";
 }
 
+@section HeaderExtras
+{
+<script>
+        $(function () {
+          $('[data-toggle="tooltip"]').tooltip()
+        })
+
+
+        function ValidateCheckboxes()
+        {
+
+        var allChecked = true;
+        $('input[type="checkbox"]').each(function() {
+            if (!$(this).is(":checked")) {
+                allChecked = false;
+            }
+        });
+
+        if(!allChecked)
+            alert("You must agree to all the requirements");
+
+        return allChecked;
+        }
+
+</script>
+}
+
 @using (Html.BeginForm("Submission", "Create", FormMethod.Post, new { @class = "form-horizontal", enctype = "multipart/form-data" }))
 {
 
@@ -59,6 +86,7 @@
     </label>
     <div class="col-xs-9">
         @Html.TextAreaFor(model => model.Description, new { @class = "form-control" })
+        <h5>e.g. Patio, Fence, Deck, etc.</h5>
     </div>
 </div>
 <div class="form-group">
@@ -70,8 +98,55 @@
     </div>
 </div>
 <div class="form-group">
+    <label class="control-label col-xs-3">
+        <label>Requirements</label>
+    </label>
+    <div class="col-xs-9">
+        <br>
+        <input type="checkbox" id="req1" value="value">
+        <label for="req1" title="Show the exact location and dimensions of the proposed improvement indicated on the drawing.  The as built plan is used to show the relationship between your planned improvement and any property lines, swales, or easements." data-toggle="tooltip" data-placement="top">
+            Copy of As-Built or Plot Plan for Your Lot
+        </label>
+        <br>
+        <input type="checkbox" id="req2" value="value">
+        <label for="req2" title="Fully complete the Request for Architectural Change form and sign.  This form is available from Josh Rozzi (Josh.rozzi@fsresidential.com)" data-toggle="tooltip" data-placement="top">
+            Completed Architectural Request Form
+        </label>
+        <br>
+        <input type="checkbox" id="req3" value="value">
+        <label for="req3" title="Include a list of all materials intended for use in this project including types of plants if applicable." data-toggle="tooltip" data-placement="top">
+            List of Materials to be Used
+        </label>
+        <br>
+        <input type="checkbox" id="req4" value="value">
+        <label for="req4" title="Please complete the Applecross Country Club Architectural Change Indemnity Agreement and sign." data-toggle="tooltip" data-placement="top">
+            Signed Indemnification Form
+        </label>
+        <br>
+        <input type="checkbox" id="req5" value="value">
+        <label for="req5" title="Show all dimensions from the sub-base or footings of the proposed improvement up to the upper most portion of the proposed improvement - on decks this is footings to top of railing - on patios it is sub-base to top of sitting wall or surface of patio if there are no walls." data-toggle="tooltip" data-placement="top">
+            Plan Showing All Dimensions
+        </label>
+        <br>
+        <input type="checkbox" id="req6" value="value">
+        <label for="req6" title="Provide a side view elevation drawing that includes sub-base or footings (for patios and decks) and proposed design details." data-toggle="tooltip" data-placement="top">
+            Side View or Sectional Plan
+        </label>
+        <br>
+        <input type="checkbox" id="req7" value="value">
+        <label for="req7" title="Include color photos of decking material, railings & spindles, fencing material, pavers, stonework and any other material where a color choice is available." data-toggle="tooltip" data-placement="top">
+            Color Photos of Materials to be Used
+        </label>
+        <br>
+        <input type="checkbox" id="req8" value="value">
+        <label for="req8" title="Have your contractor name the Homeowner (you) and Applecross Master Association as Additionally Insured.  The following language should be used in the 'description of operations' section: Homeowner's Name, Homeowner's Address, and Applecross Country Club Master are listed as additional insured.  If work is to be done yourself, the declarations page of your homeowner's insurance policy will take the place of this certificate." data-toggle="tooltip" data-placement="top">
+            Certificate of Liability Insurance
+        </label>
+    </div>
+</div>
+<div class="form-group">
     <div class="col-xs-offset-3 col-xs-9">
-        <input type="submit" value="Submit" class="btn btn-primary" />
+        <input type="submit" value="Submit" class="btn btn-primary" onclick="return ValidateCheckboxes();" />
     </div>
 </div>
 
