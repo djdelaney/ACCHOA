@@ -6,6 +6,8 @@ using Microsoft.AspNet.Mvc;
 using Microsoft.AspNet.Identity;
 using HOA.Model;
 using Microsoft.AspNet.Authorization;
+using HOA.Util;
+using HOA.Services;
 
 // For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -22,19 +24,24 @@ namespace HOA.Controllers
 
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ApplicationDbContext _applicationDbContext;
+        private readonly IEmailSender _email;
 
         public ReminderController(
             UserManager<ApplicationUser> userManager,
-            ApplicationDbContext applicationDbContext)
+            ApplicationDbContext applicationDbContext,
+            IEmailSender mail)
         {
             _userManager = userManager;
             _applicationDbContext = applicationDbContext;
+            _email = mail;
         }
         
         [AllowAnonymous]
         public IActionResult Process()
         {
-            var allOpen = _applicationDbContext.Submissions.Where(s => s.Status != Status.Approved && s.Status != Status.Rejected).ToList();
+            var allOpen = _applicationDbContext.Submissions.Where(
+                s => s.Status != Status.Approved && s.Status != Status.Rejected && s.Status != Status.ConditionallyApproved && s.Status != Status.MissingInformation
+                ).ToList();
 
             foreach(var submission in allOpen)
             {
@@ -58,14 +65,13 @@ namespace HOA.Controllers
                         break;
                 }
 
-                if(DateTime.Now > submission.LastModified.Add(timeAllowance))
+                if(DateTime.Now > submission.StatusChangeTime.Add(timeAllowance))
                 {
-                    //overdue, send email
+                    EmailHelper.NotifySubmissonOverdue(_applicationDbContext, submission, _email);
                 }
             }
 
-
-            return View();
+            return Content("Processed");
         }
     }
 }

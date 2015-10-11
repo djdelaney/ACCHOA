@@ -18,6 +18,12 @@ A new submission is available for action:<br>
 <a href='{0}'>{0}</a><br>
 Status: {1}<br>";
 
+        private static string m_overdueEmail = @"
+The following submission is overdue:<br>
+<br>
+<a href='{0}'>{0}</a><br>
+Status: {1}<br>";
+
         private static string m_returnedEmail = @"
 {0} {1},<br>
 <br>
@@ -101,6 +107,54 @@ Your submission {2}. You can use the link below to view your submission and any 
             var link = String.Format("{0}Submission/View/{1}", m_baseUrl, submission.Id);
             string emailHtml = String.Format(m_returnedEmail, submission.FirstName, submission.LastName, status, link);
             mail.SendEmailAsync(new List<string> { submission.Email }, "ARB: New submission", emailHtml);
+        }
+
+        public static void NotifySubmissonOverdue(ApplicationDbContext context, Submission submission, IEmailSender mail)
+        {
+            string roleToNofity = null;
+            List<string> emails;
+            if (submission.Status == Status.Submitted)
+            {
+                roleToNofity = RoleNames.CommunityManager;
+            }
+            else if (submission.Status == Status.ARBIncoming)
+            {
+                roleToNofity = RoleNames.BoardChairman;
+            }
+            else if (submission.Status == Status.UnderReview)
+            {
+            }
+            else if (submission.Status == Status.ARBFinal)
+            {
+                roleToNofity = RoleNames.BoardChairman;
+            }
+            else if (submission.Status == Status.ReviewComplete)
+            {
+                roleToNofity = RoleNames.HOALiaison;
+            }
+            else
+            {
+                throw new Exception("Unknown status");
+            }
+
+
+            if (submission.Status == Status.UnderReview)
+            {
+                var role = context.Roles.Include(r => r.Users).FirstOrDefault(r => r.Name.Equals(RoleNames.BoardMember));
+                List<string> userIds = role.Users.Select(u => u.UserId).ToList();
+                var board = context.Users.Where(u => userIds.Contains(u.Id) && u.Enabled).Select(u => u.Id).ToList();
+                var alreadyReviewed = context.Reviews.Where(r => r.Submission.Id == submission.Id).Select(r => r.Reviewer.Id).ToList();
+                var toReview = board.Except(alreadyReviewed);
+                emails = context.Users.Where(u => toReview.Contains(u.Id) && u.Enabled).Select(u => u.Email).ToList();
+            }
+            else
+            {
+                emails = GetRoleMembers(context, roleToNofity);
+            }
+
+            var link = String.Format("{0}Submission/View/{1}", m_baseUrl, submission.Id);
+            var emailHtml = String.Format(m_overdueEmail, link, submission.Status.ToString());
+            mail.SendEmailAsync(emails, "ARB: Overdue submission", emailHtml);
         }
     }
 }
