@@ -66,6 +66,16 @@ namespace HOA
             services.AddMvc();
 
             services.AddTransient<IEmailSender, MockEmail>();
+
+            //Storage
+            var azureCon = Configuration["Data:AzureStorage:ConnectionString"];
+            if(string.IsNullOrEmpty(azureCon))
+                services.AddTransient<IFileStore, MockFileStore>();
+            else
+            {
+                AzureFileStore.ConnectionString = azureCon;
+                services.AddTransient<IFileStore, AzureFileStore>();
+            }
         }
 
         // Configure is called after ConfigureServices is called.

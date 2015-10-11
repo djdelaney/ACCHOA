@@ -30,7 +30,7 @@
             <ul>
             @foreach(var file in Model.Submission.Files)
             {
-                @:<li><a href="#">@file.Name</a></li>
+                @:<li><a href="/Submission/File/@file.Id">@file.Name</a></li>
             }
             </ul>
 

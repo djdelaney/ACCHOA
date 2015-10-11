@@ -23,14 +23,16 @@ namespace HOA.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ApplicationDbContext _applicationDbContext;
         private readonly IEmailSender _email;
+        private readonly IFileStore _storage;
         private RoleManager<IdentityRole> _roleManager;
 
-        public SubmissionController(ApplicationDbContext applicationDbContext, UserManager<ApplicationUser> userManager, IEmailSender emailSender, RoleManager<IdentityRole> roleManager)
+        public SubmissionController(ApplicationDbContext applicationDbContext, UserManager<ApplicationUser> userManager, IEmailSender emailSender, IFileStore store, RoleManager<IdentityRole> roleManager)
         {
             _applicationDbContext = applicationDbContext;
             _userManager = userManager;
             _email = emailSender;
             _roleManager = roleManager;
+            _storage = store;
         }
 
         private int GetReviewerCount()
@@ -190,6 +192,18 @@ namespace HOA.Controllers
             return View();
         }
 
+        public ActionResult File(int id)
+        {
+            var file = _applicationDbContext.Files
+                    .FirstOrDefault(f => f.Id == id);
+
+            if (file == null)
+                return HttpNotFound("File not found");
+
+            var stream = _storage.RetriveFile(file.BlobName);
+            return File(stream, "application/octet", file.Name);            
+        }
+
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -216,11 +230,13 @@ namespace HOA.Controllers
                     var chunks = fileContent.ContentDisposition.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
                     var nameChunk = chunks.FirstOrDefault(c => c.Contains("filename"));
                     var fileName = nameChunk.Split('=')[1].Trim(new char[] { '"' });
+                    fileName = System.IO.Path.GetFileName(fileName);
 
+                    var blobId = _storage.StoreFile(fileContent.OpenReadStream());
                     var file = new File
                     {
                         Name = fileName,
-                        BlobName = "TODO"
+                        BlobName = blobId
                     };
 
                     sub.Files.Add(file);
@@ -525,11 +541,13 @@ namespace HOA.Controllers
                         var chunks = fileContent.ContentDisposition.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
                         var nameChunk = chunks.FirstOrDefault(c => c.Contains("filename"));
                         var fileName = nameChunk.Split('=')[1].Trim(new char[] { '"' });
+                        fileName = System.IO.Path.GetFileName(fileName);
 
+                        var blobId = _storage.StoreFile(fileContent.OpenReadStream());
                         var file = new File
                         {
                             Name = fileName,
-                            BlobName = "TODO"
+                            BlobName = blobId
                         };
 
                         submission.Files.Add(file);
