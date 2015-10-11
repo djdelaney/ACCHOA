@@ -20,7 +20,8 @@
     "Microsoft.VisualStudio.Web.BrowserLink.Loader": "14.0.0-beta7",
     "Microsoft.Framework.Logging.Debug": "1.0.0-beta7",
     "Microsoft.AspNet.Diagnostics.Entity": "7.0.0-beta7",
-    "WindowsAzure.Storage": "6.0.0"
+    "WindowsAzure.Storage": "6.0.0",
+    "Sendgrid": "6.1.0"
   },
 
     "commands": {

@@ -4,9 +4,9 @@
     "DefaultConnection": {
       "ConnectionString": "Server=(localdb)\\MSSQLLocalDB;Database=HOA1;Trusted_Connection=True;MultipleActiveResultSets=true"
     },
-    "AzureStorage": 
-    {
+    "AzureStorage": {
       "ConnectionString": ""
-    }
+    },
+    "SendGridKey" :  ""
   }
 }

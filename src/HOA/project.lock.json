@@ -1861,6 +1861,27 @@
           "lib/net45/Remotion.Linq.dll": {}
         }
       },
+      "Sendgrid/6.1.0": {
+        "type": "package",
+        "dependencies": {
+          "SendGrid.SmtpApi": "1.3.1"
+        },
+        "compile": {
+          "lib/SendGridMail.dll": {}
+        },
+        "runtime": {
+          "lib/SendGridMail.dll": {}
+        }
+      },
+      "SendGrid.SmtpApi/1.3.1": {
+        "type": "package",
+        "compile": {
+          "lib/net40/SendGrid.SmtpApi.dll": {}
+        },
+        "runtime": {
+          "lib/net40/SendGrid.SmtpApi.dll": {}
+        }
+      },
       "System.Collections.Immutable/1.1.36": {
         "type": "package",
         "compile": {
@@ -3541,6 +3562,27 @@
         "Remotion.Linq.nuspec"
       ]
     },
+    "Sendgrid/6.1.0": {
+      "type": "package",
+      "sha512": "FYJu0QIddaAfD67T37ywZqB8mdNGEjLz/m8iLTKE1b0SWwzJaJ4xLLCj+vNZ/1kVaVneENHn8zmiv06qQQD/Vw==",
+      "files": [
+        "lib/SendGridMail.dll",
+        "Sendgrid.6.1.0.nupkg",
+        "Sendgrid.6.1.0.nupkg.sha512",
+        "Sendgrid.nuspec"
+      ]
+    },
+    "SendGrid.SmtpApi/1.3.1": {
+      "type": "package",
+      "sha512": "SxBvvuwGnGpNd88Y70edON4idaNk9wLi7n9gokpHcImjZM+5Z4CFpjvf/1N3D1ZkuFKacXAoNnyYFvFfgeNtDg==",
+      "files": [
+        "lib/net40/SendGrid.SmtpApi.dll",
+        "lib/portable-net4+wp81/SendGrid.SmtpApi.dll",
+        "SendGrid.SmtpApi.1.3.1.nupkg",
+        "SendGrid.SmtpApi.1.3.1.nupkg.sha512",
+        "SendGrid.SmtpApi.nuspec"
+      ]
+    },
     "System.Collections.Immutable/1.1.36": {
       "type": "package",
       "serviceable": true,
@@ -3660,7 +3702,8 @@
       "Microsoft.VisualStudio.Web.BrowserLink.Loader >= 14.0.0-beta7",
       "Microsoft.Framework.Logging.Debug >= 1.0.0-beta7",
       "Microsoft.AspNet.Diagnostics.Entity >= 7.0.0-beta7",
-      "WindowsAzure.Storage >= 6.0.0"
+      "WindowsAzure.Storage >= 6.0.0",
+      "Sendgrid >= 6.1.0"
     ],
     "DNX,Version=v4.5.1": []
   }

@@ -64,9 +64,7 @@ namespace HOA
             
             // Add MVC services to the services container.
             services.AddMvc();
-
-            services.AddTransient<IEmailSender, MockEmail>();
-
+            
             //Storage
             var azureCon = Configuration["Data:AzureStorage:ConnectionString"];
             if(string.IsNullOrEmpty(azureCon))
@@ -76,6 +74,16 @@ namespace HOA
                 AzureFileStore.ConnectionString = azureCon;
                 services.AddTransient<IFileStore, AzureFileStore>();
             }
+
+            //Email
+            var sendGridKey = Configuration["Data:SendGridKey"];
+            if (string.IsNullOrEmpty(sendGridKey))
+                services.AddTransient<IEmailSender, MockEmail>();
+            else
+            {
+                SendGridEmail.ApiKey = sendGridKey;
+                services.AddTransient<IEmailSender, SendGridEmail>();
+            }            
         }
 
         // Configure is called after ConfigureServices is called.
