@@ -15,14 +15,14 @@ namespace HOA.Services
             _logger = logger;
         }
 
-        private void SendEmail(string email, string subject, string message)
+        private void SendEmail(List<string> emails, string subject, string message)
         {
-            _logger.LogWarning("Sending email to {0}", email);
+            _logger.LogWarning("Sending email to {0}", string.Join(", ", emails));
         }
 
-        public Task SendEmailAsync(string email, string subject, string message)
+        public Task SendEmailAsync(List<string> emails, string subject, string message)
         {
-            return Task.Factory.StartNew(() => SendEmail(email, subject, message));
+            return Task.Factory.StartNew(() => SendEmail(emails, subject, message));
         }
     }
 }

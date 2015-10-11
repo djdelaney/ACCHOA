@@ -7,6 +7,6 @@ namespace HOA.Services
 {
     public interface IEmailSender
     {
-        Task SendEmailAsync(string email, string subject, string message);
+        Task SendEmailAsync(List<string> emails, string subject, string message);
     }
 }

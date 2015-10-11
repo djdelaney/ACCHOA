@@ -185,13 +185,6 @@ namespace HOA.Controllers
             return View(submission);
         }
 
-        [HttpGet]
-        [AllowAnonymous]
-        public IActionResult Create()
-        {
-            return View();
-        }
-
         public ActionResult File(int id)
         {
             var file = _applicationDbContext.Files
@@ -201,7 +194,14 @@ namespace HOA.Controllers
                 return HttpNotFound("File not found");
 
             var stream = _storage.RetriveFile(file.BlobName);
-            return File(stream, "application/octet", file.Name);            
+            return File(stream, "application/octet", file.Name);
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult Create()
+        {
+            return View();
         }
 
         [HttpPost]
@@ -222,7 +222,9 @@ namespace HOA.Controllers
                     LastModified = DateTime.Now,
                     Code = DBUtil.GenerateUniqueCode(_applicationDbContext),
                     Files = new List<File>(),
-                    Revision = 1
+                    Revision = 1,
+                    StatusChangeTime = DateTime.Now,
+                    SubmissionDate = DateTime.Now
                 };
 
                 foreach(var fileContent in model.Files)
@@ -247,6 +249,7 @@ namespace HOA.Controllers
 
                 _applicationDbContext.Submissions.Add(sub);
                 _applicationDbContext.SaveChanges();
+                EmailHelper.NotifyStatusChanged(_applicationDbContext, sub, _email);
 
                 return View("PostCreate", sub);
             }
@@ -304,13 +307,17 @@ namespace HOA.Controllers
                 }
                 else
                     submission.Status = Status.MissingInformation;
-                
+
+                submission.StatusChangeTime = DateTime.Now;
+
                 var user = await _userManager.FindByIdAsync(User.GetUserId());                
                 string action = string.Format("Marked {0}. Comments: {1}", model.Approve ? "complete" : "missing information", model.Comments);
                 AddHistoryEntry(submission, user.FullName, action);
 
                 submission.LastModified = DateTime.Now;
                 _applicationDbContext.SaveChanges();
+                EmailHelper.NotifyStatusChanged(_applicationDbContext, submission, _email);
+
                 return RedirectToAction(nameof(View), new { id = submission.Id });
             }
 
@@ -372,7 +379,9 @@ namespace HOA.Controllers
                 {
                     submission.Status = Status.ARBFinal;
                     submission.LastModified = DateTime.Now;
+                    submission.StatusChangeTime = DateTime.Now;
                     AddHistoryEntry(submission, "System", "All reviews in, sent to chairman");
+                    EmailHelper.NotifyStatusChanged(_applicationDbContext, submission, _email);
                 }
                 
                 _applicationDbContext.SaveChanges();
@@ -426,6 +435,7 @@ namespace HOA.Controllers
                 {
                     submission.Status = Status.Rejected;
                 }
+                submission.StatusChangeTime = DateTime.Now;
 
                 var user = await _userManager.FindByIdAsync(User.GetUserId());
                 string action = string.Format("{0}. Comments: {1}", model.Status, model.Comments);
@@ -433,6 +443,8 @@ namespace HOA.Controllers
 
                 submission.LastModified = DateTime.Now;
                 _applicationDbContext.SaveChanges();
+                EmailHelper.NotifyStatusChanged(_applicationDbContext, submission, _email);
+
                 return RedirectToAction(nameof(View), new { id = submission.Id });
             }
 
@@ -486,6 +498,7 @@ namespace HOA.Controllers
                 {
                     submission.Status = Status.Rejected;
                 }
+                submission.StatusChangeTime = DateTime.Now;
 
                 var user = await _userManager.FindByIdAsync(User.GetUserId());
                 string action = string.Format("Marked {0}. Comments: {1}", model.Status, model.Comments);
@@ -493,6 +506,8 @@ namespace HOA.Controllers
 
                 submission.LastModified = DateTime.Now;
                 _applicationDbContext.SaveChanges();
+                EmailHelper.NotifyStatusChanged(_applicationDbContext, submission, _email);
+
                 return RedirectToAction(nameof(View), new { id = submission.Id });
             }
 
@@ -530,6 +545,9 @@ namespace HOA.Controllers
                 if (submission == null)
                     return HttpNotFound("Submission not found");
 
+                submission.SubmissionDate = DateTime.Now;
+                submission.StatusChangeTime = DateTime.Now;
+
                 //Add new comments
                 submission.Description = string.Format("{0}\n\nResubmitted {1}:\n\n{2}", submission.Description, DateTime.Now.ToString("MM/dd/yyyy hh:mm tt"), model.Description);
 
@@ -562,6 +580,7 @@ namespace HOA.Controllers
                 AddHistoryEntry(submission, submission.FirstName + " " + submission.LastName, "Resubmitted");
 
                 _applicationDbContext.SaveChanges();
+                EmailHelper.NotifyStatusChanged(_applicationDbContext, submission, _email);
 
                 return RedirectToAction(nameof(ViewStatus), new { id = submission.Code });
             }

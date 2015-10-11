@@ -56,6 +56,12 @@ namespace HOA.Model
         [Required]
         public DateTime LastModified { get; set; }
 
+        [Required]
+        public DateTime StatusChangeTime { get; set; }
+
+        [Required]
+        public DateTime SubmissionDate { get; set; }
+
         public virtual IList<Review> Reviews { get; set; }
 
         public virtual IList<History> Audits { get; set; }
