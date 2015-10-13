@@ -47,7 +47,6 @@
     </div>
 }
 
-
 <div class="form-group">
     <label class="control-label col-xs-3">
         @Html.LabelFor(model => model.FirstName)
@@ -102,6 +101,7 @@
         <label>Requirements</label>
     </label>
     <div class="col-xs-9">
+        <a href="/assets/RulesAndRegulations.pdf" target="_blank">Rules and Regulations</a><br />
         <br>
         <input type="checkbox" id="req1" value="value">
         <label for="req1" title="Show the exact location and dimensions of the proposed improvement indicated on the drawing.  The as built plan is used to show the relationship between your planned improvement and any property lines, swales, or easements." data-toggle="tooltip" data-placement="top">
@@ -147,6 +147,32 @@
 <div class="form-group">
     <div class="col-xs-offset-3 col-xs-9">
         <input type="submit" value="Submit" class="btn btn-primary" onclick="return ValidateCheckboxes();" />
+    </div>
+</div>
+<div class="form-group">
+    <label class="control-label col-xs-3">
+        Examples
+    </label>
+    <div class="col-xs-9">
+
+        <div class="dropdown">
+            <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                Dropdown
+                <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                <li><a href="#">Deck</a></li>
+                <li><a href="#">Patio</a></li>
+                <li><a href="#">Addition</a></li>
+                <li><a href="#">Other</a></li>
+            </ul>
+        </div>
+
+        <br />
+
+        If you have any comments, questions, or concerns please contact Josh Rozzi (<a href="mailto:josh.rozzi@fsresidential.com">josh.rozzi@fsresidential.com</a>)
+
+
     </div>
 </div>
 

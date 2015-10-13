@@ -13,6 +13,8 @@ using Microsoft.Framework.Logging;
 using HOA.Model;
 using HOA.Services;
 using Microsoft.AspNet.Diagnostics.Entity;
+using Microsoft.AspNet.StaticFiles;
+using Microsoft.AspNet.Http;
 
 namespace HOA
 {
@@ -53,10 +55,11 @@ namespace HOA
                 (
                     options => 
                     {
-                        /*options.Password.RequiredLength = 6;
+                        options.Password.RequireDigit = false;
+                        options.Password.RequireLowercase = false;
                         options.Password.RequireUppercase = false;
                         options.Password.RequireNonLetterOrDigit = false;
-                        options.User.RequireUniqueEmail = true;*/
+                        options.Password.RequiredLength = 6;
                     }
                 )
                 .AddEntityFrameworkStores<ApplicationDbContext>()
@@ -110,7 +113,10 @@ namespace HOA
             }
 
             // Add static files to the request pipeline.
-            //app.UseStaticFiles();
+            app.UseStaticFiles(new StaticFileOptions()
+            {
+                RequestPath = new PathString("/assets"),
+            });
 
             // Add cookie-based authentication to the request pipeline.
             app.UseIdentity();
