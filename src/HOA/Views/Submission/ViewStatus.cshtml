@@ -61,6 +61,24 @@
         }
 
 
+
+        @if (Model.Responses != null && Model.Responses.Count > 0)
+        {
+            <br />
+            <h4>Feedback</h4>
+            @foreach (var response in Model.Responses)
+            {
+                @response.Created.ToString("MM/dd/yyyy") <br />
+                @response.Comments<br />
+                <br />
+            }
+
+            <br />
+        }
+
+
+
+
         @if (Model.Status == Status.MissingInformation || Model.Status == Status.Rejected)
         {
             <a class="btn btn-primary" href="/Submission/Resubmit/@Model.Id" role="button">Resubmit &raquo;</a>

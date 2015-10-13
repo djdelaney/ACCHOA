@@ -22,7 +22,7 @@ namespace HOA.Model.ViewModel
         public bool Reviewed { get; set; }
     }
 
-    public class ApproveRejectViewModel
+    public class ApproveRejectViewModel : IValidatableObject
     {
         public Submission Submission { get; set; }
 
@@ -30,10 +30,22 @@ namespace HOA.Model.ViewModel
         public int SubmissionId { get; set; }
 
         [Required]
+        [Display(Name = "Application Complete?")]
         public bool Approve { get; set; }
 
         [Required]
         public string Comments { get; set; }
+
+        [Display(Name = "User Feedback")]
+        public string UserFeedback { get; set; }
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (!Approve && string.IsNullOrEmpty(UserFeedback))
+            {
+                yield return new ValidationResult("You must supply user feedback for rejections.");
+            }
+        }
     }
 
     public class ReviewSubmissionViewModel

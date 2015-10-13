@@ -4,12 +4,12 @@
 *@
 @{
     ViewBag.Title = "Submissions";
-    ViewBag.Section = "Incoming";
+    ViewBag.Section = "Submissions";
 }
 
 <p>
     <div class="btn-group" role="group" aria-label="...">
-        <a class="btn btn btn-default @if (Model.Filter == "Incoming") { @Html.Raw("active") }" href="/Submission/List/Incoming" role="button">Incoming</a>
+        <a class="btn btn btn-default @if (Model.Filter == "Todo") { @Html.Raw("active") }" href="/Submission/List/Todo" role="button">Todo</a>
         
         @if(!User.IsInRole(RoleNames.BoardMember))
         { 

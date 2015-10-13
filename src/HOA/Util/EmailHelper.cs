@@ -104,7 +104,7 @@ Your submission {2}. You can use the link below to view your submission and any 
                 status = "has been rejected";
             }
 
-            var link = String.Format("{0}Submission/View/{1}", m_baseUrl, submission.Id);
+            var link = String.Format("{0}Submission/ViewStatus/{1}", m_baseUrl, submission.Code);
             string emailHtml = String.Format(m_returnedEmail, submission.FirstName, submission.LastName, status, link);
             mail.SendEmailAsync(new List<string> { submission.Email }, "ARB: New submission", emailHtml);
         }

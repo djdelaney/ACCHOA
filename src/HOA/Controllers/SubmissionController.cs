@@ -68,10 +68,10 @@ namespace HOA.Controllers
 
             if(string.IsNullOrEmpty(filter))
             {
-                filter = "Incoming";
+                filter = "Todo";
             }
 
-            if (filter.Equals("Incoming"))
+            if (filter.Equals("Todo"))
             {
                 subs = subs.Where(s => s.Status != Status.Approved && s.Status != Status.Rejected && s.Status != Status.ConditionallyApproved && s.Status != Status.MissingInformation);
 
@@ -159,8 +159,6 @@ namespace HOA.Controllers
                     .Include(s => s.Audits)
                     .FirstOrDefault(s => s.Code.Equals(model.Code));
 
-                submission.Audits = submission.Audits.OrderBy(a => a.DateTime).ToList();
-
                 if (submission == null)
                     return View("StatusNotFound");
 
@@ -177,10 +175,14 @@ namespace HOA.Controllers
         {
             var submission = _applicationDbContext.Submissions
                     .Include(s => s.Audits)
+                    .Include(s => s.Responses)
                     .FirstOrDefault(s => s.Code.Equals(id));
 
+            submission.Audits = submission.Audits.OrderBy(a => a.DateTime).ToList();
+            submission.Responses = submission.Responses.OrderBy(r => r.Created).ToList();
+
             if (submission == null)
-                return HttpNotFound("Submission not found");
+                return View("StatusNotFound");
 
             return View(submission);
         }
@@ -209,7 +211,7 @@ namespace HOA.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CreateSubmissionViewModel model)
         {
-            if (ModelState.IsValid)
+            if (ModelState.IsValid && model.Files.Count > 0)
             {       
                 var sub = new Submission()
                 {
@@ -244,7 +246,7 @@ namespace HOA.Controllers
                     sub.Files.Add(file);
                     _applicationDbContext.Files.Add(file);
                 }
-
+                
                 AddHistoryEntry(sub, model.FirstName + " " + model.LastName, "Submitted");
 
                 _applicationDbContext.Submissions.Add(sub);
@@ -260,8 +262,7 @@ namespace HOA.Controllers
 
         
         [HttpGet]
-        [Authorize(Roles = RoleNames.CommunityManager)]
-        [Authorize(Roles = RoleNames.BoardChairman)]
+        [AuthorizeRoles(RoleNames.CommunityManager, RoleNames.BoardChairman)]
         public IActionResult CheckCompleteness(int id)
         {
             var submission = _applicationDbContext.Submissions.FirstOrDefault(s => s.Id == id);
@@ -284,8 +285,7 @@ namespace HOA.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = RoleNames.CommunityManager)]
-        [Authorize(Roles = RoleNames.BoardChairman)]
+        [AuthorizeRoles(RoleNames.CommunityManager, RoleNames.BoardChairman)]
         public async Task<IActionResult> CheckCompleteness(ApproveRejectViewModel model)
         {
             if (ModelState.IsValid)
@@ -306,7 +306,19 @@ namespace HOA.Controllers
                     }
                 }
                 else
+                {
                     submission.Status = Status.MissingInformation;
+                    submission.Responses = new List<Response>();
+
+                    var response = new Response
+                    {
+                        Created = DateTime.Now,
+                        Comments = model.UserFeedback,
+                        Submission = submission
+                    };
+                    submission.Responses.Add(response);
+                    _applicationDbContext.Responses.Add(response);
+                }
 
                 submission.StatusChangeTime = DateTime.Now;
 

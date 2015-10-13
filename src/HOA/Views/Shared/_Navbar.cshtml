@@ -18,8 +18,8 @@
 
                 @if (User.Identity.IsAuthenticated)
                 {
-                    <li @if (ViewBag.Section == "Incoming") { @Html.Raw("class=\"active\"") }><a href="/Submission/List">Incoming</a></li>
-                    <li @if (ViewBag.Section == "Overdue") { @Html.Raw("class=\"active\"") }><a href="#contact">Overdue</a></li>
+                    <li @if (ViewBag.Section == "Submissions") { @Html.Raw("class=\"active\"") }><a href="/Submission/List">Submissions</a></li>
+                    
                 }
             </ul>
 

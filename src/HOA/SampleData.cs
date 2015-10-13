@@ -66,22 +66,30 @@ namespace HOA
                 await _userManager.CreateAsync(user, "Password");
                 await _userManager.AddToRoleAsync(user, RoleNames.Administrator);
             }
-            /*
-            user = await _userManager.FindByNameAsync("CommunityManager");
+            
+            user = await _userManager.FindByNameAsync("JoshRozzi");
             if (user == null)
             {
-                user = new ApplicationUser { UserName = "CommunityManager", Email = "CommunityManager@mailinator.com", FullName = "Community Manager", Enabled = true };
-                await _userManager.CreateAsync(user, "P@ssw0rd!");
+                user = new ApplicationUser { UserName = "JoshRozzi", Email = "JoshRozzi@mailinator.com", FullName = "Josh Rozzi", Enabled = true };
+                await _userManager.CreateAsync(user, "Password");
                 await _userManager.AddToRoleAsync(user, RoleNames.CommunityManager);
             }
 
-            user = await _userManager.FindByNameAsync("BoardMember1");
+            user = await _userManager.FindByNameAsync("KirkFinnis");
             if (user == null)
             {
-                user = new ApplicationUser { UserName = "BoardMember1", Email = "BoardMember1@mailinator.com", FullName = "Board Member1", Enabled = true };
-                await _userManager.CreateAsync(user, "P@ssw0rd!");
+                user = new ApplicationUser { UserName = "KirkFinnis", Email = "KirkFinnis@mailinator.com", FullName = "Kirk Finnis", Enabled = true };
+                await _userManager.CreateAsync(user, "Password");
+                await _userManager.AddToRoleAsync(user, RoleNames.BoardChairman);
+            }
+
+            user = await _userManager.FindByNameAsync("DanLetscher");
+            if (user == null)
+            {
+                user = new ApplicationUser { UserName = "DanLetscher", Email = "DanLetscher@mailinator.com", FullName = "Dan Letscher", Enabled = true };
+                await _userManager.CreateAsync(user, "Password");
                 await _userManager.AddToRoleAsync(user, RoleNames.BoardMember);
-            }*/
+            }
 
         }
     }
