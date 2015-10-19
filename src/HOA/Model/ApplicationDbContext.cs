@@ -18,15 +18,15 @@ namespace HOA.Model
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            builder.Entity<Comment>().Key(v => v.Id);
-            builder.Entity<History>().Key(v => v.Id);
-            builder.Entity<ApplicationUser>().Key(v => v.Id);
-            builder.Entity<Review>().Key(v => v.Id);
-            builder.Entity<Submission>().Key(v => v.Id);
-            builder.Entity<File>().Key(v => v.Id);
-            builder.Entity<Response>().Key(v => v.Id);
+            builder.Entity<Comment>().HasKey(v => v.Id);
+            builder.Entity<History>().HasKey(v => v.Id);
+            builder.Entity<ApplicationUser>().HasKey(v => v.Id);
+            builder.Entity<Review>().HasKey(v => v.Id);
+            builder.Entity<Submission>().HasKey(v => v.Id);
+            builder.Entity<File>().HasKey(v => v.Id);
+            builder.Entity<Response>().HasKey(v => v.Id);
 
-            builder.Entity<Submission>().Collection(s => s.Audits).InverseReference(h => h.Submission).Required(false);
+            builder.Entity<Submission>().HasMany(s => s.Audits).WithOne(h => h.Submission).Required(false);
 
             //var builder = modelBuilder.Entity<CustomerDetails>().Reference(e => e.Customer).InverseReference(e => e.Details);
             //builder.Entity<Submission>().Reference
