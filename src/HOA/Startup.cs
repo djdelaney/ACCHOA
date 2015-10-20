@@ -3,18 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Builder;
+using Microsoft.AspNet.Http;
+using Microsoft.Framework.DependencyInjection;
+using Microsoft.Framework.Configuration;
+using Microsoft.Framework.Logging;
 using Microsoft.AspNet.Hosting;
-using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.AspNet.Diagnostics.Entity;
 using Microsoft.Data.Entity;
 using Microsoft.Dnx.Runtime;
-using Microsoft.Framework.Configuration;
-using Microsoft.Framework.DependencyInjection;
-using Microsoft.Framework.Logging;
 using HOA.Model;
-using HOA.Services;
-using Microsoft.AspNet.Diagnostics.Entity;
+using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.StaticFiles;
-using Microsoft.AspNet.Http;
+using HOA.Services;
 
 namespace HOA
 {
@@ -35,14 +35,13 @@ namespace HOA
                 // For more details on using the user secret store see http://go.microsoft.com/fwlink/?LinkID=532709
                 builder.AddUserSecrets();
             }
-
             builder.AddEnvironmentVariables();
             Configuration = builder.Build();
         }
 
         public IConfigurationRoot Configuration { get; set; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
+        // For more information on how to configure your application, visit http://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
             // Add Entity Framework services to the services container.
@@ -54,7 +53,7 @@ namespace HOA
             // Add Identity services to the services container.
             services.AddIdentity<ApplicationUser, IdentityRole>
                 (
-                    options => 
+                    options =>
                     {
                         options.Password.RequireDigit = false;
                         options.Password.RequireLowercase = false;
@@ -65,13 +64,13 @@ namespace HOA
                 )
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
-            
+
             // Add MVC services to the services container.
             services.AddMvc();
-            
+
             //Storage
             var azureCon = Configuration["Data:AzureStorage:ConnectionString"];
-            if(string.IsNullOrEmpty(azureCon))
+            if (string.IsNullOrEmpty(azureCon))
                 services.AddTransient<IFileStore, MockFileStore>();
             else
             {
@@ -87,13 +86,12 @@ namespace HOA
             {
                 SendGridEmail.ApiKey = sendGridKey;
                 services.AddTransient<IEmailSender, SendGridEmail>();
-            }            
+            }
         }
 
-        // Configure is called after ConfigureServices is called.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
-            loggerFactory.MinimumLevel = LogLevel.Debug;
+            loggerFactory.MinimumLevel = LogLevel.Information;
             loggerFactory.AddConsole();
             loggerFactory.AddDebug();
 
@@ -124,13 +122,6 @@ namespace HOA
 
             // Add cookie-based authentication to the request pipeline.
             app.UseIdentity();
-
-            // Add authentication middleware to the request pipeline. You can configure options such as Id and Secret in the ConfigureServices method.
-            // For more information see http://go.microsoft.com/fwlink/?LinkID=532715
-            // app.UseFacebookAuthentication();
-            // app.UseGoogleAuthentication();
-            // app.UseMicrosoftAccountAuthentication();
-            // app.UseTwitterAuthentication();
 
             // Add MVC to the request pipeline.
             app.UseMvc(routes =>

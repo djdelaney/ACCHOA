@@ -48,7 +48,7 @@ namespace HOA.Controllers
 
         private async Task<ApplicationUser> GetCurrentUserAsync()
         {
-            return await _userManager.FindByIdAsync(User.GetUserId());
+            return await _userManager.FindByIdAsync(Request.HttpContext.User.GetUserId());
         }
 
         [HttpGet]

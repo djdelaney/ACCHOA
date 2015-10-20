@@ -1,50 +1,45 @@
 {
-    "webroot": "wwwroot",
-    "userSecretsId": "aspnet5-HOA-a224be4a-8ebc-4947-a838-7d1e2d7784cc",
-    "version": "1.0.0-*",
+  "webroot": "wwwroot",
+  "version": "1.0.0-*",
+  "userSecretsId": "aspnet5-HOA-a224be4a-8ebc-4947-a838-7d1e2d7784cc",
 
   "dependencies": {
-    "Microsoft.AspNet.Server.IIS": "1.0.0-beta7",
-    "Sendgrid": "6.1.0",
     "EntityFramework.Commands": "7.0.0-beta8",
+    "EntityFramework.SqlServer": "7.0.0-beta8",
     "EntityFramework.Relational": "7.0.0-beta8",
     "EntityFramework.Relational.Design": "7.0.0-beta8",
-    "EntityFramework.SqlServer": "7.0.0-beta8",
     "Microsoft.AspNet.Diagnostics": "1.0.0-beta8",
     "Microsoft.AspNet.Diagnostics.Entity": "7.0.0-beta8",
     "Microsoft.AspNet.Identity": "3.0.0-beta8",
     "Microsoft.AspNet.Identity.EntityFramework": "3.0.0-beta8",
+    "Microsoft.AspNet.IISPlatformHandler": "1.0.0-beta8",
     "Microsoft.AspNet.Mvc": "6.0.0-beta8",
-    "Microsoft.AspNet.Server.WebListener": "1.0.0-beta8",
+    "Microsoft.AspNet.Mvc.Core": "6.0.0-beta8",
+    "Microsoft.AspNet.Server.Kestrel": "1.0.0-beta8",
     "Microsoft.AspNet.StaticFiles": "1.0.0-beta8",
-    "Microsoft.Framework.Configuration.Json": "1.0.0-beta8",
     "Microsoft.Framework.Configuration.UserSecrets": "1.0.0-beta8",
     "Microsoft.Framework.Logging.Console": "1.0.0-beta8",
     "Microsoft.Framework.Logging.Debug": "1.0.0-beta8",
     "Microsoft.VisualStudio.Web.BrowserLink.Loader": "14.0.0-beta8",
-    "WindowsAzure.Storage": "6.0.0",
-    "Microsoft.AspNet.IISPlatformHandler": "1.0.0-beta8"
+    "Sendgrid": "6.1.0",
+    "WindowsAzure.Storage": "6.0.0"
   },
 
-    "commands": {
-        "web": "Microsoft.AspNet.Server.Kestrel",
-        "ef": "EntityFramework.Commands"
-    },
+  "commands": {
+    "web": "Microsoft.AspNet.Server.Kestrel",
+    "ef": "EntityFramework.Commands"
+  },
 
-    "frameworks": {
-        "dnx451": { }
-    },
+  "frameworks": {
+    "dnx451": { }
+  },
 
-    "publishExclude": [
-        "node_modules",
-        "bower_components",
-        "**.xproj",
-        "**.user",
-        "**.vspscc"
-    ],
-    "exclude": [
-        "wwwroot",
-        "node_modules",
-        "bower_components"
-    ]
+  "exclude": [
+    "wwwroot",
+    "node_modules"
+  ],
+  "publishExclude": [
+    "**.user",
+    "**.vspscc"
+  ]
 }

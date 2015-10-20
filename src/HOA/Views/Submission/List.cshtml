@@ -9,15 +9,15 @@
 
 <p>
     <div class="btn-group" role="group" aria-label="...">
-        <a class="btn btn btn-default @if (Model.Filter == "Todo") { @Html.Raw("active") }" href="/Submission/List/Todo" role="button">Todo</a>
+        <a class="btn btn btn-default @(Model.Filter == "Todo" ? "active" : "")" href="/Submission/List/Todo" role="button">Todo</a>
         
         @if(!User.IsInRole(RoleNames.BoardMember))
         { 
-        <a class="btn btn btn-default @if (Model.Filter == "All") { @Html.Raw("active") }" href="/Submission/List/All" role="button">All</a>
+        <a class="btn btn btn-default @(Model.Filter == "All" ? "active" : "")" href="/Submission/List/All" role="button">All</a>
         }
         
-        <a class="btn btn btn-default @if (Model.Filter == "Approved") { @Html.Raw("active") }" href="/Submission/List/Approved" role="button">Approved</a>
-        <a class="btn btn btn-default @if (Model.Filter == "Rejected") { @Html.Raw("active") }" href="/Submission/List/Rejected" role="button">Rejected</a>
+        <a class="btn btn btn-default @(Model.Filter == "Approved" ? "active" : "")" href="/Submission/List/Approved" role="button">Approved</a>
+        <a class="btn btn btn-default @(Model.Filter == "Rejected" ? "active" : "")" href="/Submission/List/Rejected" role="button">Rejected</a>
     </div>
 </p>
 
