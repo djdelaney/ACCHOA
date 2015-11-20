@@ -8,12 +8,12 @@ namespace HOA.Services
 {
     public class MockFileStore : IFileStore
     {
-        public Stream RetriveFile(string id)
+        Task<Stream> IFileStore.RetriveFile(string id)
         {
             throw new NotImplementedException();
         }
 
-        public string StoreFile(Stream data)
+        async Task<string> IFileStore.StoreFile(Stream data)
         {
             return Guid.NewGuid().ToString();
         }

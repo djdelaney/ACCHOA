@@ -187,7 +187,7 @@ namespace HOA.Controllers
             return View(submission);
         }
 
-        public ActionResult File(int id)
+        public async Task<ActionResult> File(int id)
         {
             var file = _applicationDbContext.Files
                     .FirstOrDefault(f => f.Id == id);
@@ -195,7 +195,7 @@ namespace HOA.Controllers
             if (file == null)
                 return HttpNotFound("File not found");
 
-            var stream = _storage.RetriveFile(file.BlobName);
+            var stream = await _storage.RetriveFile(file.BlobName);
             return File(stream, "application/octet", file.Name);
         }
 
@@ -236,7 +236,7 @@ namespace HOA.Controllers
                     var fileName = nameChunk.Split('=')[1].Trim(new char[] { '"' });
                     fileName = System.IO.Path.GetFileName(fileName);
 
-                    var blobId = _storage.StoreFile(fileContent.OpenReadStream());
+                    var blobId = await _storage.StoreFile(fileContent.OpenReadStream());
                     var file = new File
                     {
                         Name = fileName,
@@ -573,7 +573,7 @@ namespace HOA.Controllers
                         var fileName = nameChunk.Split('=')[1].Trim(new char[] { '"' });
                         fileName = System.IO.Path.GetFileName(fileName);
 
-                        var blobId = _storage.StoreFile(fileContent.OpenReadStream());
+                        var blobId = await _storage.StoreFile(fileContent.OpenReadStream());
                         var file = new File
                         {
                             Name = fileName,

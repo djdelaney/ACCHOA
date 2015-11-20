@@ -9,6 +9,7 @@ namespace HOA.Services
 {
     public class SendGridEmail : IEmailSender
     {
+        public static string ApiUser;
         public static string ApiKey;
 
         public Task SendEmailAsync(List<string> recipients, string subject, string message)
@@ -27,8 +28,10 @@ namespace HOA.Services
             myMessage.Html = message;
             //myMessage.Text = "Hello World plain text!";
 
-            var transportWeb = new Web(ApiKey);
-
+            var credentials = new System.Net.NetworkCredential(ApiUser, ApiKey);
+            
+            var transportWeb = new Web(credentials);
+            
             // Send the email.
             return transportWeb.DeliverAsync(myMessage);
         }

@@ -26,7 +26,7 @@ namespace HOA.Model
             builder.Entity<File>().HasKey(v => v.Id);
             builder.Entity<Response>().HasKey(v => v.Id);
 
-            builder.Entity<Submission>().HasMany(s => s.Audits).WithOne(h => h.Submission).Required(false);
+            builder.Entity<Submission>().HasMany(s => s.Audits).WithOne(h => h.Submission).IsRequired(false);
 
             //var builder = modelBuilder.Entity<CustomerDetails>().Reference(e => e.Customer).InverseReference(e => e.Details);
             //builder.Entity<Submission>().Reference

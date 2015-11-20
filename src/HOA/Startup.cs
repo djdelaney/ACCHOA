@@ -3,35 +3,31 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Builder;
-using Microsoft.AspNet.Http;
-using Microsoft.Framework.DependencyInjection;
-using Microsoft.Framework.Configuration;
-using Microsoft.Framework.Logging;
 using Microsoft.AspNet.Hosting;
-using Microsoft.AspNet.Diagnostics.Entity;
-using Microsoft.Data.Entity;
-using Microsoft.Dnx.Runtime;
-using HOA.Model;
 using Microsoft.AspNet.Identity.EntityFramework;
-using Microsoft.AspNet.StaticFiles;
+using Microsoft.Data.Entity;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using HOA.Model;
 using HOA.Services;
+using Microsoft.AspNet.StaticFiles;
+using Microsoft.AspNet.Http;
 
 namespace HOA
 {
     public class Startup
     {
-        public Startup(IHostingEnvironment env, IApplicationEnvironment appEnv)
+        public Startup(IHostingEnvironment env)
         {
             // Setup configuration sources.
 
             var builder = new ConfigurationBuilder()
-                .SetBasePath(appEnv.ApplicationBasePath)
                 .AddJsonFile("appsettings.json")
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
 
             if (env.IsDevelopment())
             {
-                // This reads the configuration keys from the secret store.
                 // For more details on using the user secret store see http://go.microsoft.com/fwlink/?LinkID=532709
                 builder.AddUserSecrets();
             }
@@ -102,7 +98,7 @@ namespace HOA
             {
                 app.UseBrowserLink();
                 app.UseDeveloperExceptionPage();
-                app.UseDatabaseErrorPage(DatabaseErrorPageOptions.ShowAll);
+                app.UseDatabaseErrorPage();
             }
             else
             {
@@ -134,5 +130,8 @@ namespace HOA
                 // routes.MapWebApiRoute("DefaultApi", "api/{controller}/{id?}");
             });
         }
+
+        // Entry point for the application.
+        public static void Main(string[] args) => WebApplication.Run<Startup>(args);
     }
 }

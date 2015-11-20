@@ -1,11 +1,10 @@
-﻿using Microsoft.Framework.Configuration;
+﻿using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Blob;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Blob;
 
 namespace HOA.Services
 {
@@ -13,7 +12,7 @@ namespace HOA.Services
     {
         public static string ConnectionString;
 
-        public Stream RetriveFile(string id)
+        public async Task<Stream> RetriveFile(string id)
         {
             // Retrieve storage account from connection string.
             CloudStorageAccount storageAccount = CloudStorageAccount.Parse(ConnectionString);
@@ -26,10 +25,10 @@ namespace HOA.Services
 
             CloudBlockBlob blockBlob = container.GetBlockBlobReference(id);
 
-            return blockBlob.OpenRead();
+            return await blockBlob.OpenReadAsync();
         }
 
-        public string StoreFile(Stream data)
+        public async Task<string> StoreFile(Stream data)
         {
             var id = Guid.NewGuid().ToString();
 
@@ -43,13 +42,13 @@ namespace HOA.Services
             CloudBlobContainer container = blobClient.GetContainerReference("arb");
 
             // Create the container if it doesn't already exist.
-            container.CreateIfNotExists();
+            await container.CreateIfNotExistsAsync();
 
             // Retrieve reference to a blob named "myblob".
             CloudBlockBlob blockBlob = container.GetBlockBlobReference(id);
-            blockBlob.UploadFromStream(data);
+            await blockBlob.UploadFromStreamAsync(data);
 
             return id;
-        }        
+        }
     }
 }
