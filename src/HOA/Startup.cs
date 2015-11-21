@@ -98,7 +98,10 @@ namespace HOA
             {
                 app.UseBrowserLink();
                 app.UseDeveloperExceptionPage();
-                app.UseDatabaseErrorPage();
+                app.UseDatabaseErrorPage(options =>
+                {
+                    options.EnableAll();
+                });
             }
             else
             {
