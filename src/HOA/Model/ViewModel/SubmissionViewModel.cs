@@ -48,6 +48,32 @@ namespace HOA.Model.ViewModel
         }
     }
 
+    public class TallyVotesViewModel : IValidatableObject
+    {
+        public Submission Submission { get; set; }
+
+        [Required]
+        public int SubmissionId { get; set; }
+
+        [Required]
+        public string Status { get; set; }
+
+        [Required]
+        public string Comments { get; set; }
+
+        [Display(Name = "User Feedback")]
+        public string UserFeedback { get; set; }
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            var status = (ReviewStatus)Enum.Parse(typeof(ReviewStatus), Status);
+            if (status == ReviewStatus.MissingInformation && string.IsNullOrEmpty(UserFeedback))
+            {
+                yield return new ValidationResult("You must supply user feedback for missing info.");
+            }
+        }
+    }
+
     public class ReviewSubmissionViewModel
     {
         public Submission Submission { get; set; }

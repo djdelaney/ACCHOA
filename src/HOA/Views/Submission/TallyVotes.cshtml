@@ -1,6 +1,6 @@
 ﻿@using HOA.Model
 @using HOA.Model.ViewModel
-@model ReviewSubmissionViewModel
+@model TallyVotesViewModel
 @*
     For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 *@
@@ -99,6 +99,11 @@
         Model.Status
     ),
     new { @class = "form-control" })
+    <br />
+    <br />
+    @Html.LabelFor(model => model.UserFeedback)@: <br />
+    @:Required for incomplete applications<br />
+    @Html.TextAreaFor(model => model.UserFeedback, new { @class = "form-control" })<br />
     <br />
     <br />
 

@@ -84,15 +84,11 @@ namespace HOA.Controllers
                 }
                 else if (User.IsInRole(RoleNames.BoardChairman))
                 {
-                    subs = subs.Where(s => s.Status == Status.ARBIncoming);
+                    subs = subs.Where(s => s.Status == Status.ARBIncoming || s.Status == Status.ARBFinal);
                 }
                 else if (User.IsInRole(RoleNames.BoardMember))
                 {
                     subs = subs.Where(s => s.Status == Status.UnderReview);
-                }
-                else if (User.IsInRole(RoleNames.BoardChairman))
-                {
-                    subs = subs.Where(s => s.Status == Status.ARBFinal);
                 }
                 else if (User.IsInRole(RoleNames.HOALiaison))
                 {
@@ -413,7 +409,7 @@ namespace HOA.Controllers
             if (submission == null)
                 return HttpNotFound("Submission not found");
 
-            ReviewSubmissionViewModel model = new ReviewSubmissionViewModel
+            TallyVotesViewModel model = new TallyVotesViewModel
             {
                 Submission = submission,
                 SubmissionId = submission.Id
@@ -425,7 +421,7 @@ namespace HOA.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = RoleNames.BoardChairman)]
-        public async Task<IActionResult> TallyVotes(ReviewSubmissionViewModel model)
+        public async Task<IActionResult> TallyVotes(TallyVotesViewModel model)
         {
             if (ModelState.IsValid)
             {
@@ -443,9 +439,13 @@ namespace HOA.Controllers
                 {
                     submission.Status = Status.MissingInformation;
                 }
+                else if (status == ReviewStatus.Rejected) //Still send rejections for final review
+                {
+                    submission.Status = Status.ReviewComplete;
+                }
                 else
                 {
-                    submission.Status = Status.Rejected;
+                    throw new Exception("Invalid option");
                 }
                 submission.StatusChangeTime = DateTime.Now;
 
@@ -461,7 +461,7 @@ namespace HOA.Controllers
             }
 
             // If we got this far, something failed, redisplay form
-            model.Submission = _applicationDbContext.Submissions.FirstOrDefault(s => s.Id == model.SubmissionId);
+            model.Submission = _applicationDbContext.Submissions.Include(s => s.Reviews).ThenInclude(r => r.Reviewer).FirstOrDefault(s => s.Id == model.SubmissionId);
             return View(model);
         }
 
