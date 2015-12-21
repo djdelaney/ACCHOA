@@ -304,7 +304,8 @@ namespace HOA.Controllers
                 else
                 {
                     submission.Status = Status.MissingInformation;
-                    submission.Responses = new List<Response>();
+                    if(submission.Responses == null)
+                        submission.Responses = new List<Response>();
 
                     var response = new Response
                     {
@@ -438,6 +439,17 @@ namespace HOA.Controllers
                 else if (status == ReviewStatus.MissingInformation)
                 {
                     submission.Status = Status.MissingInformation;
+
+                    var response = new Response
+                    {
+                        Created = DateTime.Now,
+                        Comments = model.UserFeedback,
+                        Submission = submission
+                    };
+                    if (submission.Responses == null)
+                        submission.Responses = new List<Response>();
+                    submission.Responses.Add(response);
+                    _applicationDbContext.Responses.Add(response);
                 }
                 else if (status == ReviewStatus.Rejected) //Still send rejections for final review
                 {
