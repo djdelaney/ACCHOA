@@ -80,7 +80,7 @@ namespace HOA.Controllers
                 }
                 else if (User.IsInRole(RoleNames.CommunityManager))
                 {
-                    subs = subs.Where(s => s.Status == Status.Submitted);
+                    subs = subs.Where(s => s.Status == Status.Submitted || s.Status == Status.PrepFormalResponse);
                 }
                 else if (User.IsInRole(RoleNames.BoardChairman))
                 {
@@ -181,6 +181,40 @@ namespace HOA.Controllers
                 return View("StatusNotFound");
 
             return View(submission);
+        }
+
+        [AuthorizeRoles(RoleNames.Administrator)]
+        public IActionResult Delete(int id)
+        {
+            var submission = _applicationDbContext.Submissions
+                .Include(s => s.Reviews)
+                .Include(s => s.Audits)
+                .Include(s => s.Responses)
+                .Include(s => s.Files)
+                .FirstOrDefault(s => s.Id == id);
+            if (submission == null)
+                return HttpNotFound("Submission not found");
+
+            foreach (var r in submission.Reviews)
+            {
+                _applicationDbContext.Reviews.Remove(r);
+            }
+            foreach (var a in submission.Audits)
+            {
+                _applicationDbContext.Histories.Remove(a);
+            }
+            foreach (var r in submission.Responses)
+            {
+                _applicationDbContext.Responses.Remove(r);
+            }
+            foreach (var f in submission.Files)
+            {
+                _storage.DeleteFile(f.BlobName);
+            }
+            _applicationDbContext.Submissions.Remove(submission);
+
+            _applicationDbContext.SaveChanges();
+            return RedirectToAction("List");
         }
 
         public async Task<ActionResult> File(int id)
@@ -434,7 +468,7 @@ namespace HOA.Controllers
 
                 if (status == ReviewStatus.Approved || status == ReviewStatus.ConditionallyApproved)
                 {
-                    submission.Status = Status.ReviewComplete;
+                    submission.Status = Status.PrepFormalResponse;
                 }
                 else if (status == ReviewStatus.MissingInformation)
                 {
@@ -453,7 +487,7 @@ namespace HOA.Controllers
                 }
                 else if (status == ReviewStatus.Rejected) //Still send rejections for final review
                 {
-                    submission.Status = Status.ReviewComplete;
+                    submission.Status = Status.PrepFormalResponse;
                 }
                 else
                 {

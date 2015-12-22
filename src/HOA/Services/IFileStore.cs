@@ -10,5 +10,6 @@ namespace HOA.Services
     {
         Task<string> StoreFile(Stream data);
         Task<Stream> RetriveFile(string id);
+        Task DeleteFile(string id);
     }
 }

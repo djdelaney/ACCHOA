@@ -8,6 +8,11 @@ namespace HOA.Services
 {
     public class MockFileStore : IFileStore
     {
+        public Task DeleteFile(string id)
+        {
+            return Task.FromResult<object>(null);
+        }
+
         Task<Stream> IFileStore.RetriveFile(string id)
         {
             throw new NotImplementedException();

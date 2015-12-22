@@ -12,6 +12,15 @@ namespace HOA.Services
     {
         public static string ConnectionString;
 
+        public Task DeleteFile(string id)
+        {
+            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(ConnectionString);
+            CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
+            CloudBlobContainer container = blobClient.GetContainerReference("arb");
+            CloudBlockBlob blockBlob = container.GetBlockBlobReference(id);
+            return blockBlob.DeleteAsync();
+        }
+
         public async Task<Stream> RetriveFile(string id)
         {
             // Retrieve storage account from connection string.

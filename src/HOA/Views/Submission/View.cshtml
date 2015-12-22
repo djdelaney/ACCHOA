@@ -116,6 +116,13 @@
     {
         @: None
     }
+
+    @if (User.IsInRole(RoleNames.Administrator))
+    {
+        <br />
+        <a href="/Submission/Delete/@Model.Submission.Id" onclick="if (!confirm('Are you sure?')) return false;">Delete</a>
+    }
+
 </div>
 
 <div class="col-md-4">

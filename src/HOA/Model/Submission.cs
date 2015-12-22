@@ -13,6 +13,7 @@ namespace HOA.Model
         UnderReview,
         ARBFinal,
         ReviewComplete,
+        PrepFormalResponse,
         Rejected,
         MissingInformation,
         Approved,
