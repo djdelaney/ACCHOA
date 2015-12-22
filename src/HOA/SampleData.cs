@@ -91,6 +91,14 @@ namespace HOA
                 await _userManager.AddToRoleAsync(user, RoleNames.BoardMember);
             }
 
+            user = await _userManager.FindByNameAsync("HOALiaison");
+            if (user == null)
+            {
+                user = new ApplicationUser { UserName = "HOALiaison", Email = "HOALiaison@mailinator.com", FullName = "HOA Liaison", Enabled = true };
+                await _userManager.CreateAsync(user, "Password");
+                await _userManager.AddToRoleAsync(user, RoleNames.HOALiaison);
+            }
+
         }
     }
 }

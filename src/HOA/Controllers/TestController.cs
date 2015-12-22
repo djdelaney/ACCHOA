@@ -43,9 +43,11 @@ namespace HOA.Controllers
             {
                 var sub = CreateSubmission();
 
-                Status[] statuses = { Status.ARBIncoming, Status.UnderReview, Status.ARBFinal, Status.ReviewComplete, Status.Approved, Status.Rejected };
+                //Status[] statuses = { Status.ARBIncoming, Status.UnderReview, Status.ARBFinal, Status.ReviewComplete, Status.Approved, Status.Rejected, Status.PrepFormalResponse };
+                //var status = statuses[_rand.Next(statuses.Length)];
 
-                var status = statuses[_rand.Next(statuses.Length)];
+                var status = Status.ReviewComplete;
+
                 SetStatus(sub, status);
             }
 
@@ -129,6 +131,11 @@ namespace HOA.Controllers
             {
                 SetStatus(sub, Status.ARBFinal);
                 sub.Status = Status.ReviewComplete;
+            }
+            else if (status == Status.PrepFormalResponse)
+            {
+                SetStatus(sub, Status.ReviewComplete);
+                sub.Status = Status.PrepFormalResponse;
             }
             else if (status == Status.Rejected)
             {

@@ -68,6 +68,9 @@ namespace HOA.Controllers
             var sampleData = new SampleData(_applicationDbContext, _userManager, _roleManager);
             sampleData.InitializeData();
 
+            if (string.IsNullOrEmpty(returnUrl))
+                returnUrl = "/Submission/List";
+
             ViewData["ReturnUrl"] = returnUrl;
             if (ModelState.IsValid)
             {

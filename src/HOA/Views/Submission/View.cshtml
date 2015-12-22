@@ -112,6 +112,10 @@
     {
         <a href="/Submission/FinalCheck/@Model.Submission.Id">Final check</a>
     }
+    else if (Model.Submission.Status == Status.PrepFormalResponse && User.IsInRole(RoleNames.CommunityManager))
+    {
+        <a href="/Submission/FinalResponse/@Model.Submission.Id">Homeowner final response</a>
+    }
     else
     {
         @: None

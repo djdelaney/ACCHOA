@@ -134,4 +134,35 @@ namespace HOA.Model.ViewModel
         
         public IList<IFormFile> Files { get; set; }
     }
+
+    public class FinalResponseViewModel
+    {
+        public Submission Submission { get; set; }
+    }
+
+    public class FinalReview : IValidatableObject
+    {
+        public Submission Submission { get; set; }
+
+        [Required]
+        public int SubmissionId { get; set; }
+
+        [Required]
+        public string Status { get; set; }
+
+        [Required]
+        public string Comments { get; set; }
+
+        [Display(Name = "User Feedback")]
+        public string UserFeedback { get; set; }
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            var status = (ReviewStatus)Enum.Parse(typeof(ReviewStatus), Status);
+            if ((status == ReviewStatus.ConditionallyApproved || status == ReviewStatus.MissingInformation || status == ReviewStatus.Rejected) && string.IsNullOrEmpty(UserFeedback))
+            {
+                yield return new ValidationResult("You must supply user feedback for non approvals.");
+            }
+        }
+    }
 }

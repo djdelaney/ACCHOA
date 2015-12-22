@@ -63,6 +63,10 @@ Your submission {2}. You can use the link below to view your submission and any 
             {
                 roleToNofity = RoleNames.HOALiaison;
             }
+            else if (submission.Status == Status.PrepFormalResponse)
+            {
+                roleToNofity = RoleNames.CommunityManager;
+            }
             else
             {
                 throw new Exception("Unknown status");

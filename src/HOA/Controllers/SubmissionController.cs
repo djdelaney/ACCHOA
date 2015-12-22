@@ -61,6 +61,25 @@ namespace HOA.Controllers
 
         //[Authorize(Roles = "CommunityManager")]
 
+        [AuthorizeRoles(RoleNames.CommunityManager)]
+        public IActionResult FinalResponse(int id)
+        {
+            var submission = _applicationDbContext.Submissions.Include(s => s.Reviews)
+                .ThenInclude(r => r.Reviewer)
+                .Include(s => s.Audits)
+                .Include(s => s.Files)
+                .FirstOrDefault(s => s.Id == id);
+            if (submission == null)
+                return HttpNotFound("Submission not found");
+
+            FinalResponseViewModel model = new FinalResponseViewModel
+            {
+                Submission = submission
+            };
+
+            return View(model);
+        }
+
         [Route("Submission/List/{filter?}")]
         public IActionResult List(string filter)
         {
@@ -468,7 +487,7 @@ namespace HOA.Controllers
 
                 if (status == ReviewStatus.Approved || status == ReviewStatus.ConditionallyApproved)
                 {
-                    submission.Status = Status.PrepFormalResponse;
+                    submission.Status = Status.ReviewComplete;
                 }
                 else if (status == ReviewStatus.MissingInformation)
                 {
@@ -487,7 +506,7 @@ namespace HOA.Controllers
                 }
                 else if (status == ReviewStatus.Rejected) //Still send rejections for final review
                 {
-                    submission.Status = Status.PrepFormalResponse;
+                    submission.Status = Status.ReviewComplete;
                 }
                 else
                 {
@@ -519,7 +538,7 @@ namespace HOA.Controllers
             if (submission == null)
                 return HttpNotFound("Submission not found");
 
-            ReviewSubmissionViewModel model = new ReviewSubmissionViewModel
+            FinalReview model = new FinalReview
             {
                 Submission = submission,
                 SubmissionId = submission.Id
@@ -530,7 +549,7 @@ namespace HOA.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> FinalCheck(ReviewSubmissionViewModel model)
+        public async Task<IActionResult> FinalCheck(FinalReview model)
         {
             if (ModelState.IsValid)
             {
@@ -538,30 +557,37 @@ namespace HOA.Controllers
                 if (submission == null)
                     return HttpNotFound("Submission not found");
 
-                var status = (Status)Enum.Parse(typeof(Status), model.Status);
+                var user = await _userManager.FindByIdAsync(User.GetUserId());
+                string action = string.Format("{0}. Comments: {1}", model.Status, model.Comments);
+                AddHistoryEntry(submission, user.FullName, action);
 
-                if (status == Status.Approved)
+                var status = (Status)Enum.Parse(typeof(Status), model.Status);
+                if (status == Status.Approved || status == Status.ConditionallyApproved)
                 {
-                    submission.Status = Status.Approved;
-                }
-                else if (status == Status.ConditionallyApproved)
-                {
-                    submission.Status = Status.ConditionallyApproved;
-                }
-                else if (status == Status.MissingInformation)
-                {
-                    submission.Status = Status.MissingInformation;
+                    Status finalStatus = status;
+                    AddHistoryEntry(submission, user.FullName, finalStatus.ToString()); //Store desired action
+                    submission.Status = Status.PrepFormalResponse;
                 }
                 else
                 {
-                    submission.Status = Status.Rejected;
+                    if (status == Status.MissingInformation)
+                        submission.Status = Status.MissingInformation;
+                    else
+                        submission.Status = Status.Rejected;
+
+                    var response = new Response
+                    {
+                        Created = DateTime.Now,
+                        Comments = model.UserFeedback,
+                        Submission = submission
+                    };
+                    if (submission.Responses == null)
+                        submission.Responses = new List<Response>();
+                    submission.Responses.Add(response);
+                    _applicationDbContext.Responses.Add(response);
                 }
-                submission.StatusChangeTime = DateTime.Now;
 
-                var user = await _userManager.FindByIdAsync(User.GetUserId());
-                string action = string.Format("Marked {0}. Comments: {1}", model.Status, model.Comments);
-                AddHistoryEntry(submission, user.FullName, action);
-
+                submission.StatusChangeTime = DateTime.Now;                
                 submission.LastModified = DateTime.Now;
                 _applicationDbContext.SaveChanges();
                 EmailHelper.NotifyStatusChanged(_applicationDbContext, submission, _email);
@@ -648,5 +674,6 @@ namespace HOA.Controllers
             return View(model);
         }
 
+        
     }
 }
