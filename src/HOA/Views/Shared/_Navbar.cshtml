@@ -21,6 +21,10 @@
                     <li @if (ViewBag.Section == "Submissions") { @Html.Raw("class=\"active\"") }><a href="/Submission/List">Submissions</a></li>
                     
                 }
+                @if (User.IsInRole(RoleNames.Administrator))
+                {
+                    <li @if (ViewBag.Section == "TestData") { @Html.Raw("class=\"active\"")   }><a href="/Test/">Test Data</a></li>
+                }
             </ul>
 
             @if (User.Identity.IsAuthenticated)

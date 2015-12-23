@@ -23,37 +23,136 @@ namespace HOA.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ApplicationDbContext _applicationDbContext;
         private readonly IEmailSender _email;
+        private readonly IFileStore _storage;
         private RoleManager<IdentityRole> _roleManager;
 
         private Random _rand;
 
-        public TestController(ApplicationDbContext applicationDbContext, UserManager<ApplicationUser> userManager, IEmailSender emailSender, RoleManager<IdentityRole> roleManager)
+        public TestController(ApplicationDbContext applicationDbContext, UserManager<ApplicationUser> userManager, IEmailSender emailSender, IFileStore fileStore, RoleManager<IdentityRole> roleManager)
         {
             _applicationDbContext = applicationDbContext;
             _userManager = userManager;
             _email = emailSender;
             _roleManager = roleManager;
+            _storage = fileStore;
             _rand = new Random();
         }
 
         [Authorize(Roles = RoleNames.Administrator)]
         public IActionResult Index()
         {
-            for (int x = 0; x < 4; x++)
+            return View();
+        }
+
+        [HttpGet]
+        [Authorize(Roles = RoleNames.Administrator)]
+        public IActionResult CreateSample()
+        {
+            CreateTestViewModel model = new CreateTestViewModel()
             {
-                var sub = CreateSubmission();
+                Count = 1,
+                Type = Status.Approved.ToString()
+            };
+            return View(model);
+        }
 
-                //Status[] statuses = { Status.ARBIncoming, Status.UnderReview, Status.ARBFinal, Status.ReviewComplete, Status.Approved, Status.Rejected, Status.PrepFormalResponse };
-                //var status = statuses[_rand.Next(statuses.Length)];
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = RoleNames.Administrator)]
+        public async Task<IActionResult> CreateSample(CreateTestViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var status = (Status)Enum.Parse(typeof(Status), model.Type);
 
-                var status = Status.ReviewComplete;
+                for (int x = 0; x < model.Count; x++)
+                {
+                    var sub = CreateSubmission();
+                    SetStatus(sub, status);
+                }
+                _applicationDbContext.SaveChanges();
 
-                SetStatus(sub, status);
+                return RedirectToAction("List", "Submission");
+            }
+            
+            return View(model);
+        }
+
+        [HttpGet]
+        [Authorize(Roles = RoleNames.Administrator)]
+        public IActionResult DeleteAll()
+        {
+            DeleteAllViewModel model = new DeleteAllViewModel()
+            {
+            };
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = RoleNames.Administrator)]
+        public async Task<IActionResult> DeleteAll(DeleteAllViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var files = _applicationDbContext.Files.ToList();
+                foreach (var f in files)
+                {
+                    if (!f.BlobName.Equals("NONE"))
+                        await _storage.DeleteFile(f.BlobName);
+                }
+
+                foreach (var entity in _applicationDbContext.Submissions)
+                    _applicationDbContext.Submissions.Remove(entity);
+                foreach (var entity in _applicationDbContext.Comments)
+                    _applicationDbContext.Comments.Remove(entity);
+                foreach (var entity in _applicationDbContext.Histories)
+                    _applicationDbContext.Histories.Remove(entity);
+                foreach (var entity in _applicationDbContext.Reviews)
+                    _applicationDbContext.Reviews.Remove(entity);
+                foreach (var entity in _applicationDbContext.Files)
+                    _applicationDbContext.Files.Remove(entity);
+                foreach (var entity in _applicationDbContext.Responses)
+                    _applicationDbContext.Responses.Remove(entity);
+
+                _applicationDbContext.SaveChanges();
+
+                return RedirectToAction("List", "Submission");
             }
 
-            _applicationDbContext.SaveChanges();
-            //return Content("Created");
-            return RedirectToAction("List", "Submission");
+            return View(model);
+        }
+
+        [HttpGet]
+        [Authorize(Roles = RoleNames.Administrator)]
+        public IActionResult CreateRandom()
+        {
+            CreateRandomViewModel model = new CreateRandomViewModel()
+            {
+                Count = 10
+            };
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = RoleNames.Administrator)]
+        public async Task<IActionResult> CreateRandom(CreateRandomViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                for (int x = 0; x < model.Count; x++)
+                {
+                    var sub = CreateSubmission();
+                    Status[] statuses = { Status.ARBIncoming, Status.UnderReview, Status.ARBFinal, Status.ReviewComplete, Status.Approved, Status.Rejected, Status.PrepApproval, Status.PrepConditionalApproval };
+                    var status = statuses[_rand.Next(statuses.Length)];
+                    SetStatus(sub, status);
+                    _applicationDbContext.SaveChanges();
+                }                
+
+                return RedirectToAction("List", "Submission");
+            }
+            return View(model);
         }
 
         private Submission CreateSubmission()
@@ -73,6 +172,7 @@ namespace HOA.Controllers
                 Description = string.Format("Build a {0}", objects[_rand.Next(objects.Length)]),
                 Status = Status.Submitted,
                 LastModified = DateTime.Now,
+                SubmissionDate = DateTime.Now.AddHours(-1),
                 Code = DBUtil.GenerateUniqueCode(_applicationDbContext),
                 Files = new List<File>(),
                 Audits = new List<History>(),
@@ -82,7 +182,7 @@ namespace HOA.Controllers
             var file = new File
             {
                 Name = "Application.pdf",
-                BlobName = "TODO"
+                BlobName = "NONE"
             };
 
             sub.Files.Add(file);
@@ -151,6 +251,11 @@ namespace HOA.Controllers
             {
                 SetStatus(sub, Status.ReviewComplete);
                 sub.Status = Status.Approved;
+            }
+            else if (status == Status.MissingInformation)
+            {
+                SetStatus(sub, Status.Submitted);
+                sub.Status = Status.MissingInformation;
             }
 
             sub.LastModified = DateTime.Now;
