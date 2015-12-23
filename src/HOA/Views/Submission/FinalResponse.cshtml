@@ -1,4 +1,6 @@
 ﻿@using HOA.Model
+@using HOA.Model.ViewModel
+@model FinalResponseViewModel
 @*
     For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 *@
@@ -14,4 +16,27 @@
 @Model.Submission.Description<br />
 <br />
 
-<a class="btn btn-lg btn-primary" href="/Submission/Finalize/@Model.Submission.Id" role="button">Send final approval</a>
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    @if (!Html.ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger" role="alert">
+            <strong>Oh snap!</strong> Please fix the listed errors and try submitting again.
+
+            @Html.ValidationSummary()
+        </div>
+    }
+
+    @Html.HiddenFor(model => model.SubmissionId)
+
+    @Html.LabelFor(model => model.Comments)@: <br />
+    @Html.TextAreaFor(model => model.Comments, new { @class = "form-control" })<br />
+    <br />
+    <br />
+
+
+    <input type="submit" value="Send final approval" class="btn btn-lg btn-primary" />
+
+}

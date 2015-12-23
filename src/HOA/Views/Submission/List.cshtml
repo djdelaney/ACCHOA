@@ -73,9 +73,13 @@
                 {
                     @:Sent to HOA Liaison
                 }
-                else if (submission.Status == Status.PrepFormalResponse)
+                else if (submission.Status == Status.PrepApproval)
                 {
-                    @:Preparing final response
+                    @:Preparing approval response
+                }
+                else if (submission.Status == Status.PrepConditionalApproval)
+                {
+                    @:Preparing conditional response
                 }
                 else if (submission.Status == Status.Approved)
                 {

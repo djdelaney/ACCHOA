@@ -46,7 +46,11 @@
 {
     @: Missing Information
 }
-    
+
+@if (Model.Status == Status.PrepApproval || Model.Status == Status.PrepConditionalApproval)
+{
+    @: Preparing final response
+}
 
 
 </h3>

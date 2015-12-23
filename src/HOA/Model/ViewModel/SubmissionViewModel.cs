@@ -138,6 +138,11 @@ namespace HOA.Model.ViewModel
     public class FinalResponseViewModel
     {
         public Submission Submission { get; set; }
+
+        [Required]
+        public int SubmissionId { get; set; }
+
+        public string Comments { get; set; }
     }
 
     public class FinalReview : IValidatableObject

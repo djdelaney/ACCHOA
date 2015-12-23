@@ -58,25 +58,67 @@ namespace HOA.Controllers
             s.Audits.Add(history);
             _applicationDbContext.Histories.Add(history);
         }
-
-        //[Authorize(Roles = "CommunityManager")]
-
-        [AuthorizeRoles(RoleNames.CommunityManager)]
+        
+        [HttpGet]
+        [Authorize(Roles = "CommunityManager")]
         public IActionResult FinalResponse(int id)
         {
-            var submission = _applicationDbContext.Submissions.Include(s => s.Reviews)
-                .ThenInclude(r => r.Reviewer)
-                .Include(s => s.Audits)
-                .Include(s => s.Files)
-                .FirstOrDefault(s => s.Id == id);
+            var submission = _applicationDbContext.Submissions.FirstOrDefault(s => s.Id == id);
             if (submission == null)
                 return HttpNotFound("Submission not found");
 
             FinalResponseViewModel model = new FinalResponseViewModel
             {
-                Submission = submission
+                Submission = submission,
+                SubmissionId = submission.Id
             };
 
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = RoleNames.CommunityManager)]
+        public async Task<IActionResult> FinalResponse(FinalResponseViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var submission = _applicationDbContext.Submissions.Include(s => s.Audits).Include(s => s.Reviews)
+                    .FirstOrDefault(s => s.Id == model.SubmissionId);
+                if (submission == null)
+                    return HttpNotFound("Submission not found");
+
+                var user = await _userManager.FindByIdAsync(User.GetUserId());
+
+                if (submission.Status == Status.PrepApproval)
+                    submission.Status = Status.Approved;
+                else
+                    submission.Status = Status.ConditionallyApproved;
+
+                //Any final comments?
+                if (!string.IsNullOrEmpty(model.Comments))
+                {
+                    var response = new Response
+                    {
+                        Created = DateTime.Now,
+                        Comments = model.Comments,
+                        Submission = submission
+                    };
+                    if (submission.Responses == null)
+                        submission.Responses = new List<Response>();
+                    submission.Responses.Add(response);
+                    _applicationDbContext.Responses.Add(response);
+                }
+
+                _applicationDbContext.SaveChanges();
+
+                EmailHelper.NotifyStatusChanged(_applicationDbContext, submission, _email);
+
+                return RedirectToAction(nameof(View), new { id = submission.Id });
+            }
+
+            // If we got this far, something failed, redisplay form
+            model.Submission = _applicationDbContext.Submissions.FirstOrDefault(s => s.Id == model.SubmissionId);
             return View(model);
         }
 
@@ -99,7 +141,7 @@ namespace HOA.Controllers
                 }
                 else if (User.IsInRole(RoleNames.CommunityManager))
                 {
-                    subs = subs.Where(s => s.Status == Status.Submitted || s.Status == Status.PrepFormalResponse);
+                    subs = subs.Where(s => s.Status == Status.Submitted || s.Status == Status.PrepApproval || s.Status == Status.PrepConditionalApproval);
                 }
                 else if (User.IsInRole(RoleNames.BoardChairman))
                 {
@@ -562,11 +604,24 @@ namespace HOA.Controllers
                 AddHistoryEntry(submission, user.FullName, action);
 
                 var status = (Status)Enum.Parse(typeof(Status), model.Status);
-                if (status == Status.Approved || status == Status.ConditionallyApproved)
+                if (status == Status.Approved)
                 {
-                    Status finalStatus = status;
-                    AddHistoryEntry(submission, user.FullName, finalStatus.ToString()); //Store desired action
-                    submission.Status = Status.PrepFormalResponse;
+                    submission.Status = Status.PrepApproval;
+                }
+                else if (status == Status.ConditionallyApproved)
+                {
+                    submission.Status = Status.PrepConditionalApproval;
+
+                    var response = new Response
+                    {
+                        Created = DateTime.Now,
+                        Comments = model.UserFeedback,
+                        Submission = submission
+                    };
+                    if (submission.Responses == null)
+                        submission.Responses = new List<Response>();
+                    submission.Responses.Add(response);
+                    _applicationDbContext.Responses.Add(response);
                 }
                 else
                 {

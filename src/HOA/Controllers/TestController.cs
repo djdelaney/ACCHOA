@@ -39,7 +39,7 @@ namespace HOA.Controllers
         [Authorize(Roles = RoleNames.Administrator)]
         public IActionResult Index()
         {
-            for (int x = 0; x < 10; x++)
+            for (int x = 0; x < 4; x++)
             {
                 var sub = CreateSubmission();
 
@@ -132,10 +132,15 @@ namespace HOA.Controllers
                 SetStatus(sub, Status.ARBFinal);
                 sub.Status = Status.ReviewComplete;
             }
-            else if (status == Status.PrepFormalResponse)
+            else if (status == Status.PrepApproval)
             {
                 SetStatus(sub, Status.ReviewComplete);
-                sub.Status = Status.PrepFormalResponse;
+                sub.Status = Status.PrepApproval;
+            }
+            else if (status == Status.PrepConditionalApproval)
+            {
+                SetStatus(sub, Status.ReviewComplete);
+                sub.Status = Status.PrepConditionalApproval;
             }
             else if (status == Status.Rejected)
             {
