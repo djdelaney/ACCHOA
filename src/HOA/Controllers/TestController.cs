@@ -59,7 +59,7 @@ namespace HOA.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = RoleNames.Administrator)]
-        public async Task<IActionResult> CreateSample(CreateTestViewModel model)
+        public IActionResult CreateSample(CreateTestViewModel model)
         {
             if (ModelState.IsValid)
             {
@@ -137,7 +137,7 @@ namespace HOA.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = RoleNames.Administrator)]
-        public async Task<IActionResult> CreateRandom(CreateRandomViewModel model)
+        public IActionResult CreateRandom(CreateRandomViewModel model)
         {
             if (ModelState.IsValid)
             {

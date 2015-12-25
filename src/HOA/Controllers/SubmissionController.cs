@@ -208,7 +208,7 @@ namespace HOA.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> LookupStatus(StatusViewModel model)
+        public IActionResult LookupStatus(StatusViewModel model)
         {
             if (ModelState.IsValid)
             {

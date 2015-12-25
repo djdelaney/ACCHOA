@@ -18,9 +18,9 @@ namespace HOA.Services
             throw new NotImplementedException();
         }
 
-        async Task<string> IFileStore.StoreFile(Stream data)
+        Task<string> IFileStore.StoreFile(Stream data)
         {
-            return Guid.NewGuid().ToString();
+            return Task.FromResult(Guid.NewGuid().ToString());
         }
     }
 }
