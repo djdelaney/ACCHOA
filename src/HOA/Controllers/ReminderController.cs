@@ -39,6 +39,8 @@ namespace HOA.Controllers
         [AllowAnonymous]
         public IActionResult Process()
         {
+            Dictionary<string, List<Submission>> toNotify = new Dictionary<string, List<Submission>>();
+
             var allOpen = _applicationDbContext.Submissions.Where(
                 s => s.Status != Status.Approved && s.Status != Status.Rejected && s.Status != Status.ConditionallyApproved && s.Status != Status.MissingInformation
                 ).ToList();
@@ -67,8 +69,21 @@ namespace HOA.Controllers
 
                 if(DateTime.Now > submission.StatusChangeTime.Add(timeAllowance))
                 {
-                    EmailHelper.NotifySubmissonOverdue(_applicationDbContext, submission, _email);
+                    //Group notifications together
+                    List<string> emailsToNotify = EmailHelper.GetOverdueRecipients(_applicationDbContext, submission);
+                    foreach (var email in emailsToNotify)
+                    {
+                        if (!toNotify.ContainsKey(email))
+                            toNotify[email] = new List<Submission>();
+
+                        toNotify[email].Add(submission);
+                    }
                 }
+            }
+
+            foreach (KeyValuePair<string, List<Submission>> entry in toNotify)
+            {
+                EmailHelper.NotifySubmissonsOverdue(entry.Key, entry.Value, _email);
             }
 
             return Content("Processed");

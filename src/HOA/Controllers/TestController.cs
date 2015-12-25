@@ -51,7 +51,7 @@ namespace HOA.Controllers
             CreateTestViewModel model = new CreateTestViewModel()
             {
                 Count = 1,
-                Type = Status.Approved.ToString()
+                Type = Status.Submitted.ToString()
             };
             return View(model);
         }
@@ -171,6 +171,7 @@ namespace HOA.Controllers
                 Email = string.Format("{0}@mailinator.com", name),
                 Description = string.Format("Build a {0}", objects[_rand.Next(objects.Length)]),
                 Status = Status.Submitted,
+                StatusChangeTime = DateTime.Now,
                 LastModified = DateTime.Now,
                 SubmissionDate = DateTime.Now.AddHours(-1),
                 Code = DBUtil.GenerateUniqueCode(_applicationDbContext),

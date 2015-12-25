@@ -19,10 +19,9 @@ A new submission is available for action:<br>
 Status: {1}<br>";
 
         private static string m_overdueEmail = @"
-The following submission is overdue:<br>
+The following submission(s) are overdue:<br>
 <br>
-<a href='{0}'>{0}</a><br>
-Status: {1}<br>";
+{0}";
 
         private static string m_homeownerEmail = @"
 {0} {1},<br>
@@ -117,7 +116,7 @@ Your submission {2}. You can use the link below to view your submission and any 
             mail.SendEmailAsync(new List<string> { submission.Email }, "ARB: New submission", emailHtml);
         }
 
-        public static void NotifySubmissonOverdue(ApplicationDbContext context, Submission submission, IEmailSender mail)
+        public static List<string> GetOverdueRecipients(ApplicationDbContext context, Submission submission)
         {
             string roleToNofity = null;
             List<string> emails;
@@ -160,9 +159,22 @@ Your submission {2}. You can use the link below to view your submission and any 
                 emails = GetRoleMembers(context, roleToNofity);
             }
 
-            var link = String.Format("{0}/Submission/View/{1}", BaseHost, submission.Id);
-            var emailHtml = String.Format(m_overdueEmail, link, submission.Status.ToString());
-            mail.SendEmailAsync(emails, "ARB: Overdue submission", emailHtml);
+            return emails;
+        }
+        
+        public static void NotifySubmissonsOverdue(string email, List<Submission> submissions, IEmailSender mail)
+        {
+            string body = "";
+
+            foreach (var submission in submissions)
+            {
+                var link = String.Format("{0}/Submission/View/{1}", BaseHost, submission.Id);
+                string html = string.Format("<a href='{0}'>{0}</a><br>", link);
+                body = body + "\n" + html;
+            }
+                                   
+            var emailHtml = String.Format(m_overdueEmail, body);
+            mail.SendEmailAsync(new List<string> { email }, "ARB: Overdue submission", emailHtml);
         }
     }
 }
