@@ -176,7 +176,8 @@ namespace HOA.Controllers
                 Code = DBUtil.GenerateUniqueCode(_applicationDbContext),
                 Files = new List<File>(),
                 Audits = new List<History>(),
-                Revision = 1
+                Revision = 1,
+                PrecedentSetting = false
             };
 
             var file = new File

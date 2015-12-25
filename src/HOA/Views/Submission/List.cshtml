@@ -97,6 +97,10 @@
                 {
                     @:Missing Information
                 }
+                else if (submission.Status == Status.Retracted)
+                {
+                    @:Retracted
+                }
 
             </td>
             <td>@submission.LastModified.ToString("MM/dd/yyyy")</td>

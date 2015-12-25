@@ -67,6 +67,10 @@ Your submission {2}. You can use the link below to view your submission and any 
             {
                 roleToNofity = RoleNames.CommunityManager;
             }
+            else if (submission.Status == Status.Retracted)
+            {
+                roleToNofity = RoleNames.CommunityManager;
+            }
             else
             {
                 throw new Exception("Unknown status");

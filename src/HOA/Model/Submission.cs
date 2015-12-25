@@ -18,7 +18,8 @@ namespace HOA.Model
         Rejected = 7,
         MissingInformation = 8,
         Approved = 9,
-        ConditionallyApproved = 10
+        ConditionallyApproved = 10,
+        Retracted = 11
     }
 
     public class Submission
@@ -63,6 +64,9 @@ namespace HOA.Model
 
         [Required]
         public DateTime SubmissionDate { get; set; }
+
+        [Required]
+        public bool PrecedentSetting { get; set; }
 
         public virtual IList<Review> Reviews { get; set; }
 

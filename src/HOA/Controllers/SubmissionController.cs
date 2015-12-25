@@ -58,7 +58,7 @@ namespace HOA.Controllers
             s.Audits.Add(history);
             _applicationDbContext.Histories.Add(history);
         }
-        
+
         [HttpGet]
         [Authorize(Roles = "CommunityManager")]
         public IActionResult FinalResponse(int id)
@@ -317,7 +317,8 @@ namespace HOA.Controllers
                     Files = new List<File>(),
                     Revision = 1,
                     StatusChangeTime = DateTime.Now,
-                    SubmissionDate = DateTime.Now
+                    SubmissionDate = DateTime.Now,
+                    PrecedentSetting = false
                 };
 
                 foreach(var fileContent in model.Files)
@@ -654,7 +655,7 @@ namespace HOA.Controllers
             model.Submission = _applicationDbContext.Submissions.FirstOrDefault(s => s.Id == model.SubmissionId);
             return View(model);
         }
-
+        
         [HttpGet]
         [AllowAnonymous]
         public IActionResult Resubmit(int id)
@@ -729,6 +730,30 @@ namespace HOA.Controllers
             return View(model);
         }
 
-        
+        [AllowAnonymous]
+        public IActionResult Retract(int id)
+        {
+            var submission = _applicationDbContext.Submissions.FirstOrDefault(s => s.Id == id);
+            if (submission == null)
+                return HttpNotFound("Submission not found");
+
+            if (submission.Status == Status.Approved ||
+                submission.Status == Status.ConditionallyApproved ||
+                submission.Status == Status.Rejected ||
+                submission.Status == Status.Retracted ||
+                submission.Status == Status.MissingInformation)
+            {
+                throw new Exception("Invliad state!");
+            }
+
+            submission.Status = Status.Retracted;
+            AddHistoryEntry(submission, submission.FirstName + " " + submission.LastName, "Retracted");
+
+            _applicationDbContext.SaveChanges();
+
+            EmailHelper.NotifyStatusChanged(_applicationDbContext, submission, _email);
+
+            return RedirectToAction(nameof(ViewStatus), new { id = submission.Code });
+        }
     }
 }

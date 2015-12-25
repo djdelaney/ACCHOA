@@ -27,5 +27,8 @@ namespace HOA.Model
 
         [Required]
         public bool Enabled { get; set; }
+
+        [Required]
+        public bool DisableNotification { get; set; }
     }
 }
