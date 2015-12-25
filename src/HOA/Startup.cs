@@ -13,6 +13,7 @@ using HOA.Model;
 using HOA.Services;
 using Microsoft.AspNet.StaticFiles;
 using Microsoft.AspNet.Http;
+using HOA.Util;
 
 namespace HOA
 {
@@ -75,12 +76,15 @@ namespace HOA
             }
 
             //Email
-            var sendGridKey = Configuration["Data:SendGridKey"];
-            if (string.IsNullOrEmpty(sendGridKey))
+            EmailHelper.BaseHost = Configuration["Data:Email:LinkHost"];
+            var sendGridUser = Configuration["Data:Email:SendGridUser"];
+            var sendGridPass = Configuration["Data:Email:SendGridPass"];
+            if (string.IsNullOrEmpty(sendGridUser) || string.IsNullOrEmpty(sendGridPass))
                 services.AddTransient<IEmailSender, MockEmail>();
             else
             {
-                SendGridEmail.ApiKey = sendGridKey;
+                SendGridEmail.ApiUser = sendGridUser;
+                SendGridEmail.ApiPass = sendGridPass;
                 services.AddTransient<IEmailSender, SendGridEmail>();
             }
         }

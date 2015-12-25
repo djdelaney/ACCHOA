@@ -10,7 +10,7 @@ namespace HOA.Util
 {
     public static class EmailHelper
     {
-        private static string m_baseUrl = "http://hoaweb1.azurewebsites.net/";
+        public static string BaseHost = "";
 
         private static string m_availableEmail = @"
 A new submission is available for action:<br>
@@ -24,7 +24,7 @@ The following submission is overdue:<br>
 <a href='{0}'>{0}</a><br>
 Status: {1}<br>";
 
-        private static string m_returnedEmail = @"
+        private static string m_homeownerEmail = @"
 {0} {1},<br>
 <br>
 Your submission {2}. You can use the link below to view your submission and any comments.<br>
@@ -78,7 +78,7 @@ Your submission {2}. You can use the link below to view your submission and any 
 
             List<string> emails = GetRoleMembers(context, roleToNofity);
 
-            var link = String.Format("{0}Submission/View/{1}", m_baseUrl, submission.Id);
+            var link = String.Format("{0}/Submission/View/{1}", BaseHost, submission.Id);
             var emailHtml = String.Format(m_availableEmail, link, submission.Status.ToString());
             mail.SendEmailAsync(emails, "ARB: New submission", emailHtml);
         }
@@ -112,8 +112,8 @@ Your submission {2}. You can use the link below to view your submission and any 
                 status = "has been rejected";
             }
 
-            var link = String.Format("{0}Submission/ViewStatus/{1}", m_baseUrl, submission.Code);
-            string emailHtml = String.Format(m_returnedEmail, submission.FirstName, submission.LastName, status, link);
+            var link = String.Format("{0}/Submission/ViewStatus/{1}", BaseHost, submission.Code);
+            string emailHtml = String.Format(m_homeownerEmail, submission.FirstName, submission.LastName, status, link);
             mail.SendEmailAsync(new List<string> { submission.Email }, "ARB: New submission", emailHtml);
         }
 
@@ -160,7 +160,7 @@ Your submission {2}. You can use the link below to view your submission and any 
                 emails = GetRoleMembers(context, roleToNofity);
             }
 
-            var link = String.Format("{0}Submission/View/{1}", m_baseUrl, submission.Id);
+            var link = String.Format("{0}/Submission/View/{1}", BaseHost, submission.Id);
             var emailHtml = String.Format(m_overdueEmail, link, submission.Status.ToString());
             mail.SendEmailAsync(emails, "ARB: Overdue submission", emailHtml);
         }
