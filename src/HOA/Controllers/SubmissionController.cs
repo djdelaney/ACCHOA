@@ -35,15 +35,15 @@ namespace HOA.Controllers
             _storage = store;
         }
 
-        private int GetReviewerCount()
+        public static int GetReviewerCount(ApplicationDbContext context)
         {
-            var role = _applicationDbContext.Roles.Include(r => r.Users).FirstOrDefault(r => r.Name.Equals(RoleNames.BoardMember));
+            var role = context.Roles.Include(r => r.Users).FirstOrDefault(r => r.Name.Equals(RoleNames.BoardMember));
             List<string> userIds = role.Users.Select(u => u.UserId).ToList();
-            var users = _applicationDbContext.Users.Where(u => userIds.Contains(u.Id) && u.Enabled);
+            var users = context.Users.Where(u => userIds.Contains(u.Id) && u.Enabled);
             return users.Count();
         }
 
-        private void AddHistoryEntry(Submission s, string user, string action)
+        public void AddHistoryEntry(Submission s, string user, string action)
         {
             if (s.Audits == null)
                 s.Audits = new List<History>();
@@ -190,7 +190,7 @@ namespace HOA.Controllers
             var model = new ViewSubmissionViewModel()
             {
                 Submission = submission,
-                ReviewerCount = GetReviewerCount(),
+                ReviewerCount = GetReviewerCount(_applicationDbContext),
                 CurrentReviewCount = submission.Reviews.Count(r => r.SubmissionRevision == submission.Revision),
                 Reviewed = submission.Reviews.Any(r => r.Reviewer.Id == User.GetUserId() && r.SubmissionRevision == submission.Revision)
             };
@@ -480,7 +480,7 @@ namespace HOA.Controllers
                 _applicationDbContext.Reviews.Add(review);
 
                 //Final review!
-                if (submission.Reviews.Where(r => r.SubmissionRevision == submission.Revision).Count() == GetReviewerCount())
+                if (submission.Reviews.Where(r => r.SubmissionRevision == submission.Revision).Count() == GetReviewerCount(_applicationDbContext))
                 {
                     submission.Status = Status.ARBFinal;
                     submission.LastModified = DateTime.Now;
@@ -488,7 +488,8 @@ namespace HOA.Controllers
                     AddHistoryEntry(submission, "System", "All reviews in, sent to chairman");
                     EmailHelper.NotifyStatusChanged(_applicationDbContext, submission, _email);
                 }
-                
+                submission.LastModified = DateTime.Now;
+
                 _applicationDbContext.SaveChanges();
 
                 return RedirectToAction(nameof(View), new { id = submission.Id });

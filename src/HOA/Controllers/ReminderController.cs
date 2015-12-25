@@ -8,6 +8,7 @@ using HOA.Model;
 using Microsoft.AspNet.Authorization;
 using HOA.Util;
 using HOA.Services;
+using Microsoft.Data.Entity;
 
 // For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -21,6 +22,8 @@ namespace HOA.Controllers
         private static readonly TimeSpan ReminderTime_Review = new TimeSpan(3, 0, 0, 0); //3 days
         private static readonly TimeSpan ReminderTime_ARBPost = new TimeSpan(3, 0, 0, 0); //3 days
         private static readonly TimeSpan ReminderTime_Final = new TimeSpan(3, 0, 0, 0); //3 days
+
+        private static readonly TimeSpan Quarum_Final = new TimeSpan(3, 0, 0, 0); //3 days
 
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ApplicationDbContext _applicationDbContext;
@@ -84,6 +87,43 @@ namespace HOA.Controllers
             foreach (KeyValuePair<string, List<Submission>> entry in toNotify)
             {
                 EmailHelper.NotifySubmissonsOverdue(entry.Key, entry.Value, _email);
+            }
+
+            return Content("Processed");
+        }
+
+        [AllowAnonymous]
+        public IActionResult CheckQuarum()
+        {
+            int totalReviewers = SubmissionController.GetReviewerCount(_applicationDbContext);
+            int quarum = (int)Math.Ceiling((double)totalReviewers / (double)2);
+
+            var allOpen = _applicationDbContext.Submissions.Where(s => s.Status == Status.UnderReview).Include(s => s.Audits).Include(s => s.Reviews).ToList();
+            foreach (Submission submission in allOpen)
+            {
+                if (submission.Reviews.Count >= quarum && DateTime.Now > submission.StatusChangeTime.Add(Quarum_Final))
+                {
+                    submission.Status = Status.ARBFinal;
+                    submission.LastModified = DateTime.Now;
+                    submission.StatusChangeTime = DateTime.Now;
+
+
+                    if (submission.Audits == null)
+                        submission.Audits = new List<History>();
+
+                    var history = new History
+                    {
+                        User = "System",
+                        DateTime = DateTime.Now,
+                        Action = "Quarum reached after delay, tallying votes.",
+                        Submission = submission
+                    };
+                    submission.Audits.Add(history);
+                    _applicationDbContext.Histories.Add(history);
+                    _applicationDbContext.SaveChanges();
+                    
+                    EmailHelper.NotifyStatusChanged(_applicationDbContext, submission, _email);
+                }
             }
 
             return Content("Processed");
