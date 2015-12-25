@@ -11,6 +11,7 @@ namespace HOA.Services
     {
         public static string ApiUser;
         public static string ApiPass;
+        public static string EmailSource;
 
         public Task SendEmailAsync(List<string> recipients, string subject, string message)
         {
@@ -18,7 +19,7 @@ namespace HOA.Services
             var myMessage = new SendGridMessage();
 
             // Add the message properties.
-            myMessage.From = new MailAddress("dan@hactar.com");
+            myMessage.From = new MailAddress(EmailSource);
             
             myMessage.AddTo(recipients);
 

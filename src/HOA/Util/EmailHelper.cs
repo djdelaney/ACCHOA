@@ -80,7 +80,7 @@ Your submission {2}. You can use the link below to view your submission and any 
 
             var link = String.Format("{0}/Submission/View/{1}", BaseHost, submission.Id);
             var emailHtml = String.Format(m_availableEmail, link, submission.Status.ToString());
-            mail.SendEmailAsync(emails, "ARB: New submission", emailHtml);
+            mail.SendEmailAsync(emails, "ARB: Available for processing", emailHtml);
         }
 
         private static List<String> GetRoleMembers(ApplicationDbContext context, string roleName)

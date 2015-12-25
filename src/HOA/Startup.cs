@@ -79,12 +79,14 @@ namespace HOA
             EmailHelper.BaseHost = Configuration["Data:Email:LinkHost"];
             var sendGridUser = Configuration["Data:Email:SendGridUser"];
             var sendGridPass = Configuration["Data:Email:SendGridPass"];
-            if (string.IsNullOrEmpty(sendGridUser) || string.IsNullOrEmpty(sendGridPass))
+            var emailSource = Configuration["Data:Email:EmailSource"];
+            if (string.IsNullOrEmpty(sendGridUser) || string.IsNullOrEmpty(sendGridPass) || string.IsNullOrEmpty(emailSource))
                 services.AddTransient<IEmailSender, MockEmail>();
             else
             {
                 SendGridEmail.ApiUser = sendGridUser;
                 SendGridEmail.ApiPass = sendGridPass;
+                SendGridEmail.EmailSource = emailSource;
                 services.AddTransient<IEmailSender, SendGridEmail>();
             }
         }
