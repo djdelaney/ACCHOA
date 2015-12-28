@@ -1093,6 +1093,15 @@
           "lib/net451/Microsoft.AspNet.WebUtilities.dll": {}
         }
       },
+      "Microsoft.Azure.KeyVault.Core/1.0.0": {
+        "type": "package",
+        "compile": {
+          "lib/net40/Microsoft.Azure.KeyVault.Core.dll": {}
+        },
+        "runtime": {
+          "lib/net40/Microsoft.Azure.KeyVault.Core.dll": {}
+        }
+      },
       "Microsoft.CodeAnalysis.Analyzers/1.0.0": {
         "type": "package",
         "frameworkAssemblies": [
@@ -2073,13 +2082,13 @@
           "lib/net45/_._": {}
         }
       },
-      "WindowsAzure.Storage/6.1.1-preview": {
+      "WindowsAzure.Storage/6.2.0": {
         "type": "package",
         "dependencies": {
+          "Microsoft.Azure.KeyVault.Core": "1.0.0",
           "Microsoft.Data.OData": "5.6.4",
           "Microsoft.Data.Services.Client": "5.6.4",
-          "Newtonsoft.Json": "6.0.8",
-          "System.Spatial": "5.6.4"
+          "Newtonsoft.Json": "6.0.8"
         },
         "frameworkAssemblies": [
           "System.Data",
@@ -2087,10 +2096,10 @@
           "System.Xml.Linq"
         ],
         "compile": {
-          "lib/dnx451/Microsoft.WindowsAzure.Storage.dll": {}
+          "lib/net40/Microsoft.WindowsAzure.Storage.dll": {}
         },
         "runtime": {
-          "lib/dnx451/Microsoft.WindowsAzure.Storage.dll": {}
+          "lib/net40/Microsoft.WindowsAzure.Storage.dll": {}
         }
       }
     },
@@ -3188,6 +3197,15 @@
           "lib/net451/Microsoft.AspNet.WebUtilities.dll": {}
         }
       },
+      "Microsoft.Azure.KeyVault.Core/1.0.0": {
+        "type": "package",
+        "compile": {
+          "lib/net40/Microsoft.Azure.KeyVault.Core.dll": {}
+        },
+        "runtime": {
+          "lib/net40/Microsoft.Azure.KeyVault.Core.dll": {}
+        }
+      },
       "Microsoft.CodeAnalysis.Analyzers/1.0.0": {
         "type": "package",
         "frameworkAssemblies": [
@@ -4168,13 +4186,13 @@
           "lib/net45/_._": {}
         }
       },
-      "WindowsAzure.Storage/6.1.1-preview": {
+      "WindowsAzure.Storage/6.2.0": {
         "type": "package",
         "dependencies": {
+          "Microsoft.Azure.KeyVault.Core": "1.0.0",
           "Microsoft.Data.OData": "5.6.4",
           "Microsoft.Data.Services.Client": "5.6.4",
-          "Newtonsoft.Json": "6.0.8",
-          "System.Spatial": "5.6.4"
+          "Newtonsoft.Json": "6.0.8"
         },
         "frameworkAssemblies": [
           "System.Data",
@@ -4182,10 +4200,10 @@
           "System.Xml.Linq"
         ],
         "compile": {
-          "lib/dnx451/Microsoft.WindowsAzure.Storage.dll": {}
+          "lib/net40/Microsoft.WindowsAzure.Storage.dll": {}
         },
         "runtime": {
-          "lib/dnx451/Microsoft.WindowsAzure.Storage.dll": {}
+          "lib/net40/Microsoft.WindowsAzure.Storage.dll": {}
         }
       }
     },
@@ -5283,6 +5301,15 @@
           "lib/net451/Microsoft.AspNet.WebUtilities.dll": {}
         }
       },
+      "Microsoft.Azure.KeyVault.Core/1.0.0": {
+        "type": "package",
+        "compile": {
+          "lib/net40/Microsoft.Azure.KeyVault.Core.dll": {}
+        },
+        "runtime": {
+          "lib/net40/Microsoft.Azure.KeyVault.Core.dll": {}
+        }
+      },
       "Microsoft.CodeAnalysis.Analyzers/1.0.0": {
         "type": "package",
         "frameworkAssemblies": [
@@ -6263,13 +6290,13 @@
           "lib/net45/_._": {}
         }
       },
-      "WindowsAzure.Storage/6.1.1-preview": {
+      "WindowsAzure.Storage/6.2.0": {
         "type": "package",
         "dependencies": {
+          "Microsoft.Azure.KeyVault.Core": "1.0.0",
           "Microsoft.Data.OData": "5.6.4",
           "Microsoft.Data.Services.Client": "5.6.4",
-          "Newtonsoft.Json": "6.0.8",
-          "System.Spatial": "5.6.4"
+          "Newtonsoft.Json": "6.0.8"
         },
         "frameworkAssemblies": [
           "System.Data",
@@ -6277,10 +6304,10 @@
           "System.Xml.Linq"
         ],
         "compile": {
-          "lib/dnx451/Microsoft.WindowsAzure.Storage.dll": {}
+          "lib/net40/Microsoft.WindowsAzure.Storage.dll": {}
         },
         "runtime": {
-          "lib/dnx451/Microsoft.WindowsAzure.Storage.dll": {}
+          "lib/net40/Microsoft.WindowsAzure.Storage.dll": {}
         }
       }
     }
@@ -7064,6 +7091,19 @@
         "Microsoft.AspNet.WebUtilities.1.0.0-rc1-final.nupkg",
         "Microsoft.AspNet.WebUtilities.1.0.0-rc1-final.nupkg.sha512",
         "Microsoft.AspNet.WebUtilities.nuspec"
+      ]
+    },
+    "Microsoft.Azure.KeyVault.Core/1.0.0": {
+      "type": "package",
+      "sha512": "iaA0E8xoVlqroQ7Iurg/VyAjfPdhzn+xN7JkdncmNoox/ez49uPbxp2vMrvhopBaUMuoBu38+8e0RvrV+X+BxA==",
+      "files": [
+        "lib/net40/Microsoft.Azure.KeyVault.Core.dll",
+        "lib/net40/Microsoft.Azure.KeyVault.Core.xml",
+        "lib/portable-net45+wp8+wpa81+win/Microsoft.Azure.KeyVault.Core.dll",
+        "lib/portable-net45+wp8+wpa81+win/Microsoft.Azure.KeyVault.Core.xml",
+        "Microsoft.Azure.KeyVault.Core.1.0.0.nupkg",
+        "Microsoft.Azure.KeyVault.Core.1.0.0.nupkg.sha512",
+        "Microsoft.Azure.KeyVault.Core.nuspec"
       ]
     },
     "Microsoft.CodeAnalysis.Analyzers/1.0.0": {
@@ -8599,29 +8639,21 @@
         "System.Threading.nuspec"
       ]
     },
-    "WindowsAzure.Storage/6.1.1-preview": {
+    "WindowsAzure.Storage/6.2.0": {
       "type": "package",
-      "sha512": "mDSDuW0GcVYsV1jILYz2nvMX0ADNXUBL6vvy5xKbcHGlKY3lZWhA9AuD/UA2dMoAnto611s5j2XPWWXGmB8N8g==",
+      "sha512": "goOiCbpHmw/H3CJYhWorrQ9kbLYMyqPaUi4IXE8ke0rZXeA9VuzXZe8bjQAPuoJT84sPWuXMqu5rSUBQTXN0dQ==",
       "files": [
-        "lib/dnx451/Microsoft.WindowsAzure.Storage.dll",
-        "lib/dnx451/Microsoft.WindowsAzure.Storage.pdb",
-        "lib/dnx451/Microsoft.WindowsAzure.Storage.xml",
-        "lib/dnxcore50/Microsoft.WindowsAzure.Storage.dll",
-        "lib/dnxcore50/Microsoft.WindowsAzure.Storage.pdb",
-        "lib/dnxcore50/Microsoft.WindowsAzure.Storage.xml",
         "lib/net40/Microsoft.WindowsAzure.Storage.dll",
         "lib/net40/Microsoft.WindowsAzure.Storage.pdb",
         "lib/net40/Microsoft.WindowsAzure.Storage.xml",
-        "lib/portable-net45+netcore45+wpa81+MonoAndroid1+MonoTouch1/Microsoft.WindowsAzure.Storage.dll",
-        "lib/portable-net45+netcore45+wpa81+MonoAndroid1+MonoTouch1/Microsoft.WindowsAzure.Storage.pdb",
         "lib/win8/Microsoft.WindowsAzure.Storage.dll",
         "lib/win8/Microsoft.WindowsAzure.Storage.pdb",
         "lib/wp8/Microsoft.WindowsAzure.Storage.dll",
         "lib/wp8/Microsoft.WindowsAzure.Storage.pdb",
         "lib/wpa/Microsoft.WindowsAzure.Storage.dll",
         "lib/wpa/Microsoft.WindowsAzure.Storage.pdb",
-        "WindowsAzure.Storage.6.1.1-preview.nupkg",
-        "WindowsAzure.Storage.6.1.1-preview.nupkg.sha512",
+        "WindowsAzure.Storage.6.2.0.nupkg",
+        "WindowsAzure.Storage.6.2.0.nupkg.sha512",
         "WindowsAzure.Storage.nuspec"
       ]
     }
@@ -8642,7 +8674,7 @@
       "Microsoft.AspNet.StaticFiles >= 1.0.0-rc1-final",
       "Microsoft.VisualStudio.Web.BrowserLink.Loader >= 14.0.0-rc1-final",
       "Sendgrid >= 6.2.0",
-      "WindowsAzure.Storage >= 6.1.1-preview",
+      "WindowsAzure.Storage >= 6.2.0",
       "EntityFramework.MicrosoftSqlServer >= 7.0.0-rc1-final",
       "Microsoft.Extensions.Configuration.UserSecrets >= 1.0.0-rc1-final",
       "Microsoft.Extensions.Configuration.Json >= 1.0.0-rc1-final",
