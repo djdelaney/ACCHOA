@@ -34,7 +34,13 @@ namespace HOA.Migrations
 
                     b.Property<bool>("Enabled");
 
-                    b.Property<string>("FullName")
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasAnnotation("MaxLength", 20);
+
+                    b.Property<string>("FullName");
+
+                    b.Property<string>("LastName")
                         .IsRequired()
                         .HasAnnotation("MaxLength", 20);
 

@@ -8,7 +8,7 @@ using HOA.Model;
 namespace HOA.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20151225005049_initial")]
+    [Migration("20151228191419_initial")]
     partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -35,7 +35,13 @@ namespace HOA.Migrations
 
                     b.Property<bool>("Enabled");
 
-                    b.Property<string>("FullName")
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasAnnotation("MaxLength", 20);
+
+                    b.Property<string>("FullName");
+
+                    b.Property<string>("LastName")
                         .IsRequired()
                         .HasAnnotation("MaxLength", 20);
 

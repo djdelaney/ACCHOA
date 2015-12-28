@@ -13,6 +13,7 @@ using Microsoft.Data.Entity;
 using HOA.Model;
 using HOA.Model.ViewModel;
 using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.AspNet.Hosting;
 
 // For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -25,17 +26,20 @@ namespace HOA.Controllers
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly ApplicationDbContext _applicationDbContext;
         private RoleManager<IdentityRole> _roleManager;
+        private IHostingEnvironment _env;
 
         public AccountController(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             ApplicationDbContext applicationDbContext,
-            RoleManager<IdentityRole> roleManager)
+            RoleManager<IdentityRole> roleManager,
+            IHostingEnvironment env)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _applicationDbContext = applicationDbContext;
             _roleManager = roleManager;
+            _env = env;
         }
 
         // GET: /<controller>/
@@ -64,9 +68,9 @@ namespace HOA.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null)
         {
-            //Remove later - Add Sample Data
+            //Setup default admin user and roles
             var sampleData = new SampleData(_applicationDbContext, _userManager, _roleManager);
-            sampleData.InitializeData();
+            sampleData.InitializeData(_env.IsDevelopment());
 
             if (string.IsNullOrEmpty(returnUrl))
                 returnUrl = "/Submission/List";
@@ -128,7 +132,7 @@ namespace HOA.Controllers
         [Authorize(Roles = RoleNames.Administrator)]
         public IActionResult ManageUsers(string returnUrl = null)
         {
-            var users = _applicationDbContext.Users.Include(u => u.Roles).OrderBy(u => u.FullName).ToList();
+            var users = _applicationDbContext.Users.Include(u => u.Roles).OrderBy(u => u.LastName).ThenBy(u => u.FirstName).ToList();
 
             var model = new ManageViewModel
             {
@@ -232,7 +236,8 @@ namespace HOA.Controllers
                 {
                     UserName = model.UserName,
                     Email = model.Email,
-                    FullName = model.FullName,
+                    FirstName = model.FirstName,
+                    LastName = model.LastName,
                     Enabled = true
                 };
                 await _userManager.CreateAsync(user, model.Password);

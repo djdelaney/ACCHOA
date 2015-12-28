@@ -7,6 +7,7 @@ using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Data.Entity;
 using Microsoft.Data.Entity.Metadata;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HOA.Model
 {
@@ -23,12 +24,25 @@ namespace HOA.Model
     {
         [Required]
         [MaxLength(20)]
-        public string FullName { get; set; }
+        public string FirstName { get; set; }
+
+        [Required]
+        [MaxLength(20)]
+        public string LastName { get; set; }
 
         [Required]
         public bool Enabled { get; set; }
 
         [Required]
         public bool DisableNotification { get; set; }
+
+        [NotMapped]
+        public string FullName
+        {
+            get
+            {
+                return string.Format("{0} {1}", FirstName, LastName);
+            }
+        }
     }
 }

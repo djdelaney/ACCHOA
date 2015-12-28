@@ -76,6 +76,8 @@ Your submission {2}. You can use the link below to view your submission and any 
             }
 
             List<string> emails = GetRoleMembers(context, roleToNofity);
+            if (emails == null || emails.Count() == 0)
+                return;
 
             var link = String.Format("{0}/Submission/View/{1}", BaseHost, submission.Id);
             var emailHtml = String.Format(m_availableEmail, link, submission.Status.ToString());

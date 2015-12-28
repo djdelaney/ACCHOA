@@ -46,8 +46,12 @@ namespace HOA.Model.ViewModel
         public string Email { get; set; }
 
         [Required]
-        [Display(Name = "Full  Name")]
-        public string FullName { get; set; }
+        [Display(Name = "First  Name")]
+        public string FirstName { get; set; }
+
+        [Required]
+        [Display(Name = "Last  Name")]
+        public string LastName { get; set; }
 
         [Required]
         public string Role { get; set; }

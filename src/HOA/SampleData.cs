@@ -18,10 +18,10 @@ namespace HOA
             _roleManager = roleManager;
         }
 
-        public void InitializeData()
+        public void InitializeData(bool isDevelopment)
         {
             CreateRoles().Wait();
-            CreateUsers().Wait();
+            CreateUsers(isDevelopment).Wait();
         }
 
         private async Task CreateRoles()
@@ -57,20 +57,24 @@ namespace HOA
             }
         }
 
-        private async Task CreateUsers()
+        private async Task CreateUsers(bool isDevelopment)
         {
             var user = await _userManager.FindByNameAsync("admin");
             if (user == null)
             {
-                user = new ApplicationUser { UserName = "admin", Email = "admin@mailinator.com", FullName = "Site Admin", Enabled = true };
+                user = new ApplicationUser { UserName = "admin", Email = "admin@mailinator.com", FirstName = "Admin", LastName = "Admin", Enabled = true };
                 await _userManager.CreateAsync(user, "Password");
                 await _userManager.AddToRoleAsync(user, RoleNames.Administrator);
             }
+
+            //Only create other users for dev purposes
+            if (!isDevelopment)
+                return;
             
             user = await _userManager.FindByNameAsync("JoshRozzi");
             if (user == null)
             {
-                user = new ApplicationUser { UserName = "JoshRozzi", Email = "JoshRozzi@mailinator.com", FullName = "Josh Rozzi", Enabled = true };
+                user = new ApplicationUser { UserName = "JoshRozzi", Email = "JoshRozzi@mailinator.com", FirstName = "Josh", LastName = "Rozzi", Enabled = true };
                 await _userManager.CreateAsync(user, "Password");
                 await _userManager.AddToRoleAsync(user, RoleNames.CommunityManager);
             }
@@ -78,7 +82,7 @@ namespace HOA
             user = await _userManager.FindByNameAsync("KirkFinnis");
             if (user == null)
             {
-                user = new ApplicationUser { UserName = "KirkFinnis", Email = "KirkFinnis@mailinator.com", FullName = "Kirk Finnis", Enabled = true };
+                user = new ApplicationUser { UserName = "KirkFinnis", Email = "KirkFinnis@mailinator.com", FirstName = "Kirk", LastName = "Finnis", Enabled = true };
                 await _userManager.CreateAsync(user, "Password");
                 await _userManager.AddToRoleAsync(user, RoleNames.BoardChairman);
             }
@@ -86,7 +90,7 @@ namespace HOA
             user = await _userManager.FindByNameAsync("DanLetscher");
             if (user == null)
             {
-                user = new ApplicationUser { UserName = "DanLetscher", Email = "DanLetscher@mailinator.com", FullName = "Dan Letscher", Enabled = true };
+                user = new ApplicationUser { UserName = "DanLetscher", Email = "DanLetscher@mailinator.com", FirstName = "Dan", LastName = "Letscher", Enabled = true };
                 await _userManager.CreateAsync(user, "Password");
                 await _userManager.AddToRoleAsync(user, RoleNames.BoardMember);
             }
@@ -94,7 +98,7 @@ namespace HOA
             user = await _userManager.FindByNameAsync("HOALiaison");
             if (user == null)
             {
-                user = new ApplicationUser { UserName = "HOALiaison", Email = "HOALiaison@mailinator.com", FullName = "HOA Liaison", Enabled = true };
+                user = new ApplicationUser { UserName = "HOALiaison", Email = "HOALiaison@mailinator.com", FirstName = "HOA", LastName = "Liaison", Enabled = true };
                 await _userManager.CreateAsync(user, "Password");
                 await _userManager.AddToRoleAsync(user, RoleNames.HOALiaison);
             }
