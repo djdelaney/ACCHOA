@@ -12,6 +12,16 @@ namespace HOA.Util
     {
         public static string BaseHost = "";
 
+        private static string m_newAccount = @"
+Welcome to the Applecross ARB website!<br>
+<br>
+Your new username is: {0}<br>
+and password: {1}<br>
+<br>
+Please use the link below to login and change your password:<br>
+<a href='{2}'>{2}</a><br>
+";
+
         private static string m_availableEmail = @"
 A new submission is available for action:<br>
 <br>
@@ -82,6 +92,13 @@ Your submission {2}. You can use the link below to view your submission and any 
             var link = String.Format("{0}/Submission/View/{1}", BaseHost, submission.Id);
             var emailHtml = String.Format(m_availableEmail, link, submission.Status.ToString());
             mail.SendEmailAsync(emails, "ARB: Available for processing", emailHtml);
+        }
+
+        public static void NotifyNewUser(string email, string username, string password, IEmailSender mail)
+        {
+            var link = String.Format("{0}/Account/Login/?returnUrl=/Account/ChangePassword/", BaseHost);
+            string emailHtml = string.Format(m_newAccount, username, password, link);
+            mail.SendEmailAsync(new List<string> { email }, "ACC ARB: New Account", emailHtml);
         }
 
         private static List<String> GetRoleMembers(ApplicationDbContext context, string roleName)

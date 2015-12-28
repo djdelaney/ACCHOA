@@ -14,6 +14,8 @@ using HOA.Model;
 using HOA.Model.ViewModel;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Hosting;
+using HOA.Util;
+using HOA.Services;
 
 // For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -27,32 +29,67 @@ namespace HOA.Controllers
         private readonly ApplicationDbContext _applicationDbContext;
         private RoleManager<IdentityRole> _roleManager;
         private IHostingEnvironment _env;
+        private readonly IEmailSender _email;
 
         public AccountController(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             ApplicationDbContext applicationDbContext,
             RoleManager<IdentityRole> roleManager,
-            IHostingEnvironment env)
+            IHostingEnvironment env,
+            IEmailSender email)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _applicationDbContext = applicationDbContext;
             _roleManager = roleManager;
             _env = env;
+            _email = email;
         }
-
-        // GET: /<controller>/
+        
         public IActionResult Index()
         {
-            var message = String.Format("Logged in as: {0}", User.Identity.Name);
-            return Content(message);
-            //return View();
+            return View(GetCurrentUserAsync().Result);
         }
 
         private async Task<ApplicationUser> GetCurrentUserAsync()
         {
             return await _userManager.FindByIdAsync(Request.HttpContext.User.GetUserId());
+        }
+
+
+        [HttpGet]
+        public IActionResult ChangePassword()
+        {
+            return View(new PasswordViewModel());
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangePassword(PasswordViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await GetCurrentUserAsync();
+                IdentityResult result = await _userManager.ChangePasswordAsync(user, model.OldPassword, model.Password);
+
+                if(!result.Succeeded)
+                {
+                    string message = "";
+                    foreach (IdentityError error in result.Errors)
+                    {
+                        message += error.Description + " ";
+                    }
+
+                    ModelState.AddModelError("Password", message);
+                    return View(model);
+                }
+
+                return RedirectToAction(nameof(Index));
+            }
+
+            // If we got this far, something failed, redisplay form
+            return View(model);
         }
 
         [HttpGet]
@@ -244,6 +281,8 @@ namespace HOA.Controllers
                 await _userManager.AddToRoleAsync(user, model.Role);
 
                 _applicationDbContext.SaveChanges();
+
+                EmailHelper.NotifyNewUser(model.Email, model.UserName, model.Password, _email);
 
                 return RedirectToAction(nameof(AccountController.ManageUsers), "Account");
             }

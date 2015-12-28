@@ -1,0 +1,14 @@
+﻿@using System.Linq
+@using HOA.Model.ViewModel
+@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewBag.Title = "Account";
+}
+
+<h3>@Model.FirstName @Model.LastName</h3>
+@Model.Email<br />
+<br />
+
+<a href="/Account/ChangePassword">Change Password</a>
