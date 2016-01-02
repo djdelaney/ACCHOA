@@ -26,6 +26,8 @@ namespace HOA.Controllers
         private readonly IFileStore _storage;
         private RoleManager<IdentityRole> _roleManager;
 
+        private const int maxSizeBytes = 1 * 1024 * 1024; //1MB
+
         public SubmissionController(ApplicationDbContext applicationDbContext, UserManager<ApplicationUser> userManager, IEmailSender emailSender, IFileStore store, RoleManager<IdentityRole> roleManager)
         {
             _applicationDbContext = applicationDbContext;
@@ -303,7 +305,26 @@ namespace HOA.Controllers
         public async Task<IActionResult> Create(CreateSubmissionViewModel model)
         {
             if (ModelState.IsValid && model.Files.Count > 0)
-            {       
+            {
+                //Validate files before continuing
+                long totalSize = 0;
+                foreach (var fileContent in model.Files)
+                {
+                    var fileName = FormUtils.GetUploadedFilename(fileContent);
+                    if(!FormUtils.IsValidFileType(fileName))
+                    {
+                        ModelState.AddModelError(string.Empty, "Invalid file type.");
+                        return View(model);
+                    }
+                    totalSize += fileContent.Length;
+                }
+
+                if(totalSize > maxSizeBytes)
+                {
+                    ModelState.AddModelError(string.Empty, "Files too large.");
+                    return View(model);
+                }
+
                 var sub = new Submission()
                 {
                     FirstName = model.FirstName,
@@ -323,11 +344,7 @@ namespace HOA.Controllers
 
                 foreach(var fileContent in model.Files)
                 {
-                    var chunks = fileContent.ContentDisposition.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
-                    var nameChunk = chunks.FirstOrDefault(c => c.Contains("filename"));
-                    var fileName = nameChunk.Split('=')[1].Trim(new char[] { '"' });
-                    fileName = System.IO.Path.GetFileName(fileName);
-
+                    var fileName = FormUtils.GetUploadedFilename(fileContent);
                     var blobId = await _storage.StoreFile(fileContent.OpenReadStream());
                     var file = new File
                     {
@@ -679,12 +696,32 @@ namespace HOA.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Resubmit(ResubmitViewModel model)
         {
+            model.Submission = _applicationDbContext.Submissions.FirstOrDefault(s => s.Id == model.SubmissionId && (s.Status == Status.Rejected || s.Status == Status.MissingInformation));
             if (ModelState.IsValid)
             {
                 var submission = _applicationDbContext.Submissions.Include(s => s.Audits).Include(s => s.Reviews).Include(s => s.Files)
                     .FirstOrDefault(s => s.Id == model.SubmissionId && (s.Status == Status.Rejected || s.Status == Status.MissingInformation));
                 if (submission == null)
                     return HttpNotFound("Submission not found");
+
+                //Validate files before continuing
+                long totalSize = 0;
+                foreach (var fileContent in model.Files)
+                {
+                    var fileName = FormUtils.GetUploadedFilename(fileContent);
+                    if (!FormUtils.IsValidFileType(fileName))
+                    {
+                        ModelState.AddModelError(string.Empty, "Invalid file type.");
+                        return View(model);
+                    }
+                    totalSize += fileContent.Length;
+                }
+
+                if (totalSize > maxSizeBytes)
+                {
+                    ModelState.AddModelError(string.Empty, "Files too large.");
+                    return View(model);
+                }
 
                 submission.SubmissionDate = DateTime.Now;
                 submission.StatusChangeTime = DateTime.Now;
@@ -697,11 +734,7 @@ namespace HOA.Controllers
                 {
                     foreach (var fileContent in model.Files)
                     {
-                        var chunks = fileContent.ContentDisposition.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
-                        var nameChunk = chunks.FirstOrDefault(c => c.Contains("filename"));
-                        var fileName = nameChunk.Split('=')[1].Trim(new char[] { '"' });
-                        fileName = System.IO.Path.GetFileName(fileName);
-
+                        var fileName = FormUtils.GetUploadedFilename(fileContent);
                         var blobId = await _storage.StoreFile(fileContent.OpenReadStream());
                         var file = new File
                         {
@@ -727,7 +760,6 @@ namespace HOA.Controllers
             }
 
             // If we got this far, something failed, redisplay form
-            model.Submission = _applicationDbContext.Submissions.FirstOrDefault(s => s.Id == model.SubmissionId && (s.Status == Status.Rejected || s.Status == Status.MissingInformation));
             return View(model);
         }
 
