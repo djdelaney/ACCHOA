@@ -166,6 +166,16 @@ namespace HOA.Controllers
                                 s.Status != Status.ConditionallyApproved &&
                                 s.Status != Status.Retracted);
             }
+            else if (filter.Equals("Recent"))
+            {
+                DateTime oneMonthAgo = DateTime.Now.AddDays(-30);
+                subs = subs.Where(s => (s.Status != Status.Rejected &&
+                                s.Status != Status.MissingInformation &&
+                                s.Status != Status.Approved &&
+                                s.Status != Status.ConditionallyApproved &&
+                                s.Status != Status.Retracted) &&
+                                s.LastModified > oneMonthAgo);
+            }
             else if (filter.Equals("Approved"))
             {
                 subs = subs.Where(s => s.Status == Status.Approved || s.Status == Status.ConditionallyApproved);

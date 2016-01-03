@@ -13,6 +13,7 @@
         
         @if(!User.IsInRole(RoleNames.BoardMember))
         { 
+        <a class="btn btn btn-default @(Model.Filter == "Recent" ? "active" : "")" href="/Submission/List/Recent" role="button">Recent</a>
         <a class="btn btn btn-default @(Model.Filter == "All" ? "active" : "")" href="/Submission/List/All" role="button">All</a>
         }
         
