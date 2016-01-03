@@ -29,6 +29,7 @@ namespace HOA.Model.ViewModel
         public string UserName { get; set; }
         public string FullName { get; set; }
         public bool Enabled { get; set; }
+        public bool DisableNotification { get; set; }
         public string Roles { get; set; }
         public string UserId { get; set; }
     }

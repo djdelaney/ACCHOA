@@ -19,8 +19,8 @@
                 <th>Username</th>
                 <th>Name</th>
                 <th>Role</th>
-                <th>Enabled</th>
-                <th>Action</th>
+                <th>Active</th>
+                <th>Notifications</th>
             </tr>
         </thead>
 
@@ -30,18 +30,11 @@
             <td>@user.UserName</td>
             <td>@user.FullName</td>
             <td>@user.Roles</td>
-            <td>@user.Enabled</td>
             <td>
-                @if(user.Enabled)
-                {
-                    <a href="/Account/DisableUser/@user.UserId">Disable</a>
-                }
-                else
-                {
-                    <a href="/Account/EnableUser/@user.UserId">Enable</a>
-                }
-
-
+                @Html.ActionLink(user.Enabled ? "Disable" : "Enable", "Disable", new { id = user.UserId, disable = user.Enabled })
+            </td>
+            <td>
+                @Html.ActionLink(user.DisableNotification ? "Enable" : "Disable", "DisableNotifications", new { id = user.UserId, disable = !user.DisableNotification })
             </td>
         </tr>
     }

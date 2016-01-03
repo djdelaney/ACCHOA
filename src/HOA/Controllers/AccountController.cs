@@ -203,6 +203,7 @@ namespace HOA.Controllers
                 {
                     UserName = user.UserName,
                     Enabled = user.Enabled,
+                    DisableNotification = user.DisableNotification,
                     FullName = user.FullName,
                     Roles = string.Join(", ", roles),
                     UserId = user.Id
@@ -211,29 +212,29 @@ namespace HOA.Controllers
                 model.Users.Add(u);
             }
             return View(model);
-        }
+        }        
 
         [Authorize(Roles = RoleNames.Administrator)]
-        public IActionResult EnableUser(string id)
+        public IActionResult Disable(string id, bool disable)
         {
             var user = _applicationDbContext.Users.FirstOrDefault(u => u.Id.Equals(id));
             if (user == null)
                 return HttpNotFound("User not found");
 
-            user.Enabled = true;
+            user.Enabled = !disable;
             _applicationDbContext.SaveChanges();
 
             return RedirectToAction(nameof(AccountController.ManageUsers), "Account");
         }
 
         [Authorize(Roles = RoleNames.Administrator)]
-        public IActionResult DisableUser(string id)
+        public IActionResult DisableNotifications(string id, bool disable)
         {
             var user = _applicationDbContext.Users.FirstOrDefault(u => u.Id.Equals(id));
             if (user == null)
                 return HttpNotFound("User not found");
 
-            user.Enabled = false;
+            user.DisableNotification = disable;
             _applicationDbContext.SaveChanges();
 
             return RedirectToAction(nameof(AccountController.ManageUsers), "Account");
