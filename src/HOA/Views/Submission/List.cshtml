@@ -16,6 +16,7 @@
         <a class="btn btn btn-default @(Model.Filter == "All" ? "active" : "")" href="/Submission/List/All" role="button">All</a>
         }
         
+        <a class="btn btn btn-default @(Model.Filter == "Open" ? "active" : "")" href="/Submission/List/Open" role="button">Open</a>
         <a class="btn btn btn-default @(Model.Filter == "Approved" ? "active" : "")" href="/Submission/List/Approved" role="button">Approved</a>
         <a class="btn btn btn-default @(Model.Filter == "Rejected" ? "active" : "")" href="/Submission/List/Rejected" role="button">Rejected</a>
     </div>

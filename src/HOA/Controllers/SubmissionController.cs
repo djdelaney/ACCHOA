@@ -158,6 +158,14 @@ namespace HOA.Controllers
                     subs = subs.Where(s => s.Status == Status.ReviewComplete);
                 }
             }
+            else if (filter.Equals("Open"))
+            {
+                subs = subs.Where(s => s.Status != Status.Rejected &&
+                                s.Status != Status.MissingInformation &&
+                                s.Status != Status.Approved &&
+                                s.Status != Status.ConditionallyApproved &&
+                                s.Status != Status.Retracted);
+            }
             else if (filter.Equals("Approved"))
             {
                 subs = subs.Where(s => s.Status == Status.Approved || s.Status == Status.ConditionallyApproved);
