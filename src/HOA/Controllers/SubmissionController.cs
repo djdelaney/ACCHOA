@@ -26,7 +26,7 @@ namespace HOA.Controllers
         private readonly IFileStore _storage;
         private RoleManager<IdentityRole> _roleManager;
 
-        private const int maxSizeBytes = 1 * 1024 * 1024; //1MB
+        private const int maxSizeBytes = 10 * 1024 * 1024; //10MB
 
         public SubmissionController(ApplicationDbContext applicationDbContext, UserManager<ApplicationUser> userManager, IEmailSender emailSender, IFileStore store, RoleManager<IdentityRole> roleManager)
         {

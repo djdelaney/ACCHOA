@@ -54,6 +54,7 @@ Your submission {2}. You can use the link below to view your submission and any 
             string roleToNofity;
             if (submission.Status == Status.Submitted)
             {
+                NotifyHomeowner(context, submission, mail);
                 roleToNofity = RoleNames.CommunityManager;
             }
             else if (submission.Status == Status.ARBIncoming)
@@ -113,7 +114,11 @@ Your submission {2}. You can use the link below to view your submission and any 
             var subject = String.Format("ARB Submission {0}", submission.Code);
 
             string status;
-            if (submission.Status == Status.Approved)
+            if (submission.Status == Status.Submitted)
+            {
+                status = "has been received";
+            }
+            else if (submission.Status == Status.Approved)
             {
                 status = "has been approved";
             }
