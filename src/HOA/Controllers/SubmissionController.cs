@@ -12,6 +12,7 @@ using System.Security.Claims;
 using HOA.Services;
 using Microsoft.AspNet.Identity.EntityFramework;
 using HOA.Util;
+using Microsoft.AspNet.Http;
 
 // For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -324,9 +325,11 @@ namespace HOA.Controllers
         {
             if (ModelState.IsValid && model.Files.Count > 0)
             {
+                List<IFormFile> files = model.Files.ToList();
+
                 //Validate files before continuing
                 long totalSize = 0;
-                foreach (var fileContent in model.Files)
+                foreach (var fileContent in files)
                 {
                     var fileName = FormUtils.GetUploadedFilename(fileContent);
                     if(!FormUtils.IsValidFileType(fileName))
@@ -360,7 +363,7 @@ namespace HOA.Controllers
                     PrecedentSetting = false
                 };
 
-                foreach(var fileContent in model.Files)
+                foreach(var fileContent in files)
                 {
                     var fileName = FormUtils.GetUploadedFilename(fileContent);
                     var blobId = await _storage.StoreFile(fileContent.OpenReadStream());
@@ -723,8 +726,9 @@ namespace HOA.Controllers
                     return HttpNotFound("Submission not found");
 
                 //Validate files before continuing
+                List<IFormFile> files = model.Files == null ? new List<IFormFile>() : model.Files.ToList();
                 long totalSize = 0;
-                foreach (var fileContent in model.Files)
+                foreach (var fileContent in files)
                 {
                     var fileName = FormUtils.GetUploadedFilename(fileContent);
                     if (!FormUtils.IsValidFileType(fileName))
@@ -750,7 +754,7 @@ namespace HOA.Controllers
                 //any new files
                 if (model.Files != null)
                 {
-                    foreach (var fileContent in model.Files)
+                    foreach (var fileContent in files)
                     {
                         var fileName = FormUtils.GetUploadedFilename(fileContent);
                         var blobId = await _storage.StoreFile(fileContent.OpenReadStream());
