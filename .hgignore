@@ -153,3 +153,7 @@ $RECYCLE.BIN/
 Thumbs.db
 ehthumbs.db
 Desktop.ini
+
+
+## ASP.net 5 files
+project.lock.json
