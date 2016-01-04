@@ -66,6 +66,10 @@ namespace HOA
                 await _userManager.CreateAsync(user, "Password");
                 await _userManager.AddToRoleAsync(user, RoleNames.Administrator);
             }
+            else
+            {
+                return;
+            }
 
             //Only create other users for dev purposes
             if (!isDevelopment)
