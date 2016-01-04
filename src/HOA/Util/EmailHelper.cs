@@ -36,9 +36,23 @@ The following submission(s) are overdue:<br>
         private static string m_homeownerEmail = @"
 {0} {1},<br>
 <br>
-Your submission {2}. You can use the link below to view your submission and any comments.<br>
+Your submission {2}. Use the link below to view your submission and any comments.<br>
 <br>
 <a href='{3}'>{3}</a><br>";
+
+        private static string m_PrecedentSettingEmail = @"
+{0} {1},<br>
+<br>
+Your submission has been marked as precedent setting by the review board and may take longer than usual to review. Use the link below to view your submission and any comments.<br>
+<br>
+<a href='{2}'>{2}</a><br>";
+
+        public static void NotifyPrecedentSetting(ApplicationDbContext context, Submission submission, IEmailSender mail)
+        {
+            var link = String.Format("{0}/Submission/ViewStatus/{1}", BaseHost, submission.Code);
+            string emailHtml = String.Format(m_PrecedentSettingEmail, submission.FirstName, submission.LastName, link);
+            mail.SendEmailAsync(new List<string> { submission.Email }, "ARB: New submission", emailHtml);
+        }
 
         public static void NotifyStatusChanged(ApplicationDbContext context, Submission submission, IEmailSender mail)
         {

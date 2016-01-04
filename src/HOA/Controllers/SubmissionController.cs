@@ -806,5 +806,26 @@ namespace HOA.Controllers
 
             return RedirectToAction(nameof(ViewStatus), new { id = submission.Code });
         }
+
+        [Authorize(Roles = RoleNames.BoardChairman)]
+        public IActionResult PrecedentSetting(int id)
+        {
+            var submission = _applicationDbContext.Submissions.FirstOrDefault(s => s.Id == id);
+            if (submission == null)
+                return HttpNotFound("Submission not found");
+
+            if (submission.Status != Status.ARBIncoming &&
+                submission.Status != Status.UnderReview)
+            {
+                throw new Exception("Invliad state!");
+            }
+
+            submission.PrecedentSetting = true;
+            _applicationDbContext.SaveChanges();
+
+            EmailHelper.NotifyPrecedentSetting(_applicationDbContext, submission, _email);
+
+            return RedirectToAction(nameof(View), new { id = submission.Id });
+        }
     }
 }

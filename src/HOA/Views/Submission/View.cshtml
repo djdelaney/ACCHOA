@@ -34,6 +34,10 @@
             }
             </ul>
 
+            @if (Model.Submission.PrecedentSetting)
+            {
+                <p class="bg-warning">Marked as precedent setting</p>
+            }
 
         </div>
     </div>
@@ -125,6 +129,14 @@
     {
         <br />
         <a href="/Submission/Delete/@Model.Submission.Id" onclick="if (!confirm('Are you sure?')) return false;">Delete</a>
+    }
+
+    
+    @if ((Model.Submission.Status == Status.ARBIncoming || Model.Submission.Status == Status.UnderReview) &&
+                (!Model.Submission.PrecedentSetting && User.IsInRole(RoleNames.BoardChairman)))
+    {
+        <br />
+        @Html.ActionLink("Mark as precedent setting", "PrecedentSetting", new { Id = Model.Submission.Id })
     }
 
 </div>
