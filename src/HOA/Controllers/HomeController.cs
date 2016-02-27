@@ -27,12 +27,5 @@ namespace HOA.Controllers
         {
             return View();
         }
-
-        public IActionResult Error()
-        {
-            
-            return Content("ERROR");
-            //return View("~/Views/Shared/Error.cshtml");
-        }
     }
 }
