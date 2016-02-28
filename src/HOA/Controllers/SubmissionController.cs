@@ -46,6 +46,34 @@ namespace HOA.Controllers
             return users.Count();
         }
 
+        public void AddStateSwitch(Submission s)
+        {
+            if (s.StateHistory == null)
+                s.StateHistory = new List<StateChange>();
+
+            StateChange existing = s.StateHistory.FirstOrDefault(h => h.EndTime.Equals(DateTime.MinValue));
+            if(existing != null)
+            {
+                existing.EndTime = DateTime.Now;
+            }
+
+            //Dont log duration for final statuses
+            if(s.Status == Status.Approved || s.Status == Status.ConditionallyApproved)
+            {
+                return;
+            }
+
+            var change = new StateChange
+            {
+                StartTime = DateTime.Now,
+                EndTime = DateTime.MinValue,
+                Submission = s,
+                State = s.Status
+            };
+            s.StateHistory.Add(change);
+            _applicationDbContext.StateChanges.Add(change);
+        }
+
         public void AddHistoryEntry(Submission s, string user, string action)
         {
             if (s.Audits == null)
@@ -86,7 +114,7 @@ namespace HOA.Controllers
         {
             if (ModelState.IsValid)
             {
-                var submission = _applicationDbContext.Submissions.Include(s => s.Audits).Include(s => s.Reviews)
+                var submission = _applicationDbContext.Submissions.Include(s => s.Audits).Include(s => s.Reviews).Include(s => s.StateHistory)
                     .FirstOrDefault(s => s.Id == model.SubmissionId);
                 if (submission == null)
                     return HttpNotFound("Submission not found");
@@ -97,6 +125,8 @@ namespace HOA.Controllers
                     submission.Status = Status.Approved;
                 else
                     submission.Status = Status.ConditionallyApproved;
+
+                AddStateSwitch(submission);
 
                 //Any final comments?
                 if (!string.IsNullOrEmpty(model.Comments))
@@ -273,6 +303,7 @@ namespace HOA.Controllers
                 .Include(s => s.Audits)
                 .Include(s => s.Responses)
                 .Include(s => s.Files)
+                .Include(s => s.StateHistory)
                 .FirstOrDefault(s => s.Id == id);
             if (submission == null)
                 return HttpNotFound("Submission not found");
@@ -292,6 +323,10 @@ namespace HOA.Controllers
             foreach (var f in submission.Files)
             {
                 _storage.DeleteFile(f.BlobName);
+            }
+            foreach (var c in submission.StateHistory)
+            {
+                _applicationDbContext.StateChanges.Remove(c);
             }
             _applicationDbContext.Submissions.Remove(submission);
 
@@ -376,7 +411,9 @@ namespace HOA.Controllers
                     sub.Files.Add(file);
                     _applicationDbContext.Files.Add(file);
                 }
-                
+
+                AddStateSwitch(sub);
+
                 AddHistoryEntry(sub, model.FirstName + " " + model.LastName, "Submitted");
 
                 _applicationDbContext.Submissions.Add(sub);
@@ -420,10 +457,10 @@ namespace HOA.Controllers
         {
             if (ModelState.IsValid)
             {
-                var submission = _applicationDbContext.Submissions.Include(s => s.Audits).FirstOrDefault(s => s.Id == model.SubmissionId);
+                var submission = _applicationDbContext.Submissions.Include(s => s.Audits).Include(s => s.StateHistory).FirstOrDefault(s => s.Id == model.SubmissionId);
                 if (submission == null)
                     return HttpNotFound("Submission not found");
-
+                
                 if (model.Approve)
                 {
                     if (submission.Status == Status.Submitted)
@@ -451,6 +488,7 @@ namespace HOA.Controllers
                     _applicationDbContext.Responses.Add(response);
                 }
 
+                AddStateSwitch(submission);
                 submission.StatusChangeTime = DateTime.Now;
 
                 var user = await _userManager.FindByIdAsync(User.GetUserId());                
@@ -492,7 +530,7 @@ namespace HOA.Controllers
         {
             if (ModelState.IsValid)
             {
-                var submission = _applicationDbContext.Submissions.Include(s => s.Audits).Include(s => s.Reviews)
+                var submission = _applicationDbContext.Submissions.Include(s => s.Audits).Include(s => s.Reviews).Include(s => s.StateHistory)
                     .FirstOrDefault(s => s.Id == model.SubmissionId);
                 if (submission == null)
                     return HttpNotFound("Submission not found");
@@ -524,6 +562,7 @@ namespace HOA.Controllers
                     submission.LastModified = DateTime.Now;
                     submission.StatusChangeTime = DateTime.Now;
                     AddHistoryEntry(submission, "System", "All reviews in, sent to chairman");
+                    AddStateSwitch(submission);
                     EmailHelper.NotifyStatusChanged(_applicationDbContext, submission, _email);
                 }
                 submission.LastModified = DateTime.Now;
@@ -561,12 +600,12 @@ namespace HOA.Controllers
         {
             if (ModelState.IsValid)
             {
-                var submission = _applicationDbContext.Submissions.Include(s => s.Audits).FirstOrDefault(s => s.Id == model.SubmissionId);
+                var submission = _applicationDbContext.Submissions.Include(s => s.Audits).Include(s => s.StateHistory).FirstOrDefault(s => s.Id == model.SubmissionId);
                 if (submission == null)
                     return HttpNotFound("Submission not found");
 
                 var status = (ReviewStatus)Enum.Parse(typeof(ReviewStatus), model.Status);
-
+                
                 if (status == ReviewStatus.Approved || status == ReviewStatus.ConditionallyApproved)
                 {
                     submission.Status = Status.ReviewComplete;
@@ -594,6 +633,7 @@ namespace HOA.Controllers
                 {
                     throw new Exception("Invalid option");
                 }
+                AddStateSwitch(submission);
                 submission.StatusChangeTime = DateTime.Now;
 
                 var user = await _userManager.FindByIdAsync(User.GetUserId());
@@ -635,7 +675,7 @@ namespace HOA.Controllers
         {
             if (ModelState.IsValid)
             {
-                var submission = _applicationDbContext.Submissions.Include(s => s.Audits).FirstOrDefault(s => s.Id == model.SubmissionId);
+                var submission = _applicationDbContext.Submissions.Include(s => s.Audits).Include(s => s.StateHistory).FirstOrDefault(s => s.Id == model.SubmissionId);
                 if (submission == null)
                     return HttpNotFound("Submission not found");
 
@@ -682,6 +722,7 @@ namespace HOA.Controllers
                     _applicationDbContext.Responses.Add(response);
                 }
 
+                AddStateSwitch(submission);
                 submission.StatusChangeTime = DateTime.Now;                
                 submission.LastModified = DateTime.Now;
                 _applicationDbContext.SaveChanges();
@@ -788,7 +829,7 @@ namespace HOA.Controllers
         [AllowAnonymous]
         public IActionResult Retract(int id)
         {
-            var submission = _applicationDbContext.Submissions.FirstOrDefault(s => s.Id == id);
+            var submission = _applicationDbContext.Submissions.Include(s => s.StateHistory).FirstOrDefault(s => s.Id == id);
             if (submission == null)
                 return HttpNotFound("Submission not found");
 
@@ -801,6 +842,7 @@ namespace HOA.Controllers
                 throw new Exception("Invliad state!");
             }
 
+            AddStateSwitch(submission);
             submission.Status = Status.Retracted;
             AddHistoryEntry(submission, submission.FirstName + " " + submission.LastName, "Retracted");
 

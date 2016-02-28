@@ -21,7 +21,6 @@ namespace HOA.Migrations
                     EmailConfirmed = table.Column<bool>(nullable: false),
                     Enabled = table.Column<bool>(nullable: false),
                     FirstName = table.Column<string>(nullable: false),
-                    FullName = table.Column<string>(nullable: true),
                     LastName = table.Column<string>(nullable: false),
                     LockoutEnabled = table.Column<bool>(nullable: false),
                     LockoutEnd = table.Column<DateTimeOffset>(nullable: true),
@@ -232,6 +231,27 @@ namespace HOA.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
             migrationBuilder.CreateTable(
+                name: "StateChange",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    EndTime = table.Column<DateTime>(nullable: false),
+                    StartTime = table.Column<DateTime>(nullable: false),
+                    State = table.Column<int>(nullable: false),
+                    SubmissionId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_StateChange", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_StateChange_Submission_SubmissionId",
+                        column: x => x.SubmissionId,
+                        principalTable: "Submission",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+            migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
@@ -295,6 +315,7 @@ namespace HOA.Migrations
             migrationBuilder.DropTable("History");
             migrationBuilder.DropTable("Response");
             migrationBuilder.DropTable("Review");
+            migrationBuilder.DropTable("StateChange");
             migrationBuilder.DropTable("AspNetRoleClaims");
             migrationBuilder.DropTable("AspNetUserClaims");
             migrationBuilder.DropTable("AspNetUserLogins");

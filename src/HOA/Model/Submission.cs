@@ -75,5 +75,7 @@ namespace HOA.Model
         public virtual IList<Response> Responses { get; set; }
 
         public virtual IList<File> Files { get; set; }
+
+        public virtual IList<StateChange> StateHistory { get; set; }        
     }
 }

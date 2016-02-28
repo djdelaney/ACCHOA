@@ -38,8 +38,6 @@ namespace HOA.Migrations
                         .IsRequired()
                         .HasAnnotation("MaxLength", 20);
 
-                    b.Property<string>("FullName");
-
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasAnnotation("MaxLength", 20);
@@ -170,6 +168,23 @@ namespace HOA.Migrations
                         .IsRequired();
 
                     b.Property<int>("SubmissionRevision");
+
+                    b.HasKey("Id");
+                });
+
+            modelBuilder.Entity("HOA.Model.StateChange", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<DateTime>("EndTime");
+
+                    b.Property<DateTime>("StartTime");
+
+                    b.Property<int>("State");
+
+                    b.Property<int?>("SubmissionId")
+                        .IsRequired();
 
                     b.HasKey("Id");
                 });
@@ -337,6 +352,13 @@ namespace HOA.Migrations
                         .WithMany()
                         .HasForeignKey("ReviewerId");
 
+                    b.HasOne("HOA.Model.Submission")
+                        .WithMany()
+                        .HasForeignKey("SubmissionId");
+                });
+
+            modelBuilder.Entity("HOA.Model.StateChange", b =>
+                {
                     b.HasOne("HOA.Model.Submission")
                         .WithMany()
                         .HasForeignKey("SubmissionId");

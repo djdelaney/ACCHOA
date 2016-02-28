@@ -15,6 +15,7 @@ namespace HOA.Model
         public DbSet<Review> Reviews { get; set; }
         public DbSet<File> Files { get; set; }
         public DbSet<Response> Responses { get; set; }
+        public DbSet<StateChange> StateChanges { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -25,6 +26,7 @@ namespace HOA.Model
             builder.Entity<Submission>().HasKey(v => v.Id);
             builder.Entity<File>().HasKey(v => v.Id);
             builder.Entity<Response>().HasKey(v => v.Id);
+            builder.Entity<StateChange>().HasKey(v => v.Id);
 
             builder.Entity<Submission>().HasMany(s => s.Audits).WithOne(h => h.Submission).IsRequired(false);
 
