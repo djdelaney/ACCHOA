@@ -169,7 +169,7 @@ namespace HOA.Controllers
 
             if (filter.Equals("Todo"))
             {
-                subs = subs.Where(s => s.Status != Status.Approved && s.Status != Status.Rejected && s.Status != Status.ConditionallyApproved && s.Status != Status.MissingInformation);
+                subs = subs.Where(s => s.Status != Status.Approved && s.Status != Status.Rejected && s.Status != Status.ConditionallyApproved && s.Status != Status.MissingInformation && s.Status != Status.Retracted);
 
                 if (User.IsInRole(RoleNames.Administrator))
                 {
