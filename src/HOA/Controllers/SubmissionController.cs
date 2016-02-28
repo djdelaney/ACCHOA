@@ -143,6 +143,8 @@ namespace HOA.Controllers
                     _applicationDbContext.Responses.Add(response);
                 }
 
+                AddHistoryEntry(submission, user.FullName, "Sent final response");
+
                 _applicationDbContext.SaveChanges();
 
                 EmailHelper.NotifyStatusChanged(_applicationDbContext, submission, _email);
@@ -854,11 +856,13 @@ namespace HOA.Controllers
         }
 
         [Authorize(Roles = RoleNames.BoardChairman)]
-        public IActionResult PrecedentSetting(int id)
+        public async Task<IActionResult> PrecedentSetting(int id)
         {
             var submission = _applicationDbContext.Submissions.FirstOrDefault(s => s.Id == id);
             if (submission == null)
                 return HttpNotFound("Submission not found");
+
+            var user = await _userManager.FindByIdAsync(User.GetUserId());
 
             if (submission.Status != Status.ARBIncoming &&
                 submission.Status != Status.UnderReview)
@@ -866,6 +870,7 @@ namespace HOA.Controllers
                 throw new Exception("Invliad state!");
             }
 
+            AddHistoryEntry(submission, user.FullName, "Marked as precedent setting");
             submission.PrecedentSetting = true;
             _applicationDbContext.SaveChanges();
 
