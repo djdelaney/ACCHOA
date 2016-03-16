@@ -75,6 +75,7 @@ namespace HOA
             if (!isDevelopment)
                 return;
             
+            /*
             user = await _userManager.FindByNameAsync("JoshRozzi");
             if (user == null)
             {
@@ -105,7 +106,7 @@ namespace HOA
                 user = new ApplicationUser { UserName = "HOALiaison", Email = "HOALiaison@mailinator.com", FirstName = "HOA", LastName = "Liaison", Enabled = true };
                 await _userManager.CreateAsync(user, "Password");
                 await _userManager.AddToRoleAsync(user, RoleNames.HOALiaison);
-            }
+            }*/
 
         }
     }
