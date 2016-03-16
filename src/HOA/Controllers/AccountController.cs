@@ -212,7 +212,28 @@ namespace HOA.Controllers
                 model.Users.Add(u);
             }
             return View(model);
-        }        
+        }
+
+        [Authorize(Roles = RoleNames.Administrator)]
+        public async Task<IActionResult> Delete(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            
+            var rolesForUser = await _userManager.GetRolesAsync(user);
+
+            if (rolesForUser.Count() > 0)
+            {
+                foreach (var item in rolesForUser.ToList())
+                {
+                    // item should be the name of the role
+                    var result = await _userManager.RemoveFromRoleAsync(user, item);
+                }
+            }
+
+            await _userManager.DeleteAsync(user);
+
+            return RedirectToAction(nameof(AccountController.ManageUsers), "Account");
+        }
 
         [Authorize(Roles = RoleNames.Administrator)]
         public IActionResult Disable(string id, bool disable)
