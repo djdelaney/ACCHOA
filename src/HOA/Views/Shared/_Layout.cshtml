@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@inject Microsoft.ApplicationInsights.Extensibility.TelemetryConfiguration TelemetryConfiguration
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
@@ -16,6 +17,10 @@
 
     <meta name="viewport" content="width=device-width" />
     <title>@ViewBag.Title</title>
+
+    @Html.ApplicationInsightsJavaScript(TelemetryConfiguration)
+
+    
 
     <style>
         body {

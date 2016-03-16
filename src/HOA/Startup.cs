@@ -14,6 +14,7 @@ using HOA.Services;
 using Microsoft.AspNet.StaticFiles;
 using Microsoft.AspNet.Http;
 using HOA.Util;
+using Microsoft.ApplicationInsights.AspNet;
 
 namespace HOA
 {
@@ -32,7 +33,15 @@ namespace HOA
                 // For more details on using the user secret store see http://go.microsoft.com/fwlink/?LinkID=532709
                 builder.AddUserSecrets();
             }
+            
             builder.AddEnvironmentVariables();
+
+            //Application insights
+            if (env.IsDevelopment())
+            {
+                builder.AddApplicationInsightsSettings(developerMode: true);
+            }
+
             Configuration = builder.Build();
         }
 
@@ -89,6 +98,8 @@ namespace HOA
                 SendGridEmail.EmailSource = emailSource;
                 services.AddTransient<IEmailSender, SendGridEmail>();
             }
+
+            services.AddApplicationInsightsTelemetry(Configuration);
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
@@ -98,6 +109,12 @@ namespace HOA
             loggerFactory.AddDebug();
 
             // Configure the HTTP request pipeline.
+
+            // Add Application Insights monitoring to the request pipeline as a very first middleware.
+            app.UseApplicationInsightsRequestTelemetry();
+
+            // Add Application Insights exceptions handling to the request pipeline.
+            app.UseApplicationInsightsExceptionTelemetry();
 
             // Add the following to the request pipeline only in development environment.
             if (env.IsDevelopment())
