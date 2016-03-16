@@ -37,9 +37,9 @@ namespace HOA.Services
             return await blockBlob.OpenReadAsync();
         }
 
-        public async Task<string> StoreFile(Stream data)
+        public async Task<string> StoreFile(string code, Stream data)
         {
-            var id = Guid.NewGuid().ToString();
+            var id = string.Format("{0}={1}", code, Guid.NewGuid().ToString());
 
             // Retrieve storage account from connection string.
             CloudStorageAccount storageAccount = CloudStorageAccount.Parse(ConnectionString);

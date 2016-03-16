@@ -8,7 +8,7 @@ namespace HOA.Services
 {
     public interface IFileStore
     {
-        Task<string> StoreFile(Stream data);
+        Task<string> StoreFile(string code, Stream data);
         Task<Stream> RetriveFile(string id);
         Task DeleteFile(string id);
     }

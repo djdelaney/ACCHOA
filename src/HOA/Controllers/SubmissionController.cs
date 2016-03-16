@@ -403,7 +403,7 @@ namespace HOA.Controllers
                 foreach(var fileContent in files)
                 {
                     var fileName = FormUtils.GetUploadedFilename(fileContent);
-                    var blobId = await _storage.StoreFile(fileContent.OpenReadStream());
+                    var blobId = await _storage.StoreFile(sub.Code, fileContent.OpenReadStream());
                     var file = new File
                     {
                         Name = fileName,
@@ -800,7 +800,7 @@ namespace HOA.Controllers
                     foreach (var fileContent in files)
                     {
                         var fileName = FormUtils.GetUploadedFilename(fileContent);
-                        var blobId = await _storage.StoreFile(fileContent.OpenReadStream());
+                        var blobId = await _storage.StoreFile(submission.Code, fileContent.OpenReadStream());
                         var file = new File
                         {
                             Name = fileName,
