@@ -8,6 +8,21 @@
     ViewBag.Title = "Check completeness";
 }
 
+@section HeaderExtras
+{
+<script>
+    function UpdateCommentField(val)
+    {
+        if (val == 'true') {
+            document.getElementById("UserFeedback").disabled = true;
+        }
+        else {
+            document.getElementById("UserFeedback").disabled = false;
+        }
+    }
+</script>
+}
+
 <h3>Submission</h3>
 @Model.Submission.FirstName @Model.Submission.LastName<br />
 @Model.Submission.Email <br />
@@ -46,11 +61,12 @@
             new { Value = "true", Text = "Yes" },
             new { Value = "false", Text = "No" },
         },
+
         "Value",
         "Text",
         Model.Approve
     ),
-    new { @class = "form-control" })
+    new { @class = "form-control", @onchange = "UpdateCommentField(this.value)" })
     <br />
     <br />
     @Html.LabelFor(model => model.UserFeedback)@: <br />

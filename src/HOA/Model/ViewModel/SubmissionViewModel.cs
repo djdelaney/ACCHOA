@@ -36,7 +36,7 @@ namespace HOA.Model.ViewModel
         [Required]
         public string Comments { get; set; }
 
-        [Display(Name = "User Feedback")]
+        [Display(Name = "Homeowner Feedback (sent via email)")]
         public string UserFeedback { get; set; }
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
@@ -61,7 +61,7 @@ namespace HOA.Model.ViewModel
         [Required]
         public string Comments { get; set; }
 
-        [Display(Name = "User Feedback")]
+        [Display(Name = "Homeowner Feedback (sent via email)")]
         public string UserFeedback { get; set; }
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
@@ -158,7 +158,7 @@ namespace HOA.Model.ViewModel
         [Required]
         public string Comments { get; set; }
 
-        [Display(Name = "User Feedback")]
+        [Display(Name = "Homeowner Feedback (sent via email)")]
         public string UserFeedback { get; set; }
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)

@@ -673,6 +673,7 @@ namespace HOA.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = RoleNames.HOALiaison)]
         public async Task<IActionResult> FinalCheck(FinalReview model)
         {
             if (ModelState.IsValid)

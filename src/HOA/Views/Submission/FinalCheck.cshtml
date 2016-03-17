@@ -8,6 +8,21 @@
     ViewBag.Title = "Final review";
 }
 
+@section HeaderExtras
+{
+    <script>
+    function UpdateCommentField(val)
+    {
+        if (val == 'Approved') {
+            document.getElementById("UserFeedback").disabled = true;
+        }
+        else {
+            document.getElementById("UserFeedback").disabled = false;
+        }
+    }
+    </script>
+}
+
 <h3>Submission</h3>
 @Model.Submission.FirstName @Model.Submission.LastName<br />
 @Model.Submission.Email <br />
@@ -53,12 +68,12 @@
         "Text",
         Model.Status
     ),
-    new { @class = "form-control" })
+    new { @class = "form-control", @onchange = "UpdateCommentField(this.value)" })
     <br />
     <br />
     @Html.LabelFor(model => model.UserFeedback)@: <br />
     @:Required for incomplete applications<br />
-    @Html.TextAreaFor(model => model.UserFeedback, new { @class = "form-control" })<br />
+    @Html.TextAreaFor(model => model.UserFeedback, new { @class = "form-control", @disabled = "disabled" })<br />
     <br />
     <br />
 
