@@ -17,7 +17,7 @@
     @Html.ValidationSummary()<br />
 
     @Html.LabelFor(model => model.Code)<br />
-    @Html.TextBoxFor(model => model.Code)<br />
+    @Html.TextBoxFor(model => model.Code, new { @maxlength = "5" })<br />
 
     <br />
     <br />

@@ -51,7 +51,7 @@
     @Html.HiddenFor(model => model.SubmissionId)
 
     @Html.LabelFor(model => model.Comments)@: <br />
-    @Html.TextAreaFor(model => model.Comments, new { @class = "form-control" })<br />
+    @Html.TextAreaFor(model => model.Comments, new { @class = "form-control", @maxlength = "512" })<br />
     <br />
     @:Approve application?<br />
 
@@ -73,7 +73,7 @@
     <br />
     @Html.LabelFor(model => model.UserFeedback)@: <br />
     @:Required for incomplete applications<br />
-    @Html.TextAreaFor(model => model.UserFeedback, new { @class = "form-control", @disabled = "disabled" })<br />
+    @Html.TextAreaFor(model => model.UserFeedback, new { @class = "form-control", @disabled = "disabled", @maxlength = "512" })<br />
     <br />
     <br />
 

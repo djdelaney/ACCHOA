@@ -29,7 +29,7 @@
             @Html.LabelFor(model => model.Description)
         </label>
         <div class="col-xs-9">
-            @Html.TextAreaFor(model => model.Description, new { @class = "form-control" })
+            @Html.TextAreaFor(model => model.Description, new { @class = "form-control", @maxlength = "256" })
         </div>
     </div>
     <div class="form-group">

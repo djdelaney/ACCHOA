@@ -52,7 +52,7 @@
         @Html.LabelFor(model => model.FirstName)
     </label>
     <div class="col-xs-9">
-        @Html.TextBoxFor(model => model.FirstName, new { @class = "form-control" })
+        @Html.TextBoxFor(model => model.FirstName, new { @class = "form-control", @maxlength = "32" })
     </div>
 </div>
 <div class="form-group">
@@ -60,7 +60,7 @@
         @Html.LabelFor(model => model.LastName)
     </label>
     <div class="col-xs-9">
-        @Html.TextBoxFor(model => model.LastName, new { @class = "form-control" })
+        @Html.TextBoxFor(model => model.LastName, new { @class = "form-control", @maxlength = "32" })
     </div>
 </div>
 <div class="form-group">
@@ -68,7 +68,7 @@
         @Html.LabelFor(model => model.Address)
     </label>
     <div class="col-xs-9">
-        @Html.TextBoxFor(model => model.Address, new { @class = "form-control" })
+        @Html.TextBoxFor(model => model.Address, new { @class = "form-control", @maxlength = "64" })
     </div>
 </div>
 <div class="form-group">
@@ -76,7 +76,7 @@
         @Html.LabelFor(model => model.Email)
     </label>
     <div class="col-xs-9">
-        @Html.TextBoxFor(model => model.Email, new { @class = "form-control" })
+        @Html.TextBoxFor(model => model.Email, new { @class = "form-control", @maxlength = "64" })
     </div>
 </div>
 <div class="form-group">
@@ -84,7 +84,7 @@
         @Html.LabelFor(model => model.Description)
     </label>
     <div class="col-xs-9">
-        @Html.TextAreaFor(model => model.Description, new { @class = "form-control" })
+        @Html.TextAreaFor(model => model.Description, new { @class = "form-control", @maxlength = "256" })
         <h5>e.g. Patio, Fence, Deck, etc.</h5>
     </div>
 </div>
