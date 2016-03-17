@@ -86,4 +86,28 @@ namespace HOA.Model.ViewModel
         public string ConfirmPassword { get; set; }
     }
 
+    public class EditUserViewModel
+    {
+        [Required]
+        public string UserId { get; set; }
+
+        [Required]
+        [Display(Name = "Username")]
+        public string UserName { get; set; }
+
+        [Required]
+        [DataType(DataType.EmailAddress)]
+        [EmailAddress]
+        [Display(Name = "Email")]
+        public string Email { get; set; }
+
+        [Required]
+        [Display(Name = "First  Name")]
+        public string FirstName { get; set; }
+
+        [Required]
+        [Display(Name = "Last  Name")]
+        public string LastName { get; set; }
+    }
+
 }

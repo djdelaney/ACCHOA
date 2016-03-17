@@ -262,7 +262,6 @@ namespace HOA.Controllers
         }
 
         [HttpGet]
-        [AllowAnonymous]
         [Authorize(Roles = RoleNames.Administrator)]
         public IActionResult CreateUser()
         {
@@ -270,7 +269,6 @@ namespace HOA.Controllers
         }
 
         [HttpPost]
-        [AllowAnonymous]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = RoleNames.Administrator)]
         public async Task<IActionResult> CreateUser(CreateUserViewModel model)
@@ -305,6 +303,50 @@ namespace HOA.Controllers
                 _applicationDbContext.SaveChanges();
 
                 EmailHelper.NotifyNewUser(model.Email, model.UserName, model.Password, _email);
+
+                return RedirectToAction(nameof(AccountController.ManageUsers), "Account");
+            }
+
+            // If we got this far, something failed, redisplay form
+            return View(model);
+        }
+
+        [Authorize(Roles = RoleNames.Administrator)]
+        public IActionResult Edit(string id)
+        {
+            var user = _applicationDbContext.Users.FirstOrDefault(u => u.Id.Equals(id));
+            if (user == null)
+                return HttpNotFound("User not found");
+
+            EditUserViewModel model = new EditUserViewModel
+            {
+                UserId = user.Id,
+                UserName = user.UserName,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Email = user.Email
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = RoleNames.Administrator)]
+        public async Task<IActionResult> Edit(EditUserViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.FindByIdAsync(model.UserId);
+                if (user == null)
+                    return HttpNotFound("User not found");
+
+                user.UserName = model.UserName;
+                user.FirstName = model.FirstName;
+                user.LastName = model.LastName;
+                user.Email = model.Email;
+
+                await _userManager.UpdateAsync(user);
 
                 return RedirectToAction(nameof(AccountController.ManageUsers), "Account");
             }
