@@ -170,4 +170,30 @@ namespace HOA.Model.ViewModel
             }
         }
     }
+
+    public class EditSubmissionViewModel
+    {
+        [Required]
+        public int SubmissionId { get; set; }
+
+        [Required]
+        [MaxLength(32)]
+        public string FirstName { get; set; }
+
+        [Required]
+        [MaxLength(32)]
+        public string LastName { get; set; }
+
+        [Required]
+        [MaxLength(64)]
+        public string Address { get; set; }
+
+        [Required]
+        [MaxLength(64)]
+        public string Email { get; set; }
+
+        [Required]
+        [MaxLength(256)]
+        public string Description { get; set; }
+    }
 }

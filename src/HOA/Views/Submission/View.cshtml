@@ -125,6 +125,14 @@
         @: None
     }
 
+    @if ((Model.Submission.Status == Status.Submitted || Model.Submission.Status == Status.ARBIncoming) &&
+                                    (User.IsInRole(RoleNames.CommunityManager) || User.IsInRole(RoleNames.Administrator)))
+    {
+        <br />
+        <a class="btn" href="/Submission/Edit/@Model.Submission.Id" role="button">Edit details</a>
+        <br />
+    }
+
     @if (User.IsInRole(RoleNames.Administrator))
     {
         <br />

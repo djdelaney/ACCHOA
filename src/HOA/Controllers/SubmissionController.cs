@@ -879,5 +879,56 @@ namespace HOA.Controllers
 
             return RedirectToAction(nameof(View), new { id = submission.Id });
         }
+
+        [HttpGet]
+        public IActionResult Edit(int id)
+        {
+            var submission = _applicationDbContext.Submissions.FirstOrDefault(s => s.Id == id);
+            if (submission == null)
+                return HttpNotFound("Submission not found");
+
+            EditSubmissionViewModel model = new EditSubmissionViewModel
+            {
+                SubmissionId = submission.Id,
+                FirstName = submission.FirstName,
+                LastName = submission.LastName,
+                Address = submission.Address,
+                Email = submission.Email,
+                Description = submission.Description
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [AuthorizeRoles(RoleNames.CommunityManager, RoleNames.Administrator)]
+        public async Task<IActionResult> Edit(EditSubmissionViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var submission = _applicationDbContext.Submissions.Include(s => s.Audits).Include(s => s.Reviews)
+                    .FirstOrDefault(s => s.Id == model.SubmissionId);
+                if (submission == null)
+                    return HttpNotFound("Submission not found");
+
+                var user = await _userManager.FindByIdAsync(User.GetUserId());
+
+                submission.Address = model.Address;
+                submission.FirstName = model.FirstName;
+                submission.LastName = model.LastName;
+                submission.Email = model.Email;
+                submission.Description = model.Description;
+
+                AddHistoryEntry(submission, user.FullName, "Edited submission details");
+
+                _applicationDbContext.SaveChanges();
+
+                return RedirectToAction(nameof(View), new { id = submission.Id });
+            }
+
+            // If we got this far, something failed, redisplay form
+            return View(model);
+        }
     }
 }
