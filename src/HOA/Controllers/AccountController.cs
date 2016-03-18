@@ -169,7 +169,7 @@ namespace HOA.Controllers
         [Authorize(Roles = RoleNames.Administrator)]
         public IActionResult ManageUsers(string returnUrl = null)
         {
-            var users = _applicationDbContext.Users.Include(u => u.Roles).OrderBy(u => u.LastName).ThenBy(u => u.FirstName).ToList();
+            var users = _applicationDbContext.Users.Include(u => u.Roles).ToList();
 
             var model = new ManageViewModel
             {
@@ -211,6 +211,9 @@ namespace HOA.Controllers
 
                 model.Users.Add(u);
             }
+
+            model.Users = model.Users.OrderBy(u => u.Roles).ToList();
+
             return View(model);
         }
 
