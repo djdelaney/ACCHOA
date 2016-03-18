@@ -16,6 +16,7 @@ using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Hosting;
 using HOA.Util;
 using HOA.Services;
+using Microsoft.AspNet.Mvc.Routing;
 
 // For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -57,6 +58,13 @@ namespace HOA.Controllers
             return await _userManager.FindByIdAsync(Request.HttpContext.User.GetUserId());
         }
 
+        private void AddErrors(IdentityResult result)
+        {
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(string.Empty, error.Description);
+            }
+        }
 
         [HttpGet]
         public IActionResult ChangePassword()
@@ -262,6 +270,85 @@ namespace HOA.Controllers
             _applicationDbContext.SaveChanges();
 
             return RedirectToAction(nameof(AccountController.ManageUsers), "Account");
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult ForgotPassword()
+        {
+            return View();
+        }
+
+        //
+        // POST: /Account/ForgotPassword
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.FindByEmailAsync(model.Email);
+                if (user == null)
+                {
+                    // Don't reveal that the user does not exist or is not confirmed
+                    return View("ForgotPasswordConfirmation");
+                }
+
+                // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=532713
+                // Send an email with this link
+                var code = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+                var url = this.Url.Action("ResetPassword", new { id = user.Id, code = code });
+
+                EmailHelper.NotifyResetPassword(user.Email, url, _email);
+
+                return View("ForgotPasswordConfirmation");
+            }
+
+            // If we got this far, something failed, redisplay form
+            return View(model);
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult ResetPassword(string id, string code)
+        {
+            var user = _applicationDbContext.Users.FirstOrDefault(u => u.Id.Equals(id));
+            if (user == null)
+                return HttpNotFound("User not found");
+            
+            ResetPasswordViewModel model = new ResetPasswordViewModel
+            {
+                UserId = user.Id,
+                ResetCode = code
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [AllowAnonymous]
+        public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = _applicationDbContext.Users.FirstOrDefault(u => u.Id.Equals(model.UserId));
+                if (user == null)
+                    return HttpNotFound("User not found");
+
+                IdentityResult result = await _userManager.ResetPasswordAsync(user, model.ResetCode, model.Password);
+                if (result.Succeeded)
+                {
+                    await _signInManager.SignInAsync(user, isPersistent: false);
+                    return RedirectToAction(nameof(SubmissionController.List), "Submission");
+                }
+                AddErrors(result);
+            }
+
+            // If we got this far, something failed, redisplay form
+            return View(model);
         }
 
         [HttpGet]

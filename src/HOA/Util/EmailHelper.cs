@@ -47,6 +47,18 @@ Your submission has been marked as precedent setting by the review board and may
 <br>
 <a href='{2}'>{2}</a><br>";
 
+        private static string m_ResetPasswordEmail = @"
+Please reset your password by clicking here:<br>
+<br>
+<a href='{0}'>{0}</a><br>";
+
+        public static void NotifyResetPassword(string email, string link, IEmailSender mail)
+        {
+            link = String.Format("{0}{1}", BaseHost, link);
+            string emailHtml = String.Format(m_ResetPasswordEmail, link);
+            mail.SendEmailAsync(new List<string> { email }, "ARB: Forgot Password", emailHtml);
+        }
+
         public static void NotifyPrecedentSetting(ApplicationDbContext context, Submission submission, IEmailSender mail)
         {
             var link = String.Format("{0}/Submission/ViewStatus/{1}", BaseHost, submission.Code);
