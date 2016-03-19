@@ -40,6 +40,7 @@
                 <th>Last Name</th>
                 <th>Status</th>
                 <th>Last Modified</th>
+                <th>Time Open</th>
                 <th>Action</th>
             </tr>
         </thead>
@@ -106,6 +107,7 @@
 
             </td>
             <td>@submission.LastModified.ToString("MM/dd/yyyy")</td>
+            <td>@submission.ElapsedTime.ToString("%d") day(s)</td>
             <td><a href="/Submission/View/@submission.Id">View</a></td>
         </tr>
     }

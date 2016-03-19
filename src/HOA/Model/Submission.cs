@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -76,6 +77,15 @@ namespace HOA.Model
 
         public virtual IList<File> Files { get; set; }
 
-        public virtual IList<StateChange> StateHistory { get; set; }        
+        public virtual IList<StateChange> StateHistory { get; set; }
+
+        [NotMapped]
+        public TimeSpan ElapsedTime
+        {
+            get
+            {
+                return DateTime.Now.Subtract(SubmissionDate);
+            }
+        }
     }
 }
