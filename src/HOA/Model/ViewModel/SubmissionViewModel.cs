@@ -196,4 +196,28 @@ namespace HOA.Model.ViewModel
         [MaxLength(256)]
         public string Description { get; set; }
     }
+
+    public class SearchViewModel : IValidatableObject
+    {
+        public string Name { get; set; }
+
+        public string Address { get; set; }
+
+        public string Code { get; set; }
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if(string.IsNullOrEmpty(Name) &&
+                string.IsNullOrEmpty(Address) &&
+                string.IsNullOrEmpty(Code))
+            {
+                yield return new ValidationResult("You must enter search terms");
+            }
+        }
+    }
+
+    public class SearchResultsViewModel
+    {
+        public IList<Submission> Submissions { get; set; }
+    }
 }

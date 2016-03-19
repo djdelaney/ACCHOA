@@ -1,0 +1,50 @@
+﻿@model HOA.Model.ViewModel.SearchViewModel
+
+@{
+    ViewBag.Title = "New submission";
+}
+
+
+@using (Html.BeginForm("Submission", "Create", FormMethod.Post, new { @class = "form-horizontal", enctype = "multipart/form-data" }))
+{
+
+    <h3>Search</h3>
+
+    @Html.AntiForgeryToken()
+
+    @if (!Html.ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger" role="alert">
+            <strong>Oh snap!</strong> Please fix the listed errors and try submitting again.
+
+            @Html.ValidationSummary()
+        </div>
+    }
+
+    <div class="form-group">
+        <label class="control-label col-xs-3">
+            @Html.LabelFor(model => model.Code)
+        </label>
+        <div class="col-xs-9">
+            @Html.TextBoxFor(model => model.Code, new { @class = "form-control", @maxlength = "32" })
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-3">
+            @Html.LabelFor(model => model.Name)
+        </label>
+        <div class="col-xs-9">
+            @Html.TextBoxFor(model => model.Name, new { @class = "form-control", @maxlength = "32" })
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-3">
+            @Html.LabelFor(model => model.Address)
+        </label>
+        <div class="col-xs-9">
+            @Html.TextBoxFor(model => model.Address, new { @class = "form-control", @maxlength = "32" })
+        </div>
+    </div>
+
+    <input type="submit" value="Submit" class="btn btn-primary" />
+}

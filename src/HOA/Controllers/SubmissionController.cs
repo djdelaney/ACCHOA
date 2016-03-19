@@ -881,6 +881,7 @@ namespace HOA.Controllers
         }
 
         [HttpGet]
+        [AuthorizeRoles(RoleNames.CommunityManager, RoleNames.Administrator)]
         public IActionResult Edit(int id)
         {
             var submission = _applicationDbContext.Submissions.FirstOrDefault(s => s.Id == id);
@@ -925,6 +926,46 @@ namespace HOA.Controllers
                 _applicationDbContext.SaveChanges();
 
                 return RedirectToAction(nameof(View), new { id = submission.Id });
+            }
+
+            // If we got this far, something failed, redisplay form
+            return View(model);
+        }
+
+        [HttpGet]
+        [Authorize]
+        public IActionResult Search()
+        {
+            return View(new SearchViewModel());
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize]
+        public async Task<IActionResult> Search(SearchViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                IQueryable<Submission> subs = _applicationDbContext.Submissions;
+
+                if (!string.IsNullOrEmpty(model.Code))
+                {
+                    subs = subs.Where(s => s.Code.Contains(model.Code));
+                    model.Code = model.Code.ToUpper();
+                }
+
+                if (!string.IsNullOrEmpty(model.Address))
+                    subs = subs.Where(s => s.Address.IndexOf(model.Address, StringComparison.OrdinalIgnoreCase) >= 0);
+
+                if (!string.IsNullOrEmpty(model.Name))
+                    subs = subs.Where(s => string.Format("{0} {1}", s.FirstName, s.LastName).IndexOf(model.Name, StringComparison.OrdinalIgnoreCase) >= 0);
+                
+                var resultModel = new SearchResultsViewModel()
+                {
+                    Submissions = subs.Include(s => s.Audits).OrderBy(s => s.LastModified).ToList()
+                };
+
+                return View("SearchResults", resultModel);
             }
 
             // If we got this far, something failed, redisplay form
