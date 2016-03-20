@@ -12,6 +12,7 @@ using System.Security.Claims;
 using HOA.Services;
 using Microsoft.AspNet.Identity.EntityFramework;
 using HOA.Util;
+using Microsoft.AspNet.Hosting;
 
 // For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -24,11 +25,17 @@ namespace HOA.Controllers
         private readonly ApplicationDbContext _applicationDbContext;
         private readonly IEmailSender _email;
         private readonly IFileStore _storage;
+        private IHostingEnvironment _env;
         private RoleManager<IdentityRole> _roleManager;
 
         private Random _rand;
 
-        public TestController(ApplicationDbContext applicationDbContext, UserManager<ApplicationUser> userManager, IEmailSender emailSender, IFileStore fileStore, RoleManager<IdentityRole> roleManager)
+        public TestController(ApplicationDbContext applicationDbContext,
+                            UserManager<ApplicationUser> userManager,
+                            IEmailSender emailSender,
+                            IFileStore fileStore,
+                            RoleManager<IdentityRole> roleManager,
+                            IHostingEnvironment env)
         {
             _applicationDbContext = applicationDbContext;
             _userManager = userManager;
@@ -36,6 +43,7 @@ namespace HOA.Controllers
             _roleManager = roleManager;
             _storage = fileStore;
             _rand = new Random();
+            _env = env;
         }
 
         [Authorize(Roles = RoleNames.Administrator)]
@@ -82,6 +90,9 @@ namespace HOA.Controllers
         [Authorize(Roles = RoleNames.Administrator)]
         public IActionResult DeleteAll()
         {
+            if (!_env.IsDevelopment())
+                throw new Exception("Hell no.");
+
             DeleteAllViewModel model = new DeleteAllViewModel()
             {
             };
@@ -93,6 +104,9 @@ namespace HOA.Controllers
         [Authorize(Roles = RoleNames.Administrator)]
         public async Task<IActionResult> DeleteAll(DeleteAllViewModel model)
         {
+            if (!_env.IsDevelopment())
+                throw new Exception("Hell no.");
+
             if (ModelState.IsValid)
             {
                 var files = _applicationDbContext.Files.ToList();
