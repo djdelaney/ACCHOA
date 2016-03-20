@@ -225,25 +225,55 @@ namespace HOA.Controllers
             return View(model);
         }
 
+        [HttpGet]
         [Authorize(Roles = RoleNames.Administrator)]
-        public async Task<IActionResult> Delete(string id)
+        public IActionResult Delete(string id)
         {
-            var user = await _userManager.FindByIdAsync(id);
-            
-            var rolesForUser = await _userManager.GetRolesAsync(user);
+            var user = _applicationDbContext.Users.FirstOrDefault(u => u.Id.Equals(id));
+            if (user == null)
+                return HttpNotFound("User not found");
 
-            if (rolesForUser.Count() > 0)
+            DeleteUserViewModel model = new DeleteUserViewModel()
             {
-                foreach (var item in rolesForUser.ToList())
+                UserId = id
+            };
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = RoleNames.Administrator)]
+        public async Task<IActionResult> Delete(DeleteUserViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.FindByIdAsync(model.UserId);
+
+                var comments = _applicationDbContext.Comments.Where(c => c.User == user);
+                var reviews = _applicationDbContext.Reviews.Where(r => r.Reviewer == user);
+
+                if (comments.Count() > 0 || reviews.Count() > 0)
                 {
-                    // item should be the name of the role
-                    var result = await _userManager.RemoveFromRoleAsync(user, item);
+                    throw new Exception("CANNOT DELETE");
                 }
+
+                var rolesForUser = await _userManager.GetRolesAsync(user);
+
+                if (rolesForUser.Count() > 0)
+                {
+                    foreach (var item in rolesForUser.ToList())
+                    {
+                        // item should be the name of the role
+                        var result = await _userManager.RemoveFromRoleAsync(user, item);
+                    }
+                }
+
+                await _userManager.DeleteAsync(user);
+
+                return RedirectToAction(nameof(AccountController.ManageUsers), "Account");
             }
 
-            await _userManager.DeleteAsync(user);
-
-            return RedirectToAction(nameof(AccountController.ManageUsers), "Account");
+            return View(model);
         }
 
         [Authorize(Roles = RoleNames.Administrator)]
