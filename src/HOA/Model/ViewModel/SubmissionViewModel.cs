@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNet.Mvc.Rendering;
 using Microsoft.AspNet.Http;
+using HOA.Util;
 
 namespace HOA.Model.ViewModel
 {
@@ -12,6 +13,7 @@ namespace HOA.Model.ViewModel
     {
         public string Filter { get; set; }
         public IList<Submission> Submissions { get; set; }
+        public Pager Pager { get; set; }
     }
 
     public class ViewSubmissionViewModel

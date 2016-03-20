@@ -11,17 +11,17 @@
 
 <p>
     <div class="btn-group" role="group" aria-label="...">
-        <a class="btn btn btn-default @(Model.Filter == "Todo" ? "active" : "")" href="/Submission/List/Todo" role="button">Todo</a>
+        <a class="btn btn btn-default @(Model.Filter == "Todo" ? "active" : "")" href="/Submission/List/?filter=Todo" role="button">Todo</a>
         
         @if(!User.IsInRole(RoleNames.BoardMember))
         { 
-        <a class="btn btn btn-default @(Model.Filter == "Recent" ? "active" : "")" href="/Submission/List/Recent" role="button">Recent</a>
-        <a class="btn btn btn-default @(Model.Filter == "All" ? "active" : "")" href="/Submission/List/All" role="button">All</a>
+        <a class="btn btn btn-default @(Model.Filter == "Recent" ? "active" : "")" href="/Submission/List/?filter=Recent" role="button">Recent</a>
+        <a class="btn btn btn-default @(Model.Filter == "All" ? "active" : "")" href="/Submission/List/?filter=All" role="button">All</a>
         }
         
-        <a class="btn btn btn-default @(Model.Filter == "Open" ? "active" : "")" href="/Submission/List/Open" role="button">Open</a>
-        <a class="btn btn btn-default @(Model.Filter == "Approved" ? "active" : "")" href="/Submission/List/Approved" role="button">Approved</a>
-        <a class="btn btn btn-default @(Model.Filter == "Rejected" ? "active" : "")" href="/Submission/List/Rejected" role="button">Rejected</a>
+        <a class="btn btn btn-default @(Model.Filter == "Open" ? "active" : "")" href="/Submission/List/?filter=Open" role="button">Open</a>
+        <a class="btn btn btn-default @(Model.Filter == "Approved" ? "active" : "")" href="/Submission/List/?filter=Approved" role="button">Approved</a>
+        <a class="btn btn btn-default @(Model.Filter == "Rejected" ? "active" : "")" href="/Submission/List/?filter=Rejected" role="button">Rejected</a>
     </div>
 </p>
 
@@ -45,81 +45,113 @@
             </tr>
         </thead>
 
-@if (Model.Submissions != null && Model.Submissions.Count > 0)
-{
-    @foreach (var submission in Model.Submissions)
-    {
-        <tr>
-            <td>@submission.Code</td>
-            <td>@submission.SubmissionDate.ToString("MM/dd/yyyy")</td>
-            <td>@submission.FirstName</td>
-            <td>@submission.LastName</td>
-            <td>                
+        @if (Model.Submissions != null && Model.Submissions.Count > 0)
+        {
+            @foreach (var submission in Model.Submissions)
+            {
+                <tr>
+                    <td>@submission.Code</td>
+                    <td>@submission.SubmissionDate.ToString("MM/dd/yyyy")</td>
+                    <td>@submission.FirstName</td>
+                    <td>@submission.LastName</td>
+                    <td>
 
-                @if (submission.Status == Status.Submitted)
-                {
-                    @:Submitted
+                        @if (submission.Status == Status.Submitted)
+                        {
+                            @:Submitted
                 }
-                else if (submission.Status == Status.ARBIncoming)
-                {
-                    @:Sent to ARB Chair
+                        else if (submission.Status == Status.ARBIncoming)
+                        {
+                            @:Sent to ARB Chair
                 }
-                else if (submission.Status == Status.UnderReview)
-                {
-                    @:Being reviewed
+                        else if (submission.Status == Status.UnderReview)
+                        {
+                            @:Being reviewed
                 }
-                else if (submission.Status == Status.ARBFinal)
-                {
-                    @:Tallying votes
+                        else if (submission.Status == Status.ARBFinal)
+                        {
+                            @:Tallying votes
                 }
-                else if (submission.Status == Status.ReviewComplete)
-                {
-                    @:Sent to HOA Liaison
+                        else if (submission.Status == Status.ReviewComplete)
+                        {
+                            @:Sent to HOA Liaison
                 }
-                else if (submission.Status == Status.PrepApproval)
-                {
-                    @:Preparing approval response
+                        else if (submission.Status == Status.PrepApproval)
+                        {
+                            @:Preparing approval response
                 }
-                else if (submission.Status == Status.PrepConditionalApproval)
-                {
-                    @:Preparing conditional response
+                        else if (submission.Status == Status.PrepConditionalApproval)
+                        {
+                            @:Preparing conditional response
                 }
-                else if (submission.Status == Status.Approved)
-                {
-                    @:Approved
+                        else if (submission.Status == Status.Approved)
+                        {
+                            @:Approved
                 }
-                else if (submission.Status == Status.ConditionallyApproved)
-                {
-                    @:Conditionally Approved
+                        else if (submission.Status == Status.ConditionallyApproved)
+                        {
+                            @:Conditionally Approved
                 }
-                else if (submission.Status == Status.Rejected)
-                {
-                    @:Rejected
+                        else if (submission.Status == Status.Rejected)
+                        {
+                            @:Rejected
                 }
-                else if (submission.Status == Status.MissingInformation)
-                {
-                    @:Missing Information
+                        else if (submission.Status == Status.MissingInformation)
+                        {
+                            @:Missing Information
                 }
-                else if (submission.Status == Status.Retracted)
-                {
-                    @:Retracted
+                        else if (submission.Status == Status.Retracted)
+                        {
+                            @:Retracted
                 }
 
-            </td>
-            <td>@submission.LastModified.ToString("MM/dd/yyyy")</td>
-            <td>@submission.ElapsedTime.ToString("%d") day(s)</td>
-            <td><a href="/Submission/View/@submission.Id">View</a></td>
-        </tr>
-    }
-}
-else
-{
-    <tr>
-        <td colspan="5">No submissions</td>
-    </tr>
-}
-
-
+                    </td>
+                    <td>@submission.LastModified.ToString("MM/dd/yyyy")</td>
+                    <td>@submission.ElapsedTime.ToString("%d") day(s)</td>
+                    <td><a href="/Submission/View/@submission.Id">View</a></td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="5">No submissions</td>
+            </tr>
+        }
     </table>
 </div>
+
+    <!-- pager -->
+    @if (Model.Pager.EndPage > 1)
+    {
+        <ul class="pagination">
+            @if (Model.Pager.CurrentPage > 1)
+                {
+                <li>
+                    <a href="/Submission/List/?filter=@(Model.Filter)">First</a>
+                </li>
+                    <li>
+                        <a href="/Submission/List/?filter=@(Model.Filter)&page=@(Model.Pager.CurrentPage - 1)">Previous</a>
+                    </li>
+            }
+
+            @for (var page = Model.Pager.StartPage; page <= Model.Pager.EndPage; page++)
+                {
+                <li class="@(page == Model.Pager.CurrentPage ? "active" : "")">
+                    <a href="/Submission/List/?filter=@(Model.Filter)&page=@page">@page</a>
+                </li>
+            }
+
+            @if (Model.Pager.CurrentPage < Model.Pager.TotalPages)
+                {
+                <li>
+                    <a href="/Submission/List/?filter=@(Model.Filter)&page=@(Model.Pager.CurrentPage + 1)">Next</a>
+                </li>
+                    <li>
+                        <a href="/Submission/List/?filter=@(Model.Filter)&page=@(Model.Pager.TotalPages)">Last</a>
+                    </li>
+            }
+        </ul>
+    }
+
 

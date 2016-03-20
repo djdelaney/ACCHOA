@@ -157,8 +157,8 @@ namespace HOA.Controllers
             return View(model);
         }
 
-        [Route("Submission/List/{filter?}")]
-        public IActionResult List(string filter)
+        
+        public IActionResult List(int page = 1, string filter = null)
         {
             IQueryable<Submission> subs = _applicationDbContext.Submissions;
 
@@ -217,12 +217,15 @@ namespace HOA.Controllers
             {
                 subs = subs.Where(s => s.Status == Status.Rejected || s.Status == Status.MissingInformation);
             }
-            //deault to all
+
+            var pager = new Pager(subs.Count(), page);
+            IList<Submission> results = subs.Include(s => s.Audits).OrderBy(s => s.LastModified).Skip((pager.CurrentPage - 1) * pager.PageSize).Take(pager.PageSize).ToList();
 
             var viewModel = new ViewSubmissionsViewModel()
             {
                 Filter = filter,
-                Submissions = subs.Include(s => s.Audits).OrderBy(s => s.LastModified).ToList()
+                Submissions = results,
+                Pager = pager
             };
 
             return View(viewModel);
@@ -942,7 +945,7 @@ namespace HOA.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize]
-        public async Task<IActionResult> Search(SearchViewModel model)
+        public IActionResult Search(SearchViewModel model)
         {
             if (ModelState.IsValid)
             {
@@ -962,7 +965,7 @@ namespace HOA.Controllers
                 
                 var resultModel = new SearchResultsViewModel()
                 {
-                    Submissions = subs.Include(s => s.Audits).OrderBy(s => s.LastModified).ToList()
+                    Submissions = subs.Take(20).Include(s => s.Audits).OrderBy(s => s.LastModified).ToList()
                 };
 
                 return View("SearchResults", resultModel);
