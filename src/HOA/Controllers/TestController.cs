@@ -18,6 +18,7 @@ using Microsoft.AspNet.Hosting;
 
 namespace HOA.Controllers
 {
+    [RequireHttps]
     [Authorize]
     public class TestController : Controller
     {

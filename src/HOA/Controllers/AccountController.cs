@@ -22,6 +22,7 @@ using Microsoft.AspNet.Mvc.Routing;
 
 namespace HOA.Controllers
 {
+    [RequireHttps]
     [Authorize]
     public class AccountController : Controller
     {

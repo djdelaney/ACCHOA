@@ -18,6 +18,7 @@ using Microsoft.AspNet.Http;
 
 namespace HOA.Controllers
 {
+    [RequireHttps]
     [Authorize]
     public class SubmissionController : Controller
     {
