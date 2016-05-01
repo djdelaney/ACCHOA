@@ -11,9 +11,9 @@
 
 <p>
     <div class="btn-group" role="group" aria-label="...">
-        <a class="btn btn btn-default @(Model.Filter == "Todo" ? "active" : "")" href="/Submission/List/?filter=Todo" role="button">Todo</a>
+        <a class="btn btn btn-default @(Model.Filter == "Todo" ? "active" : "")" href="/Submission/List/?filter=Todo" role="button">ToDo</a>
         
-        @if(!User.IsInRole(RoleNames.BoardMember))
+        @if(!User.IsInRole(RoleNames.ARBBoardMember))
         { 
         <a class="btn btn btn-default @(Model.Filter == "Recent" ? "active" : "")" href="/Submission/List/?filter=Recent" role="button">Recent</a>
         <a class="btn btn btn-default @(Model.Filter == "All" ? "active" : "")" href="/Submission/List/?filter=All" role="button">All</a>

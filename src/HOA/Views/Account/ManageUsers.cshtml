@@ -16,7 +16,7 @@
     <table class="table">
         <thead>
             <tr>
-                <th>Username</th>
+                <th>Email</th>
                 <th>Name</th>
                 <th>Role</th>
                 <th>Active</th>
@@ -28,7 +28,7 @@
     @foreach (var user in Model.Users)
     {
         <tr @if (!user.Enabled) { @Html.Raw("class=\"danger\"") } >
-            <td>@user.UserName</td>
+            <td>@user.Email</td>
             <td>@user.FullName</td>
             <td>@user.Roles</td>
             <td>

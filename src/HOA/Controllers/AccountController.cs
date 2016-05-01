@@ -125,7 +125,7 @@ namespace HOA.Controllers
             if (ModelState.IsValid)
             {
                 //User not enabled
-                var user = _applicationDbContext.Users.FirstOrDefault(u => u.UserName.Equals(model.Username));
+                var user = _applicationDbContext.Users.FirstOrDefault(u => u.Email.Equals(model.Email));
                 if (user != null && !user.Enabled)
                 {
                     ModelState.AddModelError(string.Empty, "Invalid login attempt.");
@@ -135,7 +135,7 @@ namespace HOA.Controllers
 
                 // This doesn't count login failures towards account lockout
                 // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-                var result = await _signInManager.PasswordSignInAsync(model.Username, model.Password, model.RememberMe, lockoutOnFailure: false);
+                var result = await _signInManager.PasswordSignInAsync(user.UserName, model.Password, model.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
                     return RedirectToLocal(returnUrl);
@@ -185,6 +185,8 @@ namespace HOA.Controllers
                 Users = new List<UserViewModel>()
             };
 
+            var identityUsers = _userManager.Users.ToList();
+
             foreach (var user in users)
             {
                 List<string> roles = new List<string>();
@@ -200,8 +202,8 @@ namespace HOA.Controllers
                         roleName = "Community Manager";
                     else if (roleName.Equals(RoleNames.BoardChairman))
                         roleName = "Board Chairman";
-                    else if (roleName.Equals(RoleNames.BoardMember))
-                        roleName = "Board Member";
+                    else if (roleName.Equals(RoleNames.ARBBoardMember))
+                        roleName = "ARB Board Member";
                     else if (roleName.Equals(RoleNames.HOALiaison))
                         roleName = "HOA Liaison";
 
@@ -210,12 +212,12 @@ namespace HOA.Controllers
 
                 var u = new UserViewModel
                 {
-                    UserName = user.UserName,
                     Enabled = user.Enabled,
                     DisableNotification = user.DisableNotification,
                     FullName = user.FullName,
                     Roles = string.Join(", ", roles),
-                    UserId = user.Id
+                    UserId = user.Id,
+                    Email = identityUsers.FirstOrDefault(iu => iu.Id == user.Id).Email
                 };
 
                 model.Users.Add(u);
@@ -403,7 +405,7 @@ namespace HOA.Controllers
                     return View(model);
                 }
 
-                existing = _userManager.FindByNameAsync(model.UserName).Result;
+                existing = _userManager.FindByEmailAsync(model.Email).Result;
                 if (existing != null)
                 {
                     ModelState.AddModelError("UserName", "A user with that username already exists");
@@ -412,7 +414,7 @@ namespace HOA.Controllers
 
                 var user = new ApplicationUser
                 {
-                    UserName = model.UserName,
+                    UserName = model.Email,
                     Email = model.Email,
                     FirstName = model.FirstName,
                     LastName = model.LastName,
@@ -423,7 +425,7 @@ namespace HOA.Controllers
 
                 _applicationDbContext.SaveChanges();
 
-                EmailHelper.NotifyNewUser(model.Email, model.UserName, model.Password, _email);
+                EmailHelper.NotifyNewUser(model.Email, model.Password, _email);
 
                 return RedirectToAction(nameof(AccountController.ManageUsers), "Account");
             }
@@ -442,7 +444,6 @@ namespace HOA.Controllers
             EditUserViewModel model = new EditUserViewModel
             {
                 UserId = user.Id,
-                UserName = user.UserName,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 Email = user.Email
@@ -462,13 +463,18 @@ namespace HOA.Controllers
                 if (user == null)
                     return HttpNotFound("User not found");
 
-                user.UserName = model.UserName;
+                //changing username
+                if(!model.Email.Equals(user.Email))
+                {
+                    user.UserName = model.Email;
+                }
+                
                 user.FirstName = model.FirstName;
                 user.LastName = model.LastName;
                 user.Email = model.Email;
 
                 await _userManager.UpdateAsync(user);
-
+                
                 return RedirectToAction(nameof(AccountController.ManageUsers), "Account");
             }
 

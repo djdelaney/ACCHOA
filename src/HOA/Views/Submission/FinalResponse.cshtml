@@ -16,7 +16,7 @@
 @Model.Submission.Description<br />
 <br />
 
-@using (Html.BeginForm())
+@using (Html.BeginForm("Submission", "FinalResponse", FormMethod.Post, new { @class = "form-horizontal", enctype = "multipart/form-data" }))
 {
     @Html.AntiForgeryToken()
 
@@ -33,6 +33,13 @@
 
     @Html.LabelFor(model => model.Comments)@: <br />
     @Html.TextAreaFor(model => model.Comments, new { @class = "form-control", @maxlength = "512" })<br />
+
+    @:User feedback (email): <br />    
+    @Html.TextAreaFor(model => model.UserFeedback, new { @class = "form-control", @maxlength = "512" })<br />
+
+    @:Final approval file <br />
+    <input type="file" name="Files" id="Files" /> <br />
+
     <br />
     <br />
 

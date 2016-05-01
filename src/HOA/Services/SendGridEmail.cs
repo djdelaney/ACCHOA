@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Net.Mail;
 using SendGrid;
+using System.IO;
 
 namespace HOA.Services
 {
@@ -13,7 +14,7 @@ namespace HOA.Services
         public static string ApiPass;
         public static string EmailSource;
 
-        public Task SendEmailAsync(List<string> recipients, string subject, string message)
+        public Task SendEmailAsync(List<string> recipients, string subject, string message, Stream attachment, string attachmentName)
         {
             // Create the email object first, then add the properties.
             var myMessage = new SendGridMessage();
@@ -28,6 +29,9 @@ namespace HOA.Services
             //Add the HTML and Text bodies
             myMessage.Html = message;
             //myMessage.Text = "Hello World plain text!";
+
+            if (attachment != null && !string.IsNullOrEmpty(attachmentName))
+                myMessage.AddAttachment(attachment, attachmentName);
 
             var credentials = new System.Net.NetworkCredential(ApiUser, ApiPass);
             

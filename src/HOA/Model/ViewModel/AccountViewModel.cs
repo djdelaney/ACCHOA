@@ -9,7 +9,10 @@ namespace HOA.Model.ViewModel
     public class LoginViewModel
     {
         [Required]
-        public string Username { get; set; }
+        [DataType(DataType.EmailAddress)]
+        [EmailAddress]
+        [Display(Name = "Email")]
+        public string Email { get; set; }
 
         [Required]
         [DataType(DataType.Password)]
@@ -26,7 +29,7 @@ namespace HOA.Model.ViewModel
 
     public class UserViewModel
     {
-        public string UserName { get; set; }
+        public string Email { get; set; }
         public string FullName { get; set; }
         public bool Enabled { get; set; }
         public bool DisableNotification { get; set; }
@@ -36,10 +39,6 @@ namespace HOA.Model.ViewModel
 
     public class CreateUserViewModel
     {
-        [Required]
-        [Display(Name = "Username")]
-        public string UserName { get; set; }
-
         [Required]
         [DataType(DataType.EmailAddress)]
         [EmailAddress]
@@ -90,10 +89,6 @@ namespace HOA.Model.ViewModel
     {
         [Required]
         public string UserId { get; set; }
-
-        [Required]
-        [Display(Name = "Username")]
-        public string UserName { get; set; }
 
         [Required]
         [DataType(DataType.EmailAddress)]

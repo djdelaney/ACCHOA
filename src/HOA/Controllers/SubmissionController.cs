@@ -41,7 +41,7 @@ namespace HOA.Controllers
 
         public static int GetReviewerCount(ApplicationDbContext context)
         {
-            var role = context.Roles.Include(r => r.Users).FirstOrDefault(r => r.Name.Equals(RoleNames.BoardMember));
+            var role = context.Roles.Include(r => r.Users).FirstOrDefault(r => r.Name.Equals(RoleNames.ARBBoardMember));
             List<string> userIds = role.Users.Select(u => u.UserId).ToList();
             var users = context.Users.Where(u => userIds.Contains(u.Id) && u.Enabled);
             return users.Count();
@@ -115,6 +115,16 @@ namespace HOA.Controllers
         {
             if (ModelState.IsValid)
             {
+                List<IFormFile> files = model.Files.ToList();
+                IFormFile file = files.FirstOrDefault();
+
+                if (file == null)
+                {
+                    ModelState.AddModelError(string.Empty, "File required.");
+                    model.Submission = _applicationDbContext.Submissions.FirstOrDefault(s => s.Id == model.SubmissionId);
+                    return View(model);
+                }
+
                 var submission = _applicationDbContext.Submissions.Include(s => s.Audits).Include(s => s.Reviews).Include(s => s.StateHistory)
                     .FirstOrDefault(s => s.Id == model.SubmissionId);
                 if (submission == null)
@@ -128,6 +138,10 @@ namespace HOA.Controllers
                     submission.Status = Status.ConditionallyApproved;
 
                 AddStateSwitch(submission);
+
+                //Store approval file
+                submission.FinalApprovalFileName = FormUtils.GetUploadedFilename(file);
+                submission.FinalApprovalBlob = await _storage.StoreFile(submission.Code, file.OpenReadStream());
 
                 //Any final comments?
                 if (!string.IsNullOrEmpty(model.Comments))
@@ -144,11 +158,12 @@ namespace HOA.Controllers
                     _applicationDbContext.Responses.Add(response);
                 }
 
-                AddHistoryEntry(submission, user.FullName, "Sent final response");
+                AddHistoryEntry(submission, user.FullName, "Sent final response: " + model.Comments);
 
                 _applicationDbContext.SaveChanges();
 
-                EmailHelper.NotifyStatusChanged(_applicationDbContext, submission, _email);
+                System.IO.Stream attachment = await _storage.RetriveFile(submission.FinalApprovalBlob);
+                EmailHelper.NotifyFinalResponse(_applicationDbContext, submission, model.UserFeedback, _email, attachment, submission.FinalApprovalFileName);
 
                 return RedirectToAction(nameof(View), new { id = submission.Id });
             }
@@ -183,7 +198,7 @@ namespace HOA.Controllers
                 {
                     subs = subs.Where(s => s.Status == Status.ARBIncoming || s.Status == Status.ARBFinal);
                 }
-                else if (User.IsInRole(RoleNames.BoardMember))
+                else if (User.IsInRole(RoleNames.ARBBoardMember))
                 {
                     subs = subs.Where(s => s.Status == Status.UnderReview);
                 }
@@ -334,6 +349,10 @@ namespace HOA.Controllers
             {
                 _applicationDbContext.StateChanges.Remove(c);
             }
+
+            if(!string.IsNullOrEmpty(submission.FinalApprovalBlob))
+                _storage.DeleteFile(submission.FinalApprovalBlob);
+
             _applicationDbContext.Submissions.Remove(submission);
 
             _applicationDbContext.SaveChanges();
@@ -352,6 +371,17 @@ namespace HOA.Controllers
             return File(stream, "application/octet", file.Name);
         }
 
+        public async Task<ActionResult> ResponseFile(int id)
+        {
+            var submission = _applicationDbContext.Submissions.FirstOrDefault(s => s.Id == id);
+
+            if (submission == null)
+                return HttpNotFound("File not found");
+
+            var stream = await _storage.RetriveFile(submission.FinalApprovalBlob);
+            return File(stream, "application/octet", submission.FinalApprovalFileName);
+        }
+
         [HttpGet]
         [AllowAnonymous]
         public IActionResult Create()
@@ -367,6 +397,12 @@ namespace HOA.Controllers
             if (ModelState.IsValid && model.Files.Count > 0)
             {
                 List<IFormFile> files = model.Files.ToList();
+
+                if(files.Count == 0)
+                {
+                    ModelState.AddModelError(string.Empty, "File required.");
+                    return View(model);
+                }
 
                 //Validate files before continuing
                 long totalSize = 0;
@@ -531,7 +567,7 @@ namespace HOA.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = RoleNames.BoardMember)]
+        [Authorize(Roles = RoleNames.ARBBoardMember)]
         public async Task<IActionResult> Review(ReviewSubmissionViewModel model)
         {
             if (ModelState.IsValid)

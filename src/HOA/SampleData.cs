@@ -44,10 +44,10 @@ namespace HOA
                 await _roleManager.CreateAsync(new IdentityRole(RoleNames.BoardChairman));
             }
 
-            role = await _roleManager.FindByNameAsync(RoleNames.BoardMember);
+            role = await _roleManager.FindByNameAsync(RoleNames.ARBBoardMember);
             if (role == null)
             {
-                await _roleManager.CreateAsync(new IdentityRole(RoleNames.BoardMember));
+                await _roleManager.CreateAsync(new IdentityRole(RoleNames.ARBBoardMember));
             }
 
             role = await _roleManager.FindByNameAsync(RoleNames.HOALiaison);
@@ -55,6 +55,12 @@ namespace HOA
             {
                 await _roleManager.CreateAsync(new IdentityRole(RoleNames.HOALiaison));
             }
+
+            role = await _roleManager.FindByNameAsync(RoleNames.HOABoardMember);
+            if (role == null)
+            {
+                await _roleManager.CreateAsync(new IdentityRole(RoleNames.HOABoardMember));
+            }            
         }
 
         private async Task CreateUsers(bool isDevelopment)
@@ -62,7 +68,7 @@ namespace HOA
             var user = await _userManager.FindByNameAsync("admin");
             if (user == null)
             {
-                user = new ApplicationUser { UserName = "admin", Email = "admin@mailinator.com", FirstName = "Admin", LastName = "Admin", Enabled = true };
+                user = new ApplicationUser { UserName = "admin", Email = "dan@hactar.com", FirstName = "Admin", LastName = "Admin", Enabled = true };
                 await _userManager.CreateAsync(user, "Password");
                 await _userManager.AddToRoleAsync(user, RoleNames.Administrator);
             }
@@ -76,38 +82,38 @@ namespace HOA
                 return;
             
             /*
-            user = await _userManager.FindByNameAsync("JoshRozzi");
+            user = await _userManager.FindByEmailAsync("josh.rozzi@fsresidential.com");
             if (user == null)
             {
-                user = new ApplicationUser { UserName = "JoshRozzi", Email = "JoshRozzi@mailinator.com", FirstName = "Josh", LastName = "Rozzi", Enabled = true };
+                user = new ApplicationUser { UserName = "josh.rozzi@fsresidential.com", Email = "josh.rozzi@fsresidential.com", FirstName = "Josh", LastName = "Rozzi", Enabled = true };
                 await _userManager.CreateAsync(user, "Password");
                 await _userManager.AddToRoleAsync(user, RoleNames.CommunityManager);
             }
 
-            user = await _userManager.FindByNameAsync("KirkFinnis");
+            user = await _userManager.FindByEmailAsync("kfinnis@gmail.com");
             if (user == null)
             {
-                user = new ApplicationUser { UserName = "KirkFinnis", Email = "KirkFinnis@mailinator.com", FirstName = "Kirk", LastName = "Finnis", Enabled = true };
+                user = new ApplicationUser { UserName = "kfinnis@gmail.com", Email = "kfinnis@gmail.com", FirstName = "Kirk", LastName = "Finnis", Enabled = true };
                 await _userManager.CreateAsync(user, "Password");
                 await _userManager.AddToRoleAsync(user, RoleNames.BoardChairman);
             }
 
-            user = await _userManager.FindByNameAsync("DanLetscher");
+            user = await _userManager.FindByEmailAsync("dletscher@brenntag.com");
             if (user == null)
             {
-                user = new ApplicationUser { UserName = "DanLetscher", Email = "DanLetscher@mailinator.com", FirstName = "Dan", LastName = "Letscher", Enabled = true };
+                user = new ApplicationUser { UserName = "dletscher@brenntag.com", Email = "dletscher@brenntag.com", FirstName = "Dan", LastName = "Letscher", Enabled = true };
                 await _userManager.CreateAsync(user, "Password");
-                await _userManager.AddToRoleAsync(user, RoleNames.BoardMember);
+                await _userManager.AddToRoleAsync(user, RoleNames.ARBBoardMember);
             }
 
-            user = await _userManager.FindByNameAsync("HOALiaison");
+            user = await _userManager.FindByEmailAsync("kkrama06@gmail.com");
             if (user == null)
             {
-                user = new ApplicationUser { UserName = "HOALiaison", Email = "HOALiaison@mailinator.com", FirstName = "HOA", LastName = "Liaison", Enabled = true };
+                user = new ApplicationUser { UserName = "kkrama06@gmail.com", Email = "kkrama06@gmail.com", FirstName = "Keith", LastName = "Rama", Enabled = true };
                 await _userManager.CreateAsync(user, "Password");
                 await _userManager.AddToRoleAsync(user, RoleNames.HOALiaison);
-            }*/
-
+            }
+            */
         }
     }
 }

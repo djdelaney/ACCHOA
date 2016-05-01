@@ -3,6 +3,7 @@ using HOA.Services;
 using Microsoft.Data.Entity;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -40,6 +41,13 @@ Your submission {2}. Use the link below to view your submission and any comments
 <br>
 <a href='{3}'>{3}</a><br>";
 
+        private static string m_homeownerFinalEmail = @"
+{0} {1},<br>
+<br>
+{2}
+<br>
+<a href='{3}'>{3}</a><br>";
+
         private static string m_PrecedentSettingEmail = @"
 {0} {1},<br>
 <br>
@@ -56,31 +64,40 @@ Please reset your password by clicking here:<br>
         {
             link = String.Format("{0}{1}", BaseHost, link);
             string emailHtml = String.Format(m_ResetPasswordEmail, link);
-            mail.SendEmailAsync(new List<string> { email }, "ARB: Forgot Password", emailHtml);
+            mail.SendEmailAsync(new List<string> { email }, "ARB: Forgot Password", emailHtml, null, null);
+        }
+
+        public static void NotifyFinalResponse(ApplicationDbContext context, Submission submission, string comments, IEmailSender mail, Stream file, string attachmentName)
+        {
+            var subject = String.Format("ARB Submission {0}", submission.Code);
+            string status = GetStatusText(submission.Status);
+            var link = String.Format("{0}/Submission/ViewStatus/{1}", BaseHost, submission.Code);
+            string emailHtml = String.Format(m_homeownerFinalEmail, submission.FirstName, submission.LastName, comments, link);
+            mail.SendEmailAsync(new List<string> { submission.Email }, subject, emailHtml, file, attachmentName);
         }
 
         public static void NotifyPrecedentSetting(ApplicationDbContext context, Submission submission, IEmailSender mail)
         {
             var link = String.Format("{0}/Submission/ViewStatus/{1}", BaseHost, submission.Code);
             string emailHtml = String.Format(m_PrecedentSettingEmail, submission.FirstName, submission.LastName, link);
-            mail.SendEmailAsync(new List<string> { submission.Email }, "ARB: New submission", emailHtml);
+            mail.SendEmailAsync(new List<string> { submission.Email }, "ARB: New submission", emailHtml, null, null);
         }
 
-        public static void NotifyStatusChanged(ApplicationDbContext context, Submission submission, IEmailSender mail)
+        public static void NotifyStatusChanged(ApplicationDbContext context, Submission submission, IEmailSender mail, Stream file = null, string attachmentName = null)
         {
             if (submission.Status == Status.Approved || 
                 submission.Status == Status.Rejected || 
                 submission.Status == Status.MissingInformation || 
                 submission.Status == Status.ConditionallyApproved)
             {
-                NotifyHomeowner(context, submission, mail);
+                NotifyHomeowner(context, submission, mail, file, attachmentName);
                 return;
             }
 
             string roleToNofity;
             if (submission.Status == Status.Submitted)
             {
-                NotifyHomeowner(context, submission, mail);
+                NotifyHomeowner(context, submission, mail, file, attachmentName);
                 roleToNofity = RoleNames.CommunityManager;
             }
             else if (submission.Status == Status.ARBIncoming)
@@ -89,7 +106,7 @@ Please reset your password by clicking here:<br>
             }
             else if (submission.Status == Status.UnderReview)
             {
-                roleToNofity = RoleNames.BoardMember;
+                roleToNofity = RoleNames.ARBBoardMember;
             }
             else if (submission.Status == Status.ARBFinal)
             {
@@ -118,14 +135,14 @@ Please reset your password by clicking here:<br>
 
             var link = String.Format("{0}/Submission/View/{1}", BaseHost, submission.Id);
             var emailHtml = String.Format(m_availableEmail, link, submission.Status.ToString());
-            mail.SendEmailAsync(emails, "ARB: Available for processing", emailHtml);
+            mail.SendEmailAsync(emails, "ARB: Available for processing", emailHtml, null, null);
         }
 
-        public static void NotifyNewUser(string email, string username, string password, IEmailSender mail)
+        public static void NotifyNewUser(string email, string password, IEmailSender mail)
         {
             var link = String.Format("{0}/Account/Login/?returnUrl=/Account/ChangePassword/", BaseHost);
-            string emailHtml = string.Format(m_newAccount, username, password, link);
-            mail.SendEmailAsync(new List<string> { email }, "ACC ARB: New Account", emailHtml);
+            string emailHtml = string.Format(m_newAccount, email, password, link);
+            mail.SendEmailAsync(new List<string> { email }, "ACC ARB: New Account", emailHtml, null, null);
         }
 
         private static List<String> GetRoleMembers(ApplicationDbContext context, string roleName)
@@ -135,24 +152,31 @@ Please reset your password by clicking here:<br>
             return context.Users.Where(u => userIds.Contains(u.Id) && u.Enabled && !u.DisableNotification).Select(u => u.Email).ToList();
         }
 
-        private static void NotifyHomeowner(ApplicationDbContext context, Submission submission, IEmailSender mail)
+        private static void NotifyHomeowner(ApplicationDbContext context, Submission submission, IEmailSender mail, Stream file, string attachmentName)
         {
             var subject = String.Format("ARB Submission {0}", submission.Code);
+            string status = GetStatusText(submission.Status);
+            var link = String.Format("{0}/Submission/ViewStatus/{1}", BaseHost, submission.Code);
+            string emailHtml = String.Format(m_homeownerEmail, submission.FirstName, submission.LastName, status, link);
+            mail.SendEmailAsync(new List<string> { submission.Email }, "ARB: New submission", emailHtml, file, attachmentName);
+        }
 
+        private static string GetStatusText(Status s)
+        {
             string status;
-            if (submission.Status == Status.Submitted)
+            if (s == Status.Submitted)
             {
                 status = "has been received";
             }
-            else if (submission.Status == Status.Approved)
+            else if (s == Status.Approved)
             {
                 status = "has been approved";
             }
-            else if (submission.Status == Status.ConditionallyApproved)
+            else if (s == Status.ConditionallyApproved)
             {
                 status = "has been conditionally approved";
             }
-            else if (submission.Status == Status.MissingInformation)
+            else if (s == Status.MissingInformation)
             {
                 status = "has been returned due to missing information";
             }
@@ -161,9 +185,7 @@ Please reset your password by clicking here:<br>
                 status = "has been rejected";
             }
 
-            var link = String.Format("{0}/Submission/ViewStatus/{1}", BaseHost, submission.Code);
-            string emailHtml = String.Format(m_homeownerEmail, submission.FirstName, submission.LastName, status, link);
-            mail.SendEmailAsync(new List<string> { submission.Email }, "ARB: New submission", emailHtml);
+            return status;
         }
 
         public static List<string> GetOverdueRecipients(ApplicationDbContext context, Submission submission)
@@ -196,7 +218,7 @@ Please reset your password by clicking here:<br>
 
             if (submission.Status == Status.UnderReview)
             {
-                var role = context.Roles.Include(r => r.Users).FirstOrDefault(r => r.Name.Equals(RoleNames.BoardMember));
+                var role = context.Roles.Include(r => r.Users).FirstOrDefault(r => r.Name.Equals(RoleNames.ARBBoardMember));
                 List<string> userIds = role.Users.Select(u => u.UserId).ToList();
                 var board = context.Users.Where(u => userIds.Contains(u.Id) && u.Enabled && !u.DisableNotification).Select(u => u.Id).ToList();
                 var alreadyReviewed = context.Reviews.Where(r => r.Submission.Id == submission.Id).Select(r => r.Reviewer.Id).ToList();
@@ -223,7 +245,7 @@ Please reset your password by clicking here:<br>
             }
                                    
             var emailHtml = String.Format(m_overdueEmail, body);
-            mail.SendEmailAsync(new List<string> { email }, "ARB: Overdue submission", emailHtml);
+            mail.SendEmailAsync(new List<string> { email }, "ARB: Overdue submission", emailHtml, null, null);
         }
     }
 }

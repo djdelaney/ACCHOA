@@ -34,6 +34,13 @@
             }
             </ul>
 
+            @if (Model.Submission.FinalApprovalFileName != null)
+            {
+                <br />
+                <h5><strong>Final Response</strong></h5>
+                @:<a href="/Submission/ResponseFile/@Model.Submission.Id">@Model.Submission.FinalApprovalFileName</a>
+            }
+
             @if (Model.Submission.PrecedentSetting)
             {
                 <p class="bg-warning">Marked as precedent setting</p>
@@ -97,7 +104,7 @@
     {
         <a href="/Submission/CheckCompleteness/@Model.Submission.Id">Check app</a>
     }
-    else if (Model.Submission.Status == Status.UnderReview && User.IsInRole(RoleNames.BoardMember))
+    else if (Model.Submission.Status == Status.UnderReview && User.IsInRole(RoleNames.ARBBoardMember))
     {
         @if (!Model.Reviewed)
         {

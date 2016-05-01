@@ -16,8 +16,9 @@ namespace HOA.Model
         public const string Administrator       = "Administrator";
         public const string CommunityManager    = "CommunityManager";
         public const string BoardChairman       = "BoardChairman";
-        public const string BoardMember         = "BoardMember";
-        public const string HOALiaison          = "HOALiaison";        
+        public const string ARBBoardMember      = "ARBBoardMember";
+        public const string HOALiaison          = "HOALiaison";
+        public const string HOABoardMember      = "HOABoardMember";
     }
 
     public class ApplicationUser : IdentityUser

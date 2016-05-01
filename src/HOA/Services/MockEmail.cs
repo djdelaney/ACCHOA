@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -20,7 +21,7 @@ namespace HOA.Services
             _logger.LogWarning("Sending email to {0}", string.Join(", ", emails));
         }
 
-        public Task SendEmailAsync(List<string> emails, string subject, string message)
+        public Task SendEmailAsync(List<string> emails, string subject, string message, Stream attachment, string attachmentName)
         {
             return Task.Factory.StartNew(() => SendEmail(emails, subject, message));
         }

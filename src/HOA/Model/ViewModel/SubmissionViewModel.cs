@@ -144,7 +144,13 @@ namespace HOA.Model.ViewModel
         [Required]
         public int SubmissionId { get; set; }
 
+        [Required]
+        public string UserFeedback{ get; set; }
+
+        [Required]
         public string Comments { get; set; }
+
+        public IList<IFormFile> Files { get; set; }
     }
 
     public class FinalReview : IValidatableObject
