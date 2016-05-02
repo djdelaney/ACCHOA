@@ -8,7 +8,7 @@ using HOA.Model;
 namespace HOA.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20160228034811_initial")]
+    [Migration("20160501032817_initial")]
     partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -107,8 +107,7 @@ namespace HOA.Migrations
                     b.Property<string>("Name")
                         .IsRequired();
 
-                    b.Property<int?>("SubmissionId")
-                        .IsRequired();
+                    b.Property<int>("SubmissionId");
 
                     b.HasKey("Id");
                 });
@@ -144,8 +143,7 @@ namespace HOA.Migrations
 
                     b.Property<DateTime>("Created");
 
-                    b.Property<int?>("SubmissionId")
-                        .IsRequired();
+                    b.Property<int>("SubmissionId");
 
                     b.HasKey("Id");
                 });
@@ -165,8 +163,7 @@ namespace HOA.Migrations
 
                     b.Property<int>("Status");
 
-                    b.Property<int?>("SubmissionId")
-                        .IsRequired();
+                    b.Property<int>("SubmissionId");
 
                     b.Property<int>("SubmissionRevision");
 
@@ -184,8 +181,7 @@ namespace HOA.Migrations
 
                     b.Property<int>("State");
 
-                    b.Property<int?>("SubmissionId")
-                        .IsRequired();
+                    b.Property<int>("SubmissionId");
 
                     b.HasKey("Id");
                 });
@@ -209,6 +205,10 @@ namespace HOA.Migrations
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasAnnotation("MaxLength", 64);
+
+                    b.Property<string>("FinalApprovalBlob");
+
+                    b.Property<string>("FinalApprovalFileName");
 
                     b.Property<string>("FirstName")
                         .IsRequired()

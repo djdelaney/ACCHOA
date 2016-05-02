@@ -47,6 +47,8 @@ namespace HOA.Migrations
                     Code = table.Column<string>(nullable: false),
                     Description = table.Column<string>(nullable: false),
                     Email = table.Column<string>(nullable: false),
+                    FinalApprovalBlob = table.Column<string>(nullable: true),
+                    FinalApprovalFileName = table.Column<string>(nullable: true),
                     FirstName = table.Column<string>(nullable: false),
                     LastModified = table.Column<DateTime>(nullable: false),
                     LastName = table.Column<string>(nullable: false),
