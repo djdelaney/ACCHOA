@@ -154,6 +154,14 @@
         @Html.ActionLink("Mark as precedent setting", "PrecedentSetting", new { Id = Model.Submission.Id })
     }
 
+
+     @if (Model.Submission.Status == Status.UnderReview && User.IsInRole(RoleNames.BoardChairman))
+     {
+        <br />
+        <a href="/Submission/SkipQuorum/@Model.Submission.Id" onclick="if (!confirm('Are you sure?')) return false;">Skip Quorum</a>
+     }
+    
+
 </div>
 
 <div class="col-md-4">

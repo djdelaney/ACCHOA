@@ -316,6 +316,32 @@ namespace HOA.Controllers
             return View(submission);
         }
 
+        [AuthorizeRoles(RoleNames.BoardChairman)]
+        public async Task<IActionResult> SkipQuorum(int id)
+        {
+            var submission = _applicationDbContext.Submissions.FirstOrDefault(s => s.Id == id);
+            if (submission == null)
+                return HttpNotFound("Submission not found");
+
+            if (submission.Status != Status.UnderReview)
+            {
+                throw new Exception("Invliad state!");
+            }
+
+            var user = await _userManager.FindByIdAsync(User.GetUserId());
+            
+            submission.Status = Status.ARBFinal;
+            submission.LastModified = DateTime.Now;
+            submission.StatusChangeTime = DateTime.Now;
+            AddHistoryEntry(submission, user.FullName, "Manually skiped quorum");
+            AddStateSwitch(submission);
+            _applicationDbContext.SaveChanges();
+
+            EmailHelper.NotifyStatusChanged(_applicationDbContext, submission, _email);
+
+            return RedirectToAction(nameof(View), new { id = submission.Id });
+        }        
+
         [AuthorizeRoles(RoleNames.Administrator)]
         public IActionResult Delete(int id)
         {
