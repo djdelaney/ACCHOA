@@ -90,10 +90,11 @@
 </div>
 <div class="form-group">
     <label class="control-label col-xs-3">
-        @Html.LabelFor(model => model.Files)
+        File(s)
     </label>
     <div class="col-xs-9">
         <input type="file" name="Files" id="Files" multiple /> <br />
+        Make sure any scanned documents or pictures are legible.<br />
         You can upload extra files by selecting multiple items in the file dialog.
     </div>
 </div>
@@ -166,6 +167,14 @@
         </label>
         <br>
         Have your contractor name the Homeowner (you) and Applecross Master Association as Additionally Insured.  The following language should be used in the 'description of operations' section: Homeowner's Name, Homeowner's Address, and Applecross Country Club Master are listed as additional insured.  If work is to be done yourself, the declarations page of your homeowner's insurance policy will take the place of this certificate.
+        <br>
+        <br>
+        <input type="checkbox" id="req8" value="value">
+        <label for="req9" data-toggle="tooltip" data-placement="top">
+            Rules and regulations
+        </label>
+        <br>
+        Make sure you have reviewed the applicable sections of the HOA rules and regulations.
         <br>
         <br>
     </div>

@@ -9,6 +9,7 @@ using Microsoft.AspNet.Identity;
 
 namespace HOA.Controllers
 {
+    [RequireHttps]
     public class HomeController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
@@ -24,6 +25,11 @@ namespace HOA.Controllers
         }
 
         public IActionResult Index()
+        {
+            return View();
+        }
+
+        public IActionResult Forms()
         {
             return View();
         }

@@ -36,6 +36,7 @@ namespace HOA.Model.ViewModel
         public bool Approve { get; set; }
 
         [Required]
+        [Display(Name = "Internal Comments")]
         public string Comments { get; set; }
 
         [Display(Name = "Homeowner Feedback (sent via email)")]
@@ -61,6 +62,7 @@ namespace HOA.Model.ViewModel
         public string Status { get; set; }
 
         [Required]
+        [Display(Name = "Internal Comments")]
         public string Comments { get; set; }
 
         [Display(Name = "Homeowner Feedback (sent via email)")]
@@ -87,6 +89,7 @@ namespace HOA.Model.ViewModel
         public string Status{ get; set; }
 
         [Required]
+        [Display(Name = "Internal Comments")]
         public string Comments { get; set; }
     }
 
@@ -148,6 +151,7 @@ namespace HOA.Model.ViewModel
         public string UserFeedback{ get; set; }
 
         [Required]
+        [Display(Name = "Internal Comments")]
         public string Comments { get; set; }
 
         public IList<IFormFile> Files { get; set; }
@@ -164,6 +168,7 @@ namespace HOA.Model.ViewModel
         public string Status { get; set; }
 
         [Required]
+        [Display(Name = "Internal Comments")]
         public string Comments { get; set; }
 
         [Display(Name = "Homeowner Feedback (sent via email)")]
