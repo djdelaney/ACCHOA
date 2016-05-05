@@ -37,14 +37,14 @@ The following submission(s) are overdue:<br>
         private static string m_homeownerEmail = @"
 {0} {1},<br>
 <br>
-Your submission {2}. Use the link below to view your submission and any comments.<br>
+Your submission {2}. Your access code to check your submission status is {3}. Use the link below to view your submission and any comments.<br>
 <br>
-<a href='{3}'>{3}</a><br>";
+<a href='{4}'>{4}</a><br>";
 
         private static string m_homeownerFinalEmail = @"
 {0} {1},<br>
 <br>
-{2}
+{2}<br>
 <br>
 <a href='{3}'>{3}</a><br>";
 
@@ -157,7 +157,7 @@ Please reset your password by clicking here:<br>
             var subject = String.Format("ARB Submission {0}", submission.Code);
             string status = GetStatusText(submission.Status);
             var link = String.Format("{0}/Submission/ViewStatus/{1}", BaseHost, submission.Code);
-            string emailHtml = String.Format(m_homeownerEmail, submission.FirstName, submission.LastName, status, link);
+            string emailHtml = String.Format(m_homeownerEmail, submission.FirstName, submission.LastName, status, submission.Code, link);
             mail.SendEmailAsync(new List<string> { submission.Email }, "ARB: New submission", emailHtml, file, attachmentName);
         }
 
