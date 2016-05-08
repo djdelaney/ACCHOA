@@ -80,7 +80,7 @@ Please reset your password by clicking here:<br>
         {
             var link = String.Format("{0}/Submission/ViewStatus/{1}", BaseHost, submission.Code);
             string emailHtml = String.Format(m_PrecedentSettingEmail, submission.FirstName, submission.LastName, link);
-            mail.SendEmailAsync(new List<string> { submission.Email }, "ARB: New submission", emailHtml, null, null);
+            mail.SendEmailAsync(new List<string> { submission.Email }, string.Format("ARB: New submission {0}", submission.Code), emailHtml, null, null);
         }
 
         public static void NotifyStatusChanged(ApplicationDbContext context, Submission submission, IEmailSender mail, Stream file = null, string attachmentName = null)
@@ -135,7 +135,7 @@ Please reset your password by clicking here:<br>
 
             var link = String.Format("{0}/Submission/View/{1}", BaseHost, submission.Id);
             var emailHtml = String.Format(m_availableEmail, link, submission.Status.ToString());
-            mail.SendEmailAsync(emails, "ARB: Available for processing", emailHtml, null, null);
+            mail.SendEmailAsync(emails, string.Format("ARB: Available for processing {0}", submission.Code), emailHtml, null, null);
         }
 
         public static void NotifyNewUser(string email, string password, IEmailSender mail)
@@ -158,7 +158,7 @@ Please reset your password by clicking here:<br>
             string status = GetStatusText(submission.Status);
             var link = String.Format("{0}/Submission/ViewStatus/{1}", BaseHost, submission.Code);
             string emailHtml = String.Format(m_homeownerEmail, submission.FirstName, submission.LastName, status, submission.Code, link);
-            mail.SendEmailAsync(new List<string> { submission.Email }, "ARB: New submission", emailHtml, file, attachmentName);
+            mail.SendEmailAsync(new List<string> { submission.Email }, string.Format("ARB: New submission {0}", submission.Code), emailHtml, file, attachmentName);
         }
 
         private static string GetStatusText(Status s)
