@@ -24,7 +24,7 @@ namespace HOA.Model.ViewModel
         public bool Reviewed { get; set; }
     }
 
-    public class ApproveRejectViewModel : IValidatableObject
+    public class CheckCompletenessViewModel : IValidatableObject
     {
         public Submission Submission { get; set; }
 
@@ -34,8 +34,7 @@ namespace HOA.Model.ViewModel
         [Required]
         [Display(Name = "Application Complete?")]
         public bool Approve { get; set; }
-
-        [Required]
+        
         [Display(Name = "Internal Comments")]
         public string Comments { get; set; }
 
@@ -44,6 +43,11 @@ namespace HOA.Model.ViewModel
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
+            if (!Approve && string.IsNullOrEmpty(Comments))
+            {
+                yield return new ValidationResult("You must supply internal comments for rejections.");
+            }
+
             if (!Approve && string.IsNullOrEmpty(UserFeedback))
             {
                 yield return new ValidationResult("You must supply user feedback for rejections.");
@@ -60,8 +64,7 @@ namespace HOA.Model.ViewModel
 
         [Required]
         public string Status { get; set; }
-
-        [Required]
+        
         [Display(Name = "Internal Comments")]
         public string Comments { get; set; }
 
@@ -75,10 +78,14 @@ namespace HOA.Model.ViewModel
             {
                 yield return new ValidationResult("You must supply user feedback for missing info.");
             }
+            if(status != ReviewStatus.Approved && string.IsNullOrEmpty(Comments))
+            {
+                yield return new ValidationResult("You must supply internal comments for non-approvals.");
+            }
         }
     }
 
-    public class ReviewSubmissionViewModel
+    public class ReviewSubmissionViewModel : IValidatableObject
     {
         public Submission Submission { get; set; }
 
@@ -87,10 +94,21 @@ namespace HOA.Model.ViewModel
 
         [Required]
         public string Status{ get; set; }
-
-        [Required]
+        
         [Display(Name = "Internal Comments")]
         public string Comments { get; set; }
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            ReviewStatus statusEnum;
+            if(Enum.TryParse(Status, out statusEnum))
+            {
+                if(statusEnum != ReviewStatus.Approved && string.IsNullOrEmpty(Comments))
+                {
+                    yield return new ValidationResult("You must supply comments for non-approvals.");
+                }
+            }
+        }
     }
 
     public class CreateSubmissionViewModel
@@ -166,8 +184,7 @@ namespace HOA.Model.ViewModel
 
         [Required]
         public string Status { get; set; }
-
-        [Required]
+        
         [Display(Name = "Internal Comments")]
         public string Comments { get; set; }
 
@@ -180,6 +197,10 @@ namespace HOA.Model.ViewModel
             if ((status == ReviewStatus.ConditionallyApproved || status == ReviewStatus.MissingInformation || status == ReviewStatus.Rejected) && string.IsNullOrEmpty(UserFeedback))
             {
                 yield return new ValidationResult("You must supply user feedback for non approvals.");
+            }
+            if(status != ReviewStatus.Approved && string.IsNullOrEmpty(Comments))
+            {
+                yield return new ValidationResult("You must supply comments for non approvals.");
             }
         }
     }

@@ -497,19 +497,22 @@ namespace HOA.Controllers
 
         
         [HttpGet]
-        [AuthorizeRoles(RoleNames.CommunityManager, RoleNames.BoardChairman)]
+        [AuthorizeRoles(RoleNames.CommunityManager, RoleNames.BoardChairman, RoleNames.Administrator)]
         public IActionResult CheckCompleteness(int id)
         {
             var submission = _applicationDbContext.Submissions.FirstOrDefault(s => s.Id == id);
             if (submission == null)
                 return HttpNotFound("Submission not found");
 
-            if (submission.Status == Status.Submitted && !User.IsInRole(RoleNames.CommunityManager))
-                return HttpNotFound("Not authorized");
-            if (submission.Status == Status.ARBIncoming && !User.IsInRole(RoleNames.BoardChairman))
-                return HttpNotFound("Not authorized");
+            if (!User.IsInRole(RoleNames.Administrator))
+            {
+                if (submission.Status == Status.Submitted && !User.IsInRole(RoleNames.CommunityManager))
+                    return HttpNotFound("Not authorized");
+                if (submission.Status == Status.ARBIncoming && !User.IsInRole(RoleNames.BoardChairman))
+                    return HttpNotFound("Not authorized");
+            }
 
-            ApproveRejectViewModel model = new ApproveRejectViewModel
+            CheckCompletenessViewModel model = new CheckCompletenessViewModel
             {
                 Submission = submission,
                 SubmissionId = submission.Id
@@ -520,8 +523,8 @@ namespace HOA.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [AuthorizeRoles(RoleNames.CommunityManager, RoleNames.BoardChairman)]
-        public async Task<IActionResult> CheckCompleteness(ApproveRejectViewModel model)
+        [AuthorizeRoles(RoleNames.CommunityManager, RoleNames.BoardChairman, RoleNames.Administrator)]
+        public async Task<IActionResult> CheckCompleteness(CheckCompletenessViewModel model)
         {
             if (ModelState.IsValid)
             {
@@ -559,7 +562,9 @@ namespace HOA.Controllers
                 AddStateSwitch(submission);
                 submission.StatusChangeTime = DateTime.Now;
 
-                var user = await _userManager.FindByIdAsync(User.GetUserId());                
+                var user = await _userManager.FindByIdAsync(User.GetUserId());
+                if (string.IsNullOrEmpty(model.Comments))
+                    model.Comments = "None";
                 string action = string.Format("Marked {0}. Comments: {1}", model.Approve ? "complete" : "missing information", model.Comments);
                 AddHistoryEntry(submission, user.FullName, action);
 
@@ -663,7 +668,7 @@ namespace HOA.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = RoleNames.BoardChairman)]
+        [AuthorizeRoles(RoleNames.BoardChairman, RoleNames.Administrator)]
         public async Task<IActionResult> TallyVotes(TallyVotesViewModel model)
         {
             if (ModelState.IsValid)
@@ -705,7 +710,9 @@ namespace HOA.Controllers
                 submission.StatusChangeTime = DateTime.Now;
 
                 var user = await _userManager.FindByIdAsync(User.GetUserId());
-                string action = string.Format("{0}. Comments: {1}", model.Status, model.Comments);
+                if (string.IsNullOrEmpty(model.Comments))
+                    model.Comments = "None";
+                string action = string.Format("Tally votes: {0}. Comments: {1}", model.Status, model.Comments);
                 AddHistoryEntry(submission, user.FullName, action);
 
                 submission.LastModified = DateTime.Now;
@@ -721,7 +728,7 @@ namespace HOA.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = RoleNames.HOALiaison)]
+        [AuthorizeRoles(RoleNames.HOALiaison, RoleNames.Administrator)]
         public IActionResult FinalCheck(int id)
         {
             var submission = _applicationDbContext.Submissions.FirstOrDefault(s => s.Id == id);
@@ -739,7 +746,7 @@ namespace HOA.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = RoleNames.HOALiaison)]
+        [AuthorizeRoles(RoleNames.HOALiaison, RoleNames.Administrator)]
         public async Task<IActionResult> FinalCheck(FinalReview model)
         {
             if (ModelState.IsValid)
@@ -749,6 +756,8 @@ namespace HOA.Controllers
                     return HttpNotFound("Submission not found");
 
                 var user = await _userManager.FindByIdAsync(User.GetUserId());
+                if (string.IsNullOrEmpty(model.Comments))
+                    model.Comments = "None";
                 string action = string.Format("{0}. Comments: {1}", model.Status, model.Comments);
                 AddHistoryEntry(submission, user.FullName, action);
 
