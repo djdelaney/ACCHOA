@@ -99,10 +99,16 @@
 
 
     <h3>Action:</h3>
+    @if (Model.Submission.Status == Status.Submitted && (User.IsInRole(RoleNames.CommunityManager)))
+    {
+        <a href="/Submission/QuickApprove/@Model.Submission.Id">Quick Approve</a><br />
+        <br />
+    }
+
     @if ((Model.Submission.Status == Status.Submitted && (User.IsInRole(RoleNames.CommunityManager) || User.IsInRole(RoleNames.Administrator))) ||
                     (Model.Submission.Status == Status.ARBIncoming && (User.IsInRole(RoleNames.BoardChairman) || User.IsInRole(RoleNames.Administrator))))
     {
-        <a href="/Submission/CheckCompleteness/@Model.Submission.Id">Check app</a><br />
+        <a href="/Submission/CheckCompleteness/@Model.Submission.Id">Check for completeness</a><br />
         <br />
     }
     else if (Model.Submission.Status == Status.UnderReview && User.IsInRole(RoleNames.ARBBoardMember))

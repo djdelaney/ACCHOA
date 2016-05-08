@@ -1046,5 +1046,89 @@ namespace HOA.Controllers
             // If we got this far, something failed, redisplay form
             return View(model);
         }
+
+        [HttpGet]
+        [Authorize(Roles = "CommunityManager")]
+        public IActionResult QuickApprove(int id)
+        {
+            var submission = _applicationDbContext.Submissions.FirstOrDefault(s => s.Id == id);
+            if (submission == null)
+                return HttpNotFound("Submission not found");
+
+            QuickApproveViewModel model = new QuickApproveViewModel
+            {
+                Submission = submission,
+                SubmissionId = submission.Id
+            };
+
+            return View(model);
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = RoleNames.CommunityManager)]
+        public async Task<IActionResult> QuickApprove(QuickApproveViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                List<IFormFile> files = model.Files.ToList();
+                IFormFile file = files.FirstOrDefault();
+
+                if (file == null)
+                {
+                    ModelState.AddModelError(string.Empty, "File required.");
+                    model.Submission = _applicationDbContext.Submissions.FirstOrDefault(s => s.Id == model.SubmissionId);
+                    return View(model);
+                }
+
+                var submission = _applicationDbContext.Submissions.Include(s => s.Audits).Include(s => s.Reviews).Include(s => s.StateHistory)
+                    .FirstOrDefault(s => s.Id == model.SubmissionId);
+                if (submission == null)
+                    return HttpNotFound("Submission not found");
+
+                if (submission.Status != Status.Submitted)
+                    return HttpNotFound("Incorrect status");
+
+                var user = await _userManager.FindByIdAsync(User.GetUserId());
+
+                submission.Status = Status.Approved;
+                AddStateSwitch(submission);
+
+                //Store approval file
+                submission.FinalApprovalFileName = FormUtils.GetUploadedFilename(file);
+                submission.FinalApprovalBlob = await _storage.StoreFile(submission.Code, file.OpenReadStream());
+
+                //Any final comments?
+                if (!string.IsNullOrEmpty(model.Comments))
+                {
+                    var response = new Response
+                    {
+                        Created = DateTime.Now,
+                        Comments = model.Comments,
+                        Submission = submission
+                    };
+                    if (submission.Responses == null)
+                        submission.Responses = new List<Response>();
+                    submission.Responses.Add(response);
+                    _applicationDbContext.Responses.Add(response);
+                }
+
+                AddHistoryEntry(submission, user.FullName, "Sent final response: " + model.Comments);
+
+                _applicationDbContext.SaveChanges();
+
+                System.IO.Stream attachment = await _storage.RetriveFile(submission.FinalApprovalBlob);
+                EmailHelper.NotifyFinalResponse(_applicationDbContext, submission, model.UserFeedback, _email, attachment, submission.FinalApprovalFileName);
+
+                return RedirectToAction(nameof(View), new { id = submission.Id });
+            }
+
+            // If we got this far, something failed, redisplay form
+            model.Submission = _applicationDbContext.Submissions.FirstOrDefault(s => s.Id == model.SubmissionId);
+            return View(model);
+        }
+
+
     }
 }

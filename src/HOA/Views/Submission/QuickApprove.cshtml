@@ -1,0 +1,49 @@
+﻿@using HOA.Model
+@using HOA.Model.ViewModel
+@model QuickApproveViewModel
+@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewBag.Title = "Quick Response";
+}
+
+<h3>Submission</h3>
+@Model.Submission.FirstName @Model.Submission.LastName<br />
+@Model.Submission.Email <br />
+@Model.Submission.Address<br />
+<br />
+@Model.Submission.Description<br />
+<br />
+
+@using (Html.BeginForm("Submission", "QuickApprove", FormMethod.Post, new { @class = "form-horizontal", enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+
+    @if (!Html.ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger" role="alert">
+            <strong>Oh snap!</strong> Please fix the listed errors and try submitting again.
+
+            @Html.ValidationSummary()
+        </div>
+    }
+
+    @Html.HiddenFor(model => model.SubmissionId)
+
+    @Html.LabelFor(model => model.Comments)@: <br />
+    @Html.TextAreaFor(model => model.Comments, new { @class = "form-control", @maxlength = "512" })<br />
+
+    @:User feedback (email): <br />
+    @Html.TextAreaFor(model => model.UserFeedback, new { @class = "form-control", @maxlength = "512" })<br />
+
+    @:Final approval file <br />
+    <input type="file" name="Files" id="Files" /> <br />
+
+    <br />
+    <br />
+
+
+    <input type="submit" value="Send final approval" class="btn btn-lg btn-primary" />
+
+}

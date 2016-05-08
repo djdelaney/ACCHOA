@@ -254,4 +254,21 @@ namespace HOA.Model.ViewModel
     {
         public IList<Submission> Submissions { get; set; }
     }
+
+    public class QuickApproveViewModel
+    {
+        public Submission Submission { get; set; }
+
+        [Required]
+        public int SubmissionId { get; set; }
+
+        [Required]
+        public string UserFeedback { get; set; }
+
+        [Required]
+        [Display(Name = "Internal Comments")]
+        public string Comments { get; set; }
+
+        public IList<IFormFile> Files { get; set; }
+    }
 }
