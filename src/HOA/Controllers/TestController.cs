@@ -269,6 +269,11 @@ namespace HOA.Controllers
                 SetStatus(sub, Status.ReviewComplete);
                 sub.Status = Status.Approved;
             }
+            else if (status == Status.ConditionallyApproved)
+            {
+                SetStatus(sub, Status.ReviewComplete);
+                sub.Status = Status.ConditionallyApproved;
+            }
             else if (status == Status.MissingInformation)
             {
                 SetStatus(sub, Status.Submitted);

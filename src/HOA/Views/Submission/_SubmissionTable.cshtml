@@ -57,10 +57,18 @@
                         else if (submission.Status == Status.Approved)
                         {
                             @:Approved
+                            @if(submission.FinalApprovalBlob == null)
+                            {
+                                @:(Missing attachment)
+                            }
                         }
                         else if (submission.Status == Status.ConditionallyApproved)
                         {
                             @:Conditionally Approved
+                            @if(submission.FinalApprovalBlob == null)
+                            {
+                                @:(Missing attachment)
+                            }
                         }
                         else if (submission.Status == Status.Rejected)
                         {
