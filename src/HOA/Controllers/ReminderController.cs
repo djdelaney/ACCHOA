@@ -23,7 +23,7 @@ namespace HOA.Controllers
         private static readonly TimeSpan ReminderTime_ARBPost = new TimeSpan(3, 0, 0, 0); //3 days
         private static readonly TimeSpan ReminderTime_Final = new TimeSpan(3, 0, 0, 0); //3 days
 
-        private static readonly TimeSpan Quarum_Final = new TimeSpan(3, 0, 0, 0); //3 days
+        private static readonly TimeSpan Quorum_Final = new TimeSpan(5, 0, 0, 0); //3 days
 
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ApplicationDbContext _applicationDbContext;
@@ -93,15 +93,15 @@ namespace HOA.Controllers
         }
 
         [AllowAnonymous]
-        public IActionResult CheckQuarum()
+        public IActionResult CheckQuorum()
         {
             int totalReviewers = SubmissionController.GetReviewerCount(_applicationDbContext);
-            int quarum = (int)Math.Ceiling((double)totalReviewers / (double)2);
+            int quorum = (int)Math.Ceiling((double)totalReviewers / (double)2);
 
             var allOpen = _applicationDbContext.Submissions.Where(s => s.Status == Status.UnderReview).Include(s => s.Audits).Include(s => s.Reviews).ToList();
             foreach (Submission submission in allOpen)
             {
-                if (submission.Reviews.Count >= quarum && DateTime.Now > submission.StatusChangeTime.Add(Quarum_Final))
+                if (submission.Reviews.Count >= quorum && DateTime.Now > submission.StatusChangeTime.Add(Quorum_Final))
                 {
                     submission.Status = Status.ARBFinal;
                     submission.LastModified = DateTime.Now;
@@ -115,7 +115,7 @@ namespace HOA.Controllers
                     {
                         User = "System",
                         DateTime = DateTime.Now,
-                        Action = "Quarum reached after delay, tallying votes.",
+                        Action = "Quorum reached after delay, tallying votes.",
                         Submission = submission
                     };
                     submission.Audits.Add(history);
