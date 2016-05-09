@@ -271,4 +271,17 @@ namespace HOA.Model.ViewModel
 
         public IList<IFormFile> Files { get; set; }
     }
+
+    public class AttachmentViewModel
+    {
+        public Submission Submission { get; set; }
+
+        [Required]
+        public int SubmissionId { get; set; }
+
+        [Required]
+        public string UserFeedback { get; set; }
+
+        public IList<IFormFile> Files { get; set; }
+    }
 }

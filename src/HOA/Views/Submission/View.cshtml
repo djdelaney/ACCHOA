@@ -167,7 +167,14 @@
         <br />
         <a href="/Submission/SkipQuorum/@Model.Submission.Id" onclick="if (!confirm('Are you sure?')) return false;">Skip Quorum</a>
      }
-    
+
+    @if ((Model.Submission.Status == Status.Approved || Model.Submission.Status == Status.ConditionallyApproved)
+        && User.IsInRole(RoleNames.CommunityManager) && Model.Submission.FinalApprovalBlob == null)
+    {
+        <br />
+        <a href="/Submission/AddApprovalDoc/@Model.Submission.Id" role="button">Add approval document</a><br />
+    }
+
 
 </div>
 

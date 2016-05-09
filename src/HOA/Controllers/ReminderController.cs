@@ -23,7 +23,7 @@ namespace HOA.Controllers
         private static readonly TimeSpan ReminderTime_ARBPost = new TimeSpan(3, 0, 0, 0); //3 days
         private static readonly TimeSpan ReminderTime_Final = new TimeSpan(3, 0, 0, 0); //3 days
 
-        private static readonly TimeSpan Quorum_Final = new TimeSpan(5, 0, 0, 0); //3 days
+        private static readonly TimeSpan Quorum_Final = new TimeSpan(5, 0, 0, 0); //5 days
 
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ApplicationDbContext _applicationDbContext;
