@@ -20,7 +20,7 @@ namespace HOA.Services
             var myMessage = new SendGridMessage();
 
             // Add the message properties.
-            myMessage.From = new MailAddress(EmailSource);
+            myMessage.From = new MailAddress(EmailSource, "Applecross ARB");
             
             myMessage.AddTo(recipients);
 
