@@ -79,6 +79,8 @@ namespace HOA.Model
 
         public virtual IList<StateChange> StateHistory { get; set; }
 
+        public virtual IList<Comment> Comments { get; set; }
+
         public string FinalApprovalBlob { get; set; }
 
         public string FinalApprovalFileName { get; set; }
