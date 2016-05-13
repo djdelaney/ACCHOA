@@ -97,6 +97,17 @@
         }
     }
 
+    @if (Model.Submission.Comments != null && Model.Submission.Comments.Count > 0)
+    {
+        @: <h3>Internal Comments:</h3>
+        @foreach (var comment in Model.Submission.Comments)
+        {
+            @comment.User.FullName@:, @comment.Created.ToString("g") <br />
+            @comment.Comments<br />
+            <br />
+        }
+    }
+
 
     <h3>Action:</h3>
     @if (Model.Submission.Status == Status.Submitted && (User.IsInRole(RoleNames.CommunityManager)))

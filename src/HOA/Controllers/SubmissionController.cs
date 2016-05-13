@@ -91,6 +91,22 @@ namespace HOA.Controllers
             _applicationDbContext.Histories.Add(history);
         }
 
+        public void AddInternalComment(Submission s, ApplicationUser user, string text)
+        {
+            if (s.Comments == null)
+                s.Comments = new List<Comment>();
+
+            var comment = new Comment
+            {
+                User = user,
+                Created = DateTime.Now,
+                Comments = text,
+                Submission = s
+            };
+            s.Comments.Add(comment);
+            _applicationDbContext.Comments.Add(comment);
+        }
+
         [HttpGet]
         [Authorize(Roles = "CommunityManager")]
         public IActionResult FinalResponse(int id)
@@ -141,12 +157,12 @@ namespace HOA.Controllers
                 }
 
                 //Any final comments?
-                if (!string.IsNullOrEmpty(model.Comments))
+                if (!string.IsNullOrEmpty(model.UserFeedback))
                 {
                     var response = new Response
                     {
                         Created = DateTime.Now,
-                        Comments = model.Comments,
+                        Comments = model.UserFeedback,
                         Submission = submission
                     };
                     if (submission.Responses == null)
@@ -155,7 +171,10 @@ namespace HOA.Controllers
                     _applicationDbContext.Responses.Add(response);
                 }
 
-                AddHistoryEntry(submission, user.FullName, "Sent final response: " + model.Comments);
+                AddHistoryEntry(submission, user.FullName, "Sent final response");
+
+                if(!string.IsNullOrEmpty(model.Comments))
+                    AddInternalComment(submission, user, model.Comments);
 
                 _applicationDbContext.SaveChanges();
 
@@ -263,16 +282,19 @@ namespace HOA.Controllers
             return View(viewModel);
         }
 
-        public ActionResult View(int? id)
+        public ActionResult View(int id)
         {
             var submission = _applicationDbContext.Submissions.Include(s => s.Reviews)
                 .ThenInclude(r => r.Reviewer)
                 .Include(s => s.Audits)
                 .Include(s => s.Files)
+                .Include(s => s.Comments)
+                .ThenInclude(c => c.User)
                 .FirstOrDefault(s => s.Id == id);
             if(submission == null)
                 return HttpNotFound("Submission not found");
 
+            submission.Comments = submission.Comments.OrderByDescending(c => c.Created).ToList();
             submission.Audits = submission.Audits.OrderByDescending(a => a.DateTime).ToList();
             
             var model = new ViewSubmissionViewModel()
@@ -579,10 +601,11 @@ namespace HOA.Controllers
                 submission.StatusChangeTime = DateTime.Now;
 
                 var user = await _userManager.FindByIdAsync(User.GetUserId());
-                if (string.IsNullOrEmpty(model.Comments))
-                    model.Comments = "None";
-                string action = string.Format("Marked {0}. Comments: {1}", model.Approve ? "complete" : "missing information", model.Comments);
+                string action = string.Format("Marked {0}", model.Approve ? "complete" : "missing information");
                 AddHistoryEntry(submission, user.FullName, action);
+
+                if (!string.IsNullOrEmpty(model.Comments))
+                    AddInternalComment(submission, user, model.Comments);
 
                 submission.LastModified = DateTime.Now;
                 _applicationDbContext.SaveChanges();
@@ -726,10 +749,11 @@ namespace HOA.Controllers
                 submission.StatusChangeTime = DateTime.Now;
 
                 var user = await _userManager.FindByIdAsync(User.GetUserId());
-                if (string.IsNullOrEmpty(model.Comments))
-                    model.Comments = "None";
-                string action = string.Format("Tally votes: {0}. Comments: {1}", model.Status, model.Comments);
+                string action = string.Format("Tally votes: {0}", model.Status);
                 AddHistoryEntry(submission, user.FullName, action);
+
+                if (!string.IsNullOrEmpty(model.Comments))
+                    AddInternalComment(submission, user, model.Comments);
 
                 submission.LastModified = DateTime.Now;
                 _applicationDbContext.SaveChanges();
@@ -772,9 +796,9 @@ namespace HOA.Controllers
                     return HttpNotFound("Submission not found");
 
                 var user = await _userManager.FindByIdAsync(User.GetUserId());
-                if (string.IsNullOrEmpty(model.Comments))
-                    model.Comments = "None";
-                string action = string.Format("{0}. Comments: {1}", model.Status, model.Comments);
+                if (!string.IsNullOrEmpty(model.Comments))
+                    AddInternalComment(submission, user, model.Comments);
+                string action = string.Format("Final Check {0}", model.Status);
                 AddHistoryEntry(submission, user.FullName, action);
 
                 var status = (Status)Enum.Parse(typeof(Status), model.Status);
@@ -1177,12 +1201,12 @@ namespace HOA.Controllers
                 }
 
                 //Any final comments?
-                if (!string.IsNullOrEmpty(model.Comments))
+                if (!string.IsNullOrEmpty(model.UserFeedback))
                 {
                     var response = new Response
                     {
                         Created = DateTime.Now,
-                        Comments = model.Comments,
+                        Comments = model.UserFeedback,
                         Submission = submission
                     };
                     if (submission.Responses == null)
@@ -1191,7 +1215,10 @@ namespace HOA.Controllers
                     _applicationDbContext.Responses.Add(response);
                 }
 
-                AddHistoryEntry(submission, user.FullName, "Sent final response: " + model.Comments);
+                AddHistoryEntry(submission, user.FullName, "Sent final response");
+
+                if (!string.IsNullOrEmpty(model.Comments))
+                    AddInternalComment(submission, user, model.Comments);
 
                 _applicationDbContext.SaveChanges();
 
