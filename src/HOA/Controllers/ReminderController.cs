@@ -19,8 +19,9 @@ namespace HOA.Controllers
     {
         private static readonly TimeSpan ReminderTime_Submitted = new TimeSpan(3, 0, 0, 0); //3 days
         private static readonly TimeSpan ReminderTime_ARBIncoming = new TimeSpan(3, 0, 0, 0); //3 days
-        private static readonly TimeSpan ReminderTime_Review = new TimeSpan(3, 0, 0, 0); //5 days
+        private static readonly TimeSpan ReminderTime_Review = new TimeSpan(3, 0, 0, 0); //3 days
         private static readonly TimeSpan ReminderTime_ARBPost = new TimeSpan(3, 0, 0, 0); //3 days
+        private static readonly TimeSpan ReminderTime_PrepApproval = new TimeSpan(3, 0, 0, 0); //3 days
         private static readonly TimeSpan ReminderTime_Final = new TimeSpan(3, 0, 0, 0); //3 days
 
         private static readonly TimeSpan Quorum_Final = new TimeSpan(5, 0, 0, 0); //5 days
@@ -68,6 +69,12 @@ namespace HOA.Controllers
                     case Status.ReviewComplete:
                         timeAllowance = ReminderTime_Final;
                         break;
+                    case Status.PrepApproval:
+                    case Status.PrepConditionalApproval:
+                        timeAllowance = ReminderTime_PrepApproval;
+                        break;
+                    default:
+                        continue;
                 }
 
                 if(DateTime.Now > submission.StatusChangeTime.Add(timeAllowance))
