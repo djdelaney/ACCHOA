@@ -62,7 +62,7 @@
         @if (@Model.Audits != null && @Model.Audits.Count > 0)
         {
             <p>
-            Last update: @Model.Audits[@Model.Audits.Count - 1].DateTime.ToString("MM/dd/yyyy hh:mm tt")
+            Last update: @HOA.Util.DateHtmlHelper.ConvertToLocalDate(Model.Audits[@Model.Audits.Count - 1].DateTime, "MM/dd/yyyy hh:mm tt")
             </p>
         }
 
@@ -144,7 +144,7 @@
             <h4>Feedback</h4>
             @foreach (var response in Model.Responses)
             {
-                @response.Created.ToString("MM/dd/yyyy") <br />
+                @HOA.Util.DateHtmlHelper.ConvertToLocalDate(response.Created, "MM/dd/yyyy") <br />
                 @response.Comments<br />
                 <br />
             }

@@ -21,7 +21,9 @@
             {
                 <tr>
                     <td>@submission.Code</td>
-                    <td>@submission.SubmissionDate.ToString("MM/dd/yyyy")</td>
+                    <td>
+                    @HOA.Util.DateHtmlHelper.ConvertToLocalDate(submission.SubmissionDate, "MM/dd/yyyy")
+                    </td>
                     <td>@submission.FirstName</td>
                     <td>@submission.LastName</td>
                     <td>
@@ -84,7 +86,9 @@
                         }
 
                     </td>
-                    <td>@submission.LastModified.ToString("g")</td>
+                    <td>
+                        @HOA.Util.DateHtmlHelper.ConvertToLocalDate(submission.LastModified, "g")
+                    </td>
                     <td>@submission.ElapsedTime.ToString("%d") day(s)</td>
                     <td><a href="/Submission/View/@submission.Id">View</a></td>
                 </tr>

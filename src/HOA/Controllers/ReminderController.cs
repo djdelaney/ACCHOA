@@ -39,7 +39,7 @@ namespace HOA.Controllers
             _applicationDbContext = applicationDbContext;
             _email = mail;
         }
-        
+
         [AllowAnonymous]
         public IActionResult Process()
         {
@@ -111,8 +111,8 @@ namespace HOA.Controllers
                 if (submission.Reviews.Count >= quorum && DateTime.Now > submission.StatusChangeTime.Add(Quorum_Final))
                 {
                     submission.Status = Status.ARBFinal;
-                    submission.LastModified = DateTime.Now;
-                    submission.StatusChangeTime = DateTime.Now;
+                    submission.LastModified = DateTime.UtcNow;
+                    submission.StatusChangeTime = DateTime.UtcNow;
 
 
                     if (submission.Audits == null)
@@ -121,14 +121,14 @@ namespace HOA.Controllers
                     var history = new History
                     {
                         User = "System",
-                        DateTime = DateTime.Now,
+                        DateTime = DateTime.UtcNow,
                         Action = "Quorum reached after delay, tallying votes.",
                         Submission = submission
                     };
                     submission.Audits.Add(history);
                     _applicationDbContext.Histories.Add(history);
                     _applicationDbContext.SaveChanges();
-                    
+
                     EmailHelper.NotifyStatusChanged(_applicationDbContext, submission, _email);
                 }
             }

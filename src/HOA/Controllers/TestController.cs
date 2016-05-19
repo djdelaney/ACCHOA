@@ -83,7 +83,7 @@ namespace HOA.Controllers
 
                 return RedirectToAction("List", "Submission");
             }
-            
+
             return View(model);
         }
 
@@ -163,7 +163,7 @@ namespace HOA.Controllers
                     var status = statuses[_rand.Next(statuses.Length)];
                     SetStatus(sub, status);
                     _applicationDbContext.SaveChanges();
-                }                
+                }
 
                 return RedirectToAction("List", "Submission");
             }
@@ -186,9 +186,9 @@ namespace HOA.Controllers
                 Email = string.Format("{0}@mailinator.com", name),
                 Description = string.Format("Build a {0}", objects[_rand.Next(objects.Length)]),
                 Status = Status.Submitted,
-                StatusChangeTime = DateTime.Now,
-                LastModified = DateTime.Now,
-                SubmissionDate = DateTime.Now.AddHours(-1),
+                StatusChangeTime = DateTime.UtcNow,
+                LastModified = DateTime.UtcNow,
+                SubmissionDate = DateTime.UtcNow.AddHours(-1),
                 Code = DBUtil.GenerateUniqueCode(_applicationDbContext),
                 Files = new List<File>(),
                 Audits = new List<History>(),
@@ -205,14 +205,14 @@ namespace HOA.Controllers
             sub.Files.Add(file);
             _applicationDbContext.Submissions.Add(sub);
             _applicationDbContext.Files.Add(file);
-            
+
 
             return sub;
         }
 
         private void SetStatus(Submission sub, Status status)
         {
-            
+
             AddHistoryEntry(sub, "Test user", string.Format("Moving to {0}", status));
 
             if (status == Status.ARBIncoming)
@@ -234,7 +234,7 @@ namespace HOA.Controllers
                 {
                     Reviewer = user,
                     Status = ReviewStatus.Approved,
-                    Created = DateTime.Now,
+                    Created = DateTime.UtcNow,
                     Comments = "BLAH",
                     Submission = sub,
                     SubmissionRevision = sub.Revision
@@ -280,7 +280,7 @@ namespace HOA.Controllers
                 sub.Status = Status.MissingInformation;
             }
 
-            sub.LastModified = DateTime.Now;
+            sub.LastModified = DateTime.UtcNow;
         }
 
         private void AddHistoryEntry(Submission s, string user, string action)
@@ -291,7 +291,7 @@ namespace HOA.Controllers
             var history = new History
             {
                 User = user,
-                DateTime = DateTime.Now,
+                DateTime = DateTime.UtcNow,
                 Action = action,
                 Submission = s
             };

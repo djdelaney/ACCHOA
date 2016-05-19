@@ -68,7 +68,7 @@
                 continue;
             }
 
-            @review.Reviewer.FullName@:, @review.Created.ToString("MM/dd/yyyy") <br />
+            @review.Reviewer.FullName@:, @HOA.Util.DateHtmlHelper.ConvertToLocalDate(review.Created, "MM/dd/yyyy") <br />
 
             @if (review.Status == ReviewStatus.Approved)
             {
@@ -102,7 +102,7 @@
         @: <h3>Internal Comments:</h3>
         @foreach (var comment in Model.Submission.Comments)
         {
-            @comment.User.FullName@:, @comment.Created.ToString("g") <br />
+            @comment.User.FullName@:, @HOA.Util.DateHtmlHelper.ConvertToLocalDate(comment.Created, "g") <br />
             @comment.Comments<br />
             <br />
         }
@@ -203,7 +203,7 @@
 
             <a href="#" class="list-group-item">
                 <h4 class="list-group-item-heading">@history.User</h4>
-                <p class="list-group-item-text">@history.DateTime.ToString("MM/dd/yyyy hh:mm tt").<br>
+                <p class="list-group-item-text">@HOA.Util.DateHtmlHelper.ConvertToLocalDate(history.DateTime, "MM/dd/yyyy hh:mm tt").<br>
                 @history.Action
                 </p>
             </a>
