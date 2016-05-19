@@ -90,7 +90,17 @@ namespace HOA.Model
         {
             get
             {
-                return DateTime.Now.Subtract(SubmissionDate);
+                //Only show current time for open items
+                if (Status != Status.Approved &&
+                    Status != Status.ConditionallyApproved &&
+                    Status != Status.MissingInformation &&
+                    Status != Status.Rejected &&
+                    Status != Status.Retracted)
+                {
+                    return DateTime.Now.Subtract(SubmissionDate);
+                }
+
+                return LastModified.Subtract(SubmissionDate);
             }
         }
     }

@@ -19,7 +19,7 @@ namespace HOA.Controllers
     {
         private static readonly TimeSpan ReminderTime_Submitted = new TimeSpan(3, 0, 0, 0); //3 days
         private static readonly TimeSpan ReminderTime_ARBIncoming = new TimeSpan(3, 0, 0, 0); //3 days
-        private static readonly TimeSpan ReminderTime_Review = new TimeSpan(5, 0, 0, 0); //5 days
+        private static readonly TimeSpan ReminderTime_Review = new TimeSpan(3, 0, 0, 0); //5 days
         private static readonly TimeSpan ReminderTime_ARBPost = new TimeSpan(3, 0, 0, 0); //3 days
         private static readonly TimeSpan ReminderTime_Final = new TimeSpan(3, 0, 0, 0); //3 days
 

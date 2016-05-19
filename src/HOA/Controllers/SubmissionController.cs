@@ -176,6 +176,7 @@ namespace HOA.Controllers
                 if(!string.IsNullOrEmpty(model.Comments))
                     AddInternalComment(submission, user, model.Comments);
 
+                submission.LastModified = DateTime.Now;
                 _applicationDbContext.SaveChanges();
 
                 System.IO.Stream attachment = null;
@@ -934,6 +935,7 @@ namespace HOA.Controllers
 
                 AddHistoryEntry(submission, submission.FirstName + " " + submission.LastName, "Resubmitted");
 
+                submission.LastModified = DateTime.Now;
                 _applicationDbContext.SaveChanges();
                 EmailHelper.NotifyStatusChanged(_applicationDbContext, submission, _email);
 
@@ -964,6 +966,7 @@ namespace HOA.Controllers
             submission.Status = Status.Retracted;
             AddHistoryEntry(submission, submission.FirstName + " " + submission.LastName, "Retracted");
 
+            submission.LastModified = DateTime.Now;
             _applicationDbContext.SaveChanges();
 
             EmailHelper.NotifyStatusChanged(_applicationDbContext, submission, _email);
@@ -988,6 +991,7 @@ namespace HOA.Controllers
 
             AddHistoryEntry(submission, user.FullName, "Marked as precedent setting");
             submission.PrecedentSetting = true;
+            submission.LastModified = DateTime.Now;
             _applicationDbContext.SaveChanges();
 
             EmailHelper.NotifyPrecedentSetting(_applicationDbContext, submission, _email);
@@ -1037,7 +1041,7 @@ namespace HOA.Controllers
                 submission.Description = model.Description;
 
                 AddHistoryEntry(submission, user.FullName, "Edited submission details");
-
+                submission.LastModified = DateTime.Now;
                 _applicationDbContext.SaveChanges();
 
                 return RedirectToAction(nameof(View), new { id = submission.Id });
@@ -1137,7 +1141,7 @@ namespace HOA.Controllers
                 submission.FinalApprovalBlob = await _storage.StoreFile(submission.Code, file.OpenReadStream());
 
                 AddHistoryEntry(submission, user.FullName, "Added response document");
-
+                submission.LastModified = DateTime.Now;
                 _applicationDbContext.SaveChanges();
 
                 System.IO.Stream attachment = await _storage.RetriveFile(submission.FinalApprovalBlob);
@@ -1220,6 +1224,7 @@ namespace HOA.Controllers
                 if (!string.IsNullOrEmpty(model.Comments))
                     AddInternalComment(submission, user, model.Comments);
 
+                submission.LastModified = DateTime.Now;
                 _applicationDbContext.SaveChanges();
 
                 System.IO.Stream attachment = null;
