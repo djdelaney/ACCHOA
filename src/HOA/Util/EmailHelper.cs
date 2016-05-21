@@ -211,6 +211,11 @@ Please reset your password by clicking here:<br>
             {
                 roleToNofity = RoleNames.HOALiaison;
             }
+            else if(submission.Status == Status.PrepApproval ||
+                submission.Status == Status.PrepConditionalApproval)
+            {
+                roleToNofity = RoleNames.CommunityManager;
+            }
             else
             {
                 throw new Exception("Unknown status");
