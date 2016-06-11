@@ -135,7 +135,11 @@ Please reset your password by clicking here:<br>
 
             var link = String.Format("{0}/Submission/View/{1}", BaseHost, submission.Id);
             var emailHtml = String.Format(m_availableEmail, link, submission.Status.ToString());
-            mail.SendEmailAsync(emails, string.Format("ARB: Available for processing {0}", submission.Code), emailHtml, null, null);
+
+            foreach (string email in emails)
+            {
+                mail.SendEmailAsync(new List<string>() { email }, string.Format("ARB: Available for processing {0}", submission.Code), emailHtml, null, null);
+            }
         }
 
         public static void NotifyNewUser(string email, string password, IEmailSender mail)
