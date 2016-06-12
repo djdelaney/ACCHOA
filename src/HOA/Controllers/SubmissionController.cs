@@ -271,7 +271,7 @@ namespace HOA.Controllers
             }
 
             var pager = new Pager(subs.Count(), page);
-            IList<Submission> results = subs.Include(s => s.Audits).OrderBy(s => s.LastModified).Skip((pager.CurrentPage - 1) * pager.PageSize).Take(pager.PageSize).ToList();
+            IList<Submission> results = subs.Include(s => s.Audits).OrderByDescending(s => s.LastModified).Skip((pager.CurrentPage - 1) * pager.PageSize).Take(pager.PageSize).ToList();
 
             var viewModel = new ViewSubmissionsViewModel()
             {
