@@ -50,7 +50,7 @@ namespace HOA.Controllers
                 .Include(s => s.Files)
                 .Include(s => s.Responses)
                 .Include(s => s.StateHistory)
-                .OrderByDescending(s => s.LastModified).ToList();
+                .OrderByDescending(s => s.SubmissionDate).ToList();
 
             foreach(var sub in subs)
             {
@@ -88,6 +88,7 @@ namespace HOA.Controllers
                         };
                         result.Comments.Add(comment);
                     }
+                    result.Comments = result.Comments.OrderBy(c => c.Created).ToList();
                 }
 
                 //reviews
@@ -106,6 +107,7 @@ namespace HOA.Controllers
                         };
                         result.Reviews.Add(review);
                     }
+                    result.Reviews = result.Reviews.OrderBy(r => r.Created).ToList();
                 }
 
                 //Audit/history
@@ -123,6 +125,7 @@ namespace HOA.Controllers
                         };
                         result.Audits.Add(audit);
                     }
+                    result.Audits = result.Audits.OrderBy(a => a.DateTime).ToList();
                 }
 
                 //Responses
@@ -138,6 +141,7 @@ namespace HOA.Controllers
                         };
                         result.Responses.Add(response);
                     }
+                    result.Responses = result.Responses.OrderBy(r => r.Created).ToList();
                 }
 
                 //Files
@@ -169,6 +173,7 @@ namespace HOA.Controllers
                         };
                         result.StateHistory.Add(history);
                     }
+                    result.StateHistory = result.StateHistory.OrderBy(s => s.StartTime).ToList();
                 }
 
                 results.Add(result);
@@ -177,12 +182,60 @@ namespace HOA.Controllers
             return results;
         }
 
+        private List<UserV1> GetUserBackup()
+        {
+            List<UserV1> result = new List<UserV1>();
+            var users = _applicationDbContext.Users.Include(u => u.Roles).ToList();
+            var identityUsers = _userManager.Users.ToList();
+
+            foreach (var user in users)
+            {
+                List<string> roles = new List<string>();
+
+                foreach (var role in user.Roles)
+                {
+                    var roleName = _roleManager.FindByIdAsync(role.RoleId).Result.Name;
+
+                    if (roleName.Equals(RoleNames.Administrator))
+                        roleName = "Administrator";
+                    else if (roleName.Equals(RoleNames.CommunityManager))
+                        roleName = "Community Manager";
+                    else if (roleName.Equals(RoleNames.BoardChairman))
+                        roleName = "Board Chairman";
+                    else if (roleName.Equals(RoleNames.ARBBoardMember))
+                        roleName = "ARB Board Member";
+                    else if (roleName.Equals(RoleNames.HOALiaison))
+                        roleName = "HOA Liaison";
+
+                    roles.Add(roleName);
+                }
+
+                var u = new UserV1
+                {
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    Enabled = user.Enabled,
+                    DisableNotification = user.DisableNotification,                    
+                    Roles = roles,                    
+                    Email = identityUsers.FirstOrDefault(iu => iu.Id == user.Id).Email
+                };
+
+                result.Add(u);
+            }
+
+            return result;
+        }
+
         // GET: /<controller>/
         public IActionResult Index()
         {
-            var settings = new Newtonsoft.Json.JsonSerializerSettings();
+            DataSetV1 data = new DataSetV1();
+            data.Submissions = GetBackupData();
+            data.Users = GetUserBackup();
+
+            var settings = new JsonSerializerSettings();
             settings.Formatting = Formatting.Indented;
-            return Json(GetBackupData(), settings);
+            return Json(data, settings);
         }
     }
 }
