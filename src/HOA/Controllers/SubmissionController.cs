@@ -297,6 +297,7 @@ namespace HOA.Controllers
 
             submission.Comments = submission.Comments.OrderByDescending(c => c.Created).ToList();
             submission.Audits = submission.Audits.OrderByDescending(a => a.DateTime).ToList();
+            submission.Reviews = submission.Reviews.OrderByDescending(r => r.Created).ToList();
 
             var model = new ViewSubmissionViewModel()
             {
