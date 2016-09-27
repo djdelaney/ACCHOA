@@ -1,0 +1,70 @@
+﻿@using HOA.Model
+@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewBag.Title = "Submissions";
+    ViewBag.Section = "Submissions";
+}
+
+@Html.ActionLink("Search", "Search")
+
+<p>
+    <div class="btn-group" role="group" aria-label="...">
+        <a class="btn btn btn-default @(Model.Filter == "Todo" ? "active" : "")" href="/Submission/List/?filter=Todo" role="button">ToDo</a>
+        
+        @if(!User.IsInRole(RoleNames.ARBBoardMember))
+        { 
+        <a class="btn btn btn-default @(Model.Filter == "Recent" ? "active" : "")" href="/Submission/List/?filter=Recent" role="button">Recent</a>
+        <a class="btn btn btn-default @(Model.Filter == "All" ? "active" : "")" href="/Submission/List/?filter=All" role="button">All</a>
+        }
+        
+        <a class="btn btn btn-default @(Model.Filter == "Open" ? "active" : "")" href="/Submission/List/?filter=Open" role="button">Open</a>
+        <a class="btn btn btn-default @(Model.Filter == "Approved" ? "active" : "")" href="/Submission/List/?filter=Approved" role="button">Approved</a>
+        <a class="btn btn btn-default @(Model.Filter == "Rejected" ? "active" : "")" href="/Submission/List/?filter=Rejected" role="button">Rejected</a>
+    </div>
+</p>
+
+<div class="panel panel-default">
+
+    <!-- Default panel contents -->
+    <div class="panel-heading">Submissions</div>
+
+    @Html.Partial("_SubmissionTable", (IList <Submission>)Model.Submissions)
+
+</div>
+
+    <!-- pager -->
+    @if (Model.Pager.EndPage > 1)
+    {
+        <ul class="pagination">
+            @if (Model.Pager.CurrentPage > 1)
+                {
+                <li>
+                    <a href="/Submission/List/?filter=@(Model.Filter)">First</a>
+                </li>
+                    <li>
+                        <a href="/Submission/List/?filter=@(Model.Filter)&page=@(Model.Pager.CurrentPage - 1)">Previous</a>
+                    </li>
+            }
+
+            @for (var page = Model.Pager.StartPage; page <= Model.Pager.EndPage; page++)
+                {
+                <li class="@(page == Model.Pager.CurrentPage ? "active" : "")">
+                    <a href="/Submission/List/?filter=@(Model.Filter)&page=@page">@page</a>
+                </li>
+            }
+
+            @if (Model.Pager.CurrentPage < Model.Pager.TotalPages)
+                {
+                <li>
+                    <a href="/Submission/List/?filter=@(Model.Filter)&page=@(Model.Pager.CurrentPage + 1)">Next</a>
+                </li>
+                    <li>
+                        <a href="/Submission/List/?filter=@(Model.Filter)&page=@(Model.Pager.TotalPages)">Last</a>
+                    </li>
+            }
+        </ul>
+    }
+
+

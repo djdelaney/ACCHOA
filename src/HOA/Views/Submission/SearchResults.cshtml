@@ -1,0 +1,17 @@
+﻿@using HOA.Model
+@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewBag.Title = "Search Results";
+    ViewBag.Section = "Submissions";
+}
+
+<div class="panel panel-default">
+
+    <!-- Default panel contents -->
+    <div class="panel-heading">Results</div>
+
+    @Html.Partial("_SubmissionTable", (IList<Submission>)Model.Submissions)
+
+</div>

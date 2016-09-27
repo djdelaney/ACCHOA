@@ -1,0 +1,31 @@
+﻿@model HOA.Model.ViewModel.CreateRandomViewModel
+
+@{
+    ViewBag.Title = "Create Random";
+    ViewBag.Section = "TestData";
+}
+
+
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    @if (!Html.ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger" role="alert">
+            <strong>Oh snap!</strong> Please fix the listed errors and try submitting again.
+
+            @Html.ValidationSummary()
+        </div>
+    }
+
+    @Html.LabelFor(model => model.Count)@: <br />
+    @Html.TextBoxFor(model => model.Count, new { @class = "form-control" })<br />
+    <br />
+    <br />
+
+
+    <input type="submit" value="Submit" class="btn btn-primary" />
+
+}

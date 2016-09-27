@@ -1,0 +1,27 @@
+﻿@model HOA.Model.ViewModel.DeleteUserViewModel
+
+@{
+    ViewBag.Title = "Delete User";
+    ViewBag.Section = "Account";
+}
+
+
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    @Html.HiddenFor(model => model.UserId)
+
+    @if (!Html.ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger" role="alert">
+            <strong>Oh snap!</strong> Please fix the listed errors and try submitting again.
+
+            @Html.ValidationSummary()
+        </div>
+    }
+
+    <input type="submit" value="DELETE User" class="btn btn-danger" onclick="if (!confirm('Are you sure?')) return false;" />
+
+}

@@ -1,0 +1,50 @@
+﻿@inject Microsoft.ApplicationInsights.Extensibility.TelemetryConfiguration TelemetryConfiguration
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+
+    <link rel="shortcut icon" type="image/png" href="/assets/favicon.ico" />
+    
+
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+
+    @Html.ApplicationInsightsJavaScript(TelemetryConfiguration)
+
+    
+
+    <style>
+        body {
+            /*min-height: 1080px;*/
+            padding-top: 70px;
+        }
+    </style>
+
+
+    @RenderSection("HeaderExtras", required: false)
+
+</head>
+<body>
+    @await Html.PartialAsync("_Navbar")
+
+
+    <div class="container">
+        @RenderBody()
+
+    </div> <!-- /container -->
+
+        @RenderSection("scripts", required: false)
+</body>
+</html>
+
+
