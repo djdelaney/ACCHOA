@@ -53,7 +53,7 @@ namespace HOA.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = RoleNames.Administrator)]
-        public async Task<IActionResult> Import(ImportViewModel model)
+        public IActionResult Import(ImportViewModel model)
         {
             if (ModelState.IsValid)
             {
