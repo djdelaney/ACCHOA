@@ -25,6 +25,7 @@
                 @if (User.IsInRole(RoleNames.Administrator))
                 {
                     <li @if (ViewBag.Section == "TestData") { @Html.Raw("class=\"active\"")   }><a href="/Test/">Test Data</a></li>
+                    <li @if (ViewBag.Section == "Backup") { @Html.Raw("class=\"active\"")    }><a href="/Backup/">Backup</a></li>
                 }
             </ul>
 

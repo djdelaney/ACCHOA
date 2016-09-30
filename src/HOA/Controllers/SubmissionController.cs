@@ -457,8 +457,28 @@ namespace HOA.Controllers
             if (file == null)
                 return NotFound("File not found");
 
+            System.Net.Mime.ContentDisposition cd = new System.Net.Mime.ContentDisposition
+            {
+                FileName = file.Name,
+                Inline = true  // false = prompt the user for downloading;  true = browser to try to show the file inline
+            };
+            Response.Headers.Add("Content-Disposition", cd.ToString());
+            Response.Headers.Add("X-Content-Type-Options", "nosniff");
+
+            //Supported types: ".pdf", ".jpg", ".jpeg", ".gif", ".png"
+            string extension = System.IO.Path.GetExtension(file.Name);
+            string contentType = "application/octet";
+            if (extension.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase))
+                contentType = "application/pdf";
+            if (extension.EndsWith(".png", StringComparison.OrdinalIgnoreCase))
+                contentType = "image/png";
+            if (extension.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase) || extension.EndsWith(".jpeg", StringComparison.OrdinalIgnoreCase))
+                contentType = "image/jpeg";
+            if (extension.EndsWith(".gif", StringComparison.OrdinalIgnoreCase))
+                contentType = "image/gif";
+            
             var stream = await _storage.RetriveFile(file.BlobName);
-            return File(stream, "application/octet", file.Name);
+            return File(stream, contentType);
         }
 
         public async Task<ActionResult> ResponseFile(int id)

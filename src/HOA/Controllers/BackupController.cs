@@ -11,6 +11,8 @@ using Microsoft.EntityFrameworkCore;
 using HOA.Model.Backup.V1;
 using Newtonsoft.Json;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using System.Text;
 
 // For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -33,6 +35,52 @@ namespace HOA.Controllers
             _email = emailSender;
             _roleManager = roleManager;
             _storage = store;
+        }
+
+        public IActionResult Index()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        [Authorize(Roles = RoleNames.Administrator)]
+        public IActionResult Import()
+        {
+            ImportViewModel model = new ImportViewModel();
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = RoleNames.Administrator)]
+        public async Task<IActionResult> Import(ImportViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                if (model.File == null)
+                {
+                    ModelState.AddModelError(string.Empty, "File required.");
+                    return View(model);
+                }
+
+                if(!model.File.FileName.EndsWith(".json"))
+                {
+                    ModelState.AddModelError(string.Empty, "Invalid backup file.");
+                    return View(model);
+                }
+
+                System.IO.Stream stream = model.File.OpenReadStream();
+                byte[] bytes = new byte[stream.Length];
+                stream.Position = 0;
+                stream.Read(bytes, 0, (int)stream.Length);
+                string data = Encoding.UTF8.GetString(bytes); // this is your string
+
+                ImportData(data);
+
+                return RedirectToAction("List", "Submission");
+            }
+            
+            return View(model);
         }
 
         private List<SubmissionV1> GetBackupData()
@@ -237,18 +285,24 @@ namespace HOA.Controllers
 
             var settings = new JsonSerializerSettings();
             settings.Formatting = Formatting.Indented;
-            return Json(data, settings);
+            string json = JsonConvert.SerializeObject(data, settings);
+
+            byte[] bytes = Encoding.UTF8.GetBytes(json);
+
+            string filename = DateTime.Now.ToString("M-d-yyyy H:mm") + ".json";
+
+            return File(bytes, "application/json", filename);
         }
 
-        public async Task<IActionResult> Import()
+        private async void ImportData(string json)
         {
-            string json = System.IO.File.ReadAllText(@"C:\Users\Dan\Desktop\Backup 9-25-2016.json");
-            DataSetV1 data = JsonConvert.DeserializeObject<DataSetV1>(json);
+            List<ApplicationUser> identityUsers = _userManager.Users.ToList();
 
+            DataSetV1 data = JsonConvert.DeserializeObject<DataSetV1>(json);
             //Import users
-            foreach (var imported in data.Users)
+            foreach (UserV1 imported in data.Users)
             {
-                var user = await _userManager.FindByEmailAsync(imported.Email);
+                var user = identityUsers.FirstOrDefault(u => u.Email.Equals(imported.Email));
                 if (user == null)
                 {
                     user = new ApplicationUser { UserName = imported.Email, Email = imported.Email, FirstName = imported.FirstName, LastName = imported.LastName, Enabled = imported.Enabled };
@@ -290,7 +344,7 @@ namespace HOA.Controllers
                     }
                 }
             }
-            var identityUsers = _userManager.Users.ToList();
+            identityUsers = _userManager.Users.ToList();
 
             //Now import submissions
             foreach (SubmissionV1 oldSub in data.Submissions)
@@ -299,7 +353,6 @@ namespace HOA.Controllers
             }
                         
             _applicationDbContext.SaveChanges();
-            return Content("good");
         }
 
         private void ImportSubmission(SubmissionV1 oldSub, List<ApplicationUser> identityUsers)
@@ -424,5 +477,10 @@ namespace HOA.Controllers
 
             _applicationDbContext.Submissions.Add(sub);
         }
+    }
+
+    public class ImportViewModel
+    {
+        public IFormFile File { get; set; }
     }
 }
