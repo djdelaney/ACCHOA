@@ -16,6 +16,10 @@
 <br />
 <br />
 <br />
+<canvas id="stageChart"></canvas>
+<br />
+<br />
+<br />
 <canvas id="pieChart"></canvas>
 <br />
 <br />
@@ -29,6 +33,7 @@ Rejections: @Model.ElapsedTime.Rejected day(s)<br />
 <br />
 <br />
 <h3>Other stats</h3>
+Total submissions: @Model.TotalSubmissions<br/>
 <br />
 <br />
 <br />
@@ -91,12 +96,29 @@ Rejections: @Model.ElapsedTime.Rejected day(s)<br />
                         text: 'Final Statuses'
                     }
                 },
-                
+
             };
 
 
 
+    var STAGES = ["Initial Check", "ARB Check", "Review", "Tally Votes", "HOA Check", "Final Approval"];
+    var stageDays = [
+        @Html.Raw(Model.DaysByCategory.CheckCompleteness),
+        @Html.Raw(Model.DaysByCategory.ARBCheck),
+        @Html.Raw(Model.DaysByCategory.UnderReview),
+        @Html.Raw(Model.DaysByCategory.TallyVotes),
+        @Html.Raw(Model.DaysByCategory.HOALiason),
+        @Html.Raw(Model.DaysByCategory.PrepApproval)
+    ];
 
+
+    var stagesChartData = {
+        labels: STAGES,
+        datasets: [{
+            backgroundColor: "#DBF2F2",
+            data: stageDays
+        }]
+    };
 
 
 
@@ -125,6 +147,33 @@ Rejections: @Model.ElapsedTime.Rejected day(s)<br />
                     }
             }
             });
+
+
+            var ctxStages = document.getElementById("stageChart").getContext("2d");
+            window.stagesBar = new Chart(ctxStages, {
+                type: 'bar',
+                data: stagesChartData,
+                options: {
+                    // Elements options apply to all of the options unless overridden in a dataset
+                    // In this case, we are setting the border of each bar to be 2px wide and green
+                    elements: {
+                        rectangle: {
+                            borderWidth: 2,
+                            borderColor: '#4BC0C0',
+                            borderSkipped: 'bottom'
+                        }
+                    },
+                    responsive: true,
+                    legend: {
+                        display: false,
+                    },
+                    title: {
+                        display: true,
+                        text: 'Time by stage (days)'
+                    }
+                }
+            });
+            
 
 
             var ctxPie = document.getElementById("pieChart").getContext("2d");

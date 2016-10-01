@@ -38,7 +38,8 @@ namespace HOA.Controllers
                 ByMonth = GetSubmissionsByMonth(),
                 ResponseCounts = GetResponseCounts(),
                 ElapsedTime = GetTurnaroundTime(),
-                TotalSubmissions = _applicationDbContext.Submissions.Count()
+                TotalSubmissions = _applicationDbContext.Submissions.Count(),
+                DaysByCategory = TimeByStage()
             };
 
             //Average open time 
@@ -157,6 +158,66 @@ namespace HOA.Controllers
 
             return results;
         }
+
+        private DaysByCategory TimeByStage()
+        {
+            Dictionary<Status, Tuple<TimeSpan, int>> times = new Dictionary<Status, Tuple<TimeSpan, int>>
+            {
+                {Status.Submitted, new Tuple<TimeSpan, int>(TimeSpan.Zero, 0) },
+                {Status.ARBIncoming, new Tuple<TimeSpan, int>(TimeSpan.Zero, 0) },
+                {Status.UnderReview, new Tuple<TimeSpan, int>(TimeSpan.Zero, 0) },
+                {Status.ARBFinal, new Tuple<TimeSpan, int>(TimeSpan.Zero, 0) },
+                {Status.ReviewComplete, new Tuple<TimeSpan, int>(TimeSpan.Zero, 0) },
+                {Status.PrepApproval, new Tuple<TimeSpan, int>(TimeSpan.Zero, 0) },                
+            };
+            var states = _applicationDbContext.StateChanges.Where(s => s.EndTime != DateTime.MinValue).ToList();
+            
+            foreach (var change in states)
+            {
+                if (change.State == Status.PrepConditionalApproval)
+                {
+                    change.State = Status.PrepApproval;
+                }
+                TimeSpan elapsed = change.EndTime.Subtract(change.StartTime);
+
+                if(!times.Keys.Any(k => k == change.State))
+                {
+                    continue;
+                }
+
+                Tuple<TimeSpan, int> time = times[change.State];
+
+                times[change.State] = new Tuple<TimeSpan, int>(time.Item1.Add(elapsed), time.Item2 + 1);
+            }
+
+
+            DaysByCategory results = new DaysByCategory();
+
+            foreach (var status in times.Keys)
+            {
+                var tuple = times[status];
+                if (tuple.Item2 == 0)
+                    continue;
+
+                TimeSpan total = new TimeSpan(tuple.Item1.Ticks / tuple.Item2);
+
+                if (status == Status.Submitted)
+                    results.CheckCompleteness = total.Days;
+                if (status == Status.ARBIncoming)
+                    results.ARBCheck = total.Days;
+                if (status == Status.UnderReview)
+                    results.UnderReview = total.Days;
+                if (status == Status.ARBFinal)
+                    results.TallyVotes = total.Days;
+                if (status == Status.ReviewComplete)
+                    results.HOALiason = total.Days;
+                if (status == Status.PrepApproval)
+                    results.PrepApproval = total.Days;
+            }
+
+
+            return results;
+        }
     }
 
     public class StatsModel
@@ -165,6 +226,7 @@ namespace HOA.Controllers
         public ResponseCount ResponseCounts { get; set; }
         public ResponseDays ElapsedTime { get; set; }        
         public int TotalSubmissions { get; set; }
+        public DaysByCategory DaysByCategory { get; set; }
     }
 
     public class ResponseCount
@@ -180,6 +242,16 @@ namespace HOA.Controllers
         public int Rejected { get; set; }
         public int Approved { get; set; }
         public int MissingInformation { get; set; }
+    }
+
+    public class DaysByCategory
+    {
+        public int CheckCompleteness { get; set; }
+        public int ARBCheck { get; set; }
+        public int UnderReview { get; set; }
+        public int TallyVotes { get; set; }
+        public int HOALiason { get; set; }
+        public int PrepApproval { get; set; }
     }
 
 }
