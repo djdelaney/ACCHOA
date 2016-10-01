@@ -20,7 +20,8 @@
                 @if (User.Identity.IsAuthenticated)
                 {
                     <li @if (ViewBag.Section == "Submissions") { @Html.Raw("class=\"active\"") }><a href="/Submission/List">Submissions</a></li>
-                    
+                    <li @if (ViewBag.Section == "Stats") { @Html.Raw("class=\"active\"")  }><a href="/Stats">Stats</a></li>
+
                 }
                 @if (User.IsInRole(RoleNames.Administrator))
                 {

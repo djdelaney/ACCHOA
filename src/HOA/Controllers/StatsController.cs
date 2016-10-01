@@ -23,10 +23,53 @@ namespace HOA.Controllers
     [Authorize]
     public class StatsController : Controller
     {
+        private readonly ApplicationDbContext _applicationDbContext;
+
+        public StatsController(ApplicationDbContext applicationDbContext)
+        {
+            _applicationDbContext = applicationDbContext;
+        }
+
         // GET: /<controller>/
         public IActionResult Index()
         {
-            return View();
+            List<Tuple<string, int>> submissionsByMonth = new List<Tuple<string, int>>();
+
+            DateTime minTime = DateTime.Now.AddYears(-1);
+            List<DateTime> dates = _applicationDbContext.Submissions.Where(s=> s.SubmissionDate > minTime).Select(s => s.SubmissionDate).ToList();
+
+            var grouppedResult = dates.GroupBy(x => x.Month).OrderBy(x => x.Key);
+
+            DateTime curMonth = DateTime.Now.AddMonths(-11);
+            for(int x=0; x<12; x++)
+            {
+                int month = curMonth.Month;
+
+                System.Globalization.DateTimeFormatInfo mfi = new System.Globalization.DateTimeFormatInfo();
+                string monthName = mfi.GetMonthName(month);
+                int monthCount = 0;
+                var data = grouppedResult.FirstOrDefault(g => g.Key == month);
+                if(data != null)
+                {
+                    monthCount = data.Count();
+                }
+                
+                curMonth = curMonth.AddMonths(1);
+
+                submissionsByMonth.Add(new Tuple<string, int>(monthName, monthCount));
+            }
+
+            StatsModel model = new StatsModel
+            {
+                ByMonth = submissionsByMonth
+            };
+
+            return View(model);
         }
+    }
+
+    public class StatsModel
+    {
+        public List<Tuple<string, int>> ByMonth { get; set; }
     }
 }
