@@ -33,15 +33,34 @@ namespace HOA.Controllers
         // GET: /<controller>/
         public IActionResult Index()
         {
+            StatsModel model = new StatsModel
+            {
+                ByMonth = GetSubmissionsByMonth(),
+                ResponseCounts = GetResponseCounts(),
+                ElapsedTime = GetTurnaroundTime(),
+                TotalSubmissions = _applicationDbContext.Submissions.Count()
+            };
+
+            //Average open time 
+
+            //pie chart of responses
+
+            return View(model);
+        }
+
+        
+
+        private List<Tuple<string, int>> GetSubmissionsByMonth()
+        {
             List<Tuple<string, int>> submissionsByMonth = new List<Tuple<string, int>>();
 
             DateTime minTime = DateTime.Now.AddYears(-1);
-            List<DateTime> dates = _applicationDbContext.Submissions.Where(s=> s.SubmissionDate > minTime).Select(s => s.SubmissionDate).ToList();
+            List<DateTime> dates = _applicationDbContext.Submissions.Where(s => s.SubmissionDate > minTime).Select(s => s.SubmissionDate).ToList();
 
             var grouppedResult = dates.GroupBy(x => x.Month).OrderBy(x => x.Key);
 
             DateTime curMonth = DateTime.Now.AddMonths(-11);
-            for(int x=0; x<12; x++)
+            for (int x = 0; x < 12; x++)
             {
                 int month = curMonth.Month;
 
@@ -49,27 +68,118 @@ namespace HOA.Controllers
                 string monthName = mfi.GetMonthName(month);
                 int monthCount = 0;
                 var data = grouppedResult.FirstOrDefault(g => g.Key == month);
-                if(data != null)
+                if (data != null)
                 {
                     monthCount = data.Count();
                 }
-                
+
                 curMonth = curMonth.AddMonths(1);
 
                 submissionsByMonth.Add(new Tuple<string, int>(monthName, monthCount));
             }
 
-            StatsModel model = new StatsModel
-            {
-                ByMonth = submissionsByMonth
-            };
+            return submissionsByMonth;
+        }
 
-            return View(model);
+        private ResponseCount GetResponseCounts()
+        {
+            ResponseCount results = new ResponseCount();
+            List<Submission> submissions = _applicationDbContext.Submissions
+                                                                .Where(s => s.Status == Status.Approved ||
+                                                                s.Status == Status.ConditionallyApproved ||
+                                                                s.Status == Status.Rejected ||
+                                                                s.Status == Status.MissingInformation).ToList();
+            var grouppedResult = submissions.GroupBy(x => x.Status);
+
+            foreach(var g in grouppedResult)
+            {
+                if (g.Key == Status.Approved)
+                    results.Approved = g.Count();
+                else if (g.Key == Status.ConditionallyApproved)
+                    results.ConditionallyApproved = g.Count();
+                else if (g.Key == Status.Rejected)
+                    results.Rejected = g.Count();
+                else if (g.Key == Status.MissingInformation)
+                    results.MissingInformation = g.Count();
+            }
+
+            return results;
+        }
+
+        private ResponseDays GetTurnaroundTime()
+        {
+            Dictionary<Status, Tuple<TimeSpan, int>> times = new Dictionary<Status, Tuple<TimeSpan, int>>
+            {
+                {Status.Approved, new Tuple<TimeSpan, int>(TimeSpan.Zero, 0) },
+                {Status.Rejected, new Tuple<TimeSpan, int>(TimeSpan.Zero, 0) },
+                {Status.MissingInformation, new Tuple<TimeSpan, int>(TimeSpan.Zero, 0) },
+            };
+            List<Submission> submissions = _applicationDbContext.Submissions
+                                                                .Where(s => s.Status == Status.Approved ||
+                                                                s.Status == Status.ConditionallyApproved ||
+                                                                s.Status == Status.Rejected ||
+                                                                s.Status == Status.MissingInformation).ToList();
+
+            foreach (var sub in submissions)
+            {
+                if (sub.Status == Status.ConditionallyApproved)
+                {
+                    sub.Status = Status.Approved;
+                }
+                TimeSpan elapsed = sub.LastModified.Subtract(sub.SubmissionDate);
+
+                Tuple<TimeSpan, int> time = times[sub.Status];
+
+                times[sub.Status] = new Tuple<TimeSpan, int>(time.Item1.Add(elapsed), time.Item2 + 1);
+
+                
+            }
+
+
+            ResponseDays results = new ResponseDays();
+
+            foreach(var status in times.Keys)
+            {
+                var tuple = times[status];
+                if (tuple.Item2 == 0)
+                    continue;
+
+                TimeSpan total = new TimeSpan(tuple.Item1.Ticks / tuple.Item2);
+
+                if (status == Status.Approved)
+                    results.Approved = total.Days;
+                if (status == Status.Rejected)
+                    results.Rejected = total.Days;
+                if (status == Status.MissingInformation)
+                    results.MissingInformation = total.Days;
+            }
+
+
+            return results;
         }
     }
 
     public class StatsModel
     {
         public List<Tuple<string, int>> ByMonth { get; set; }
+        public ResponseCount ResponseCounts { get; set; }
+        public ResponseDays ElapsedTime { get; set; }        
+        public int TotalSubmissions { get; set; }
     }
+
+    public class ResponseCount
+    {
+        public int Rejected { get; set; }
+        public int Approved { get; set; }
+        public int ConditionallyApproved { get; set; }
+        public int MissingInformation { get; set; }
+    }
+
+    public class ResponseDays
+    {
+        public int Rejected { get; set; }
+        public int Approved { get; set; }
+        public int MissingInformation { get; set; }
+    }
+
 }

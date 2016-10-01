@@ -12,9 +12,26 @@
 
 
 
-<canvas id="canvas"></canvas>
+<canvas id="monthChart"></canvas>
+<br />
+<br />
+<br />
+<canvas id="pieChart"></canvas>
+<br />
+<br />
+<br />
+<h3>Average response time</h3>
 
-
+Approvals: @Model.ElapsedTime.Approved day(s)<br />
+Missing Information: @Model.ElapsedTime.MissingInformation day(s)<br />
+Rejections: @Model.ElapsedTime.Rejected day(s)<br />
+<br />
+<br />
+<br />
+<h3>Other stats</h3>
+<br />
+<br />
+<br />
 <script>
             var MONTHS = [
             @foreach (Tuple<string, int> dat in Model.ByMonth)
@@ -37,9 +54,54 @@
             backgroundColor: "#DBF2F2",
                 data: VALUES
             }]
-        };
+            };
+
+
+
+
+            var config = {
+                type: 'pie',
+                data: {
+                    datasets: [
+                    {
+                        data: [
+                            @Html.Raw(Model.ResponseCounts.Rejected),
+                            @Html.Raw(Model.ResponseCounts.Approved),
+                            @Html.Raw(Model.ResponseCounts.ConditionallyApproved),
+                            @Html.Raw(Model.ResponseCounts.MissingInformation)
+                        ],
+                        backgroundColor: [
+                            "#F7464A",
+                            "#46BFBD",
+                            "#FDB45C",
+                            "#949FB1",
+                        ],
+                    }],
+                    labels: [
+                        "Rejected",
+                        "Approved",
+                        "Conditionally Approved",
+                        "Missing Information"
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    title: {
+                        display: true,
+                        text: 'Final Statuses'
+                    }
+                },
+                
+            };
+
+
+
+
+
+
+
         window.onload = function() {
-            var ctx = document.getElementById("canvas").getContext("2d");
+            var ctx = document.getElementById("monthChart").getContext("2d");
             window.myBar = new Chart(ctx, {
                 type: 'bar',
                 data: barChartData,
@@ -54,14 +116,21 @@
                         }
                 },
                     responsive: true,
-                    legend: {
-                display: false,
+                legend: {
+                    display: false,
                     },
-                    title: {
-                display: true,
-                        text: 'Submissions by month'
+                title: {
+                    display: true,
+                    text: 'Submissions by month'
                     }
             }
-        });
+            });
+
+
+            var ctxPie = document.getElementById("pieChart").getContext("2d");
+            window.myPie = new Chart(ctxPie, config);
+
+
+
         };
 </script>
