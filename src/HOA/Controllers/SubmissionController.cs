@@ -1192,6 +1192,9 @@ namespace HOA.Controllers
                 if (!string.IsNullOrEmpty(model.Name))
                     subs = subs.Where(s => string.Format("{0} {1}", s.FirstName, s.LastName).IndexOf(model.Name, StringComparison.OrdinalIgnoreCase) >= 0);
 
+                if (!string.IsNullOrEmpty(model.Description))
+                    subs = subs.Where(s => s.Description.IndexOf(model.Description, StringComparison.OrdinalIgnoreCase) >= 0);
+
                 var resultModel = new SearchResultsViewModel()
                 {
                     Submissions = subs.Take(20).Include(s => s.Audits).OrderBy(s => s.LastModified).ToList()

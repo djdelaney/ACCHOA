@@ -6,8 +6,7 @@
             <tr>
                 <th>Code</th>
                 <th>Submitted</th>
-                <th>First Name</th>
-                <th>Last Name</th>
+                <th>Address</th>
                 <th>Status</th>
                 <th>Last Modified</th>
                 <th>Time Open</th>
@@ -24,8 +23,7 @@
                     <td>
                     @HOA.Util.DateHtmlHelper.ConvertToLocalDate(submission.SubmissionDate, "MM/dd/yyyy")
                     </td>
-                    <td>@submission.FirstName</td>
-                    <td>@submission.LastName</td>
+                    <td>@submission.Address</td>
                     <td>
 
                         @if (submission.Status == Status.Submitted)

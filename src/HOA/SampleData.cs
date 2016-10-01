@@ -82,10 +82,18 @@ namespace HOA
                 return;
             
             
-            /*user = await _userManager.FindByEmailAsync("josh.rozzi@fsresidential.com");
+            user = await _userManager.FindByEmailAsync("josh.rozzi@fsresidential.com");
             if (user == null)
             {
                 user = new ApplicationUser { UserName = "josh.rozzi@fsresidential.com", Email = "josh.rozzi@fsresidential.com", FirstName = "Josh", LastName = "Rozzi", Enabled = true };
+                await _userManager.CreateAsync(user, "Password");
+                await _userManager.AddToRoleAsync(user, RoleNames.CommunityManager);
+            }
+
+            user = await _userManager.FindByEmailAsync("laura.stover@fsresidential.com");
+            if (user == null)
+            {
+                user = new ApplicationUser { UserName = "laura.stover@fsresidential.com", Email = "laura.stover@fsresidential.com", FirstName = "Laura", LastName = "Stover", Enabled = true };
                 await _userManager.CreateAsync(user, "Password");
                 await _userManager.AddToRoleAsync(user, RoleNames.CommunityManager);
             }
@@ -106,13 +114,37 @@ namespace HOA
                 await _userManager.AddToRoleAsync(user, RoleNames.ARBBoardMember);
             }
 
+            user = await _userManager.FindByEmailAsync("deanaclymer@verizon.net");
+            if (user == null)
+            {
+                user = new ApplicationUser { UserName = "deanaclymer@verizon.net", Email = "deanaclymer@verizon.net", FirstName = "Deana", LastName = "Clymer", Enabled = true };
+                await _userManager.CreateAsync(user, "Password");
+                await _userManager.AddToRoleAsync(user, RoleNames.ARBBoardMember);
+            }
+
+            user = await _userManager.FindByEmailAsync("sergio.carrillo@alumni.duke.edu");
+            if (user == null)
+            {
+                user = new ApplicationUser { UserName = "sergio.carrillo@alumni.duke.edu", Email = "sergio.carrillo@alumni.duke.edu", FirstName = "Sergio", LastName = "Carrillo", Enabled = true };
+                await _userManager.CreateAsync(user, "Password");
+                await _userManager.AddToRoleAsync(user, RoleNames.ARBBoardMember);
+            }
+
+            user = await _userManager.FindByEmailAsync("gsz@aol.com");
+            if (user == null)
+            {
+                user = new ApplicationUser { UserName = "gsz@aol.com", Email = "gsz@aol.com", FirstName = "Gordon", LastName = "Zeigler", Enabled = true };
+                await _userManager.CreateAsync(user, "Password");
+                await _userManager.AddToRoleAsync(user, RoleNames.ARBBoardMember);
+            }
+
             user = await _userManager.FindByEmailAsync("kkrama06@gmail.com");
             if (user == null)
             {
                 user = new ApplicationUser { UserName = "kkrama06@gmail.com", Email = "kkrama06@gmail.com", FirstName = "Keith", LastName = "Rama", Enabled = true };
                 await _userManager.CreateAsync(user, "Password");
                 await _userManager.AddToRoleAsync(user, RoleNames.HOALiaison);
-            }*/         
+            }     
         }
     }
 }

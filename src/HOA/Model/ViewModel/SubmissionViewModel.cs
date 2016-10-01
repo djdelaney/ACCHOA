@@ -237,11 +237,14 @@ namespace HOA.Model.ViewModel
 
         public string Code { get; set; }
 
+        public string Description { get; set; }
+
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             if(string.IsNullOrEmpty(Name) &&
                 string.IsNullOrEmpty(Address) &&
-                string.IsNullOrEmpty(Code))
+                string.IsNullOrEmpty(Code) &&
+                string.IsNullOrEmpty(Description))
             {
                 yield return new ValidationResult("You must enter search terms");
             }

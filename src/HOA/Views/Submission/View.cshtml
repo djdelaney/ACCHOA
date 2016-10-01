@@ -61,6 +61,9 @@
     @if (Model.Submission.Reviews != null && Model.Submission.Reviews.Count > 0)
     {
         @: <h3>Reviews:</h3>
+
+        
+
         @foreach (var review in Model.Submission.Reviews)
         {
             if (review.SubmissionRevision != Model.Submission.Revision)
@@ -95,6 +98,51 @@
 
             <br />
         }
+
+        bool oldReviewsShown = false;
+        @foreach (var review in Model.Submission.Reviews)
+        {
+            if (review.SubmissionRevision == Model.Submission.Revision)
+            {
+                continue;
+            }
+
+            if (!oldReviewsShown)
+            {
+                oldReviewsShown = true;
+                @: <h3>Old Reviews</h3>
+            }
+
+            @review.Reviewer.FullName@:, @HOA.Util.DateHtmlHelper.ConvertToLocalDate(review.Created, "MM/dd/yyyy") <br />
+
+
+            @if (review.Status == ReviewStatus.Approved)
+            {
+                @: Approved
+            }
+            else if (review.Status == ReviewStatus.Rejected)
+            {
+                @: Rejected
+            }
+            else if (review.Status == ReviewStatus.ConditionallyApproved)
+            {
+                @: Conditionally Approved
+            }
+            else if (review.Status == ReviewStatus.MissingInformation)
+            {
+                @: Missing Information
+            }
+            else if (review.Status == ReviewStatus.Abstain)
+            {
+                @: Abstain
+            }
+            <br />
+            @review.Comments<br />
+
+            <br />
+        }
+
+    
     }
 
     @if (Model.Submission.Comments != null && Model.Submission.Comments.Count > 0)

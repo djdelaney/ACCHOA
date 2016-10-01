@@ -42,6 +42,14 @@ namespace HOA.Controllers
             return View();
         }
 
+        [Authorize(Roles = RoleNames.Administrator)]
+        public IActionResult ImportLocal()
+        {
+            string json = System.IO.File.ReadAllText(@"C:\Users\Daniel\Downloads\10-1-2016 0-21.json");
+            ImportData(json);
+            return Content("asdas");
+        }
+
         [HttpGet]
         [Authorize(Roles = RoleNames.Administrator)]
         public IActionResult Import()
