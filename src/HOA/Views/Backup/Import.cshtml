@@ -1,0 +1,36 @@
+﻿@using HOA.Controllers
+@model ImportViewModel
+@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewBag.Title = "Import Backup";
+    ViewBag.Section = "Backup";
+}
+
+<h3>Import Backup File</h3>
+
+@using (Html.BeginForm("Import", "Backup", FormMethod.Post, new { @class = "form-horizontal", enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+
+    @if (!Html.ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger" role="alert">
+            <strong>Oh snap!</strong> Please fix the listed errors and try submitting again.
+
+            @Html.ValidationSummary()
+        </div>
+    }
+    
+
+    @:Backup data:<br />
+    <input type="file" name="File" id="File" /> <br />
+
+    <br />
+    <br />
+
+
+    <input type="submit" value="Import" class="btn btn-primary" />
+
+}
