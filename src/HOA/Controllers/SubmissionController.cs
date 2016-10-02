@@ -256,6 +256,11 @@ namespace HOA.Controllers
                 else if (User.IsInRole(RoleNames.ARBBoardMember))
                 {
                     subs = subs.Where(s => s.Status == Status.UnderReview);
+
+                    //Filter to ones that the current user hasnt reviewed
+                    var user = _userManager.GetUserAsync(HttpContext.User).Result;
+                    subs = subs.Where(s => !s.Reviews.Any(r => r.Reviewer.Id == user.Id));
+
                 }
                 else if (User.IsInRole(RoleNames.HOALiaison))
                 {
