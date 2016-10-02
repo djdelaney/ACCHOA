@@ -12,15 +12,15 @@
 
 
 
-<canvas id="monthChart"></canvas>
+<canvas id="monthChart" height="100"></canvas>
 <br />
 <br />
 <br />
-<canvas id="stageChart"></canvas>
+<canvas id="stageChart" height="100"></canvas>
 <br />
 <br />
 <br />
-<canvas id="pieChart"></canvas>
+<canvas id="pieChart" height="100"></canvas>
 <br />
 <br />
 <br />
@@ -115,7 +115,7 @@ Total submissions: @Model.TotalSubmissions<br/>
     var stagesChartData = {
         labels: STAGES,
         datasets: [{
-            backgroundColor: "#DBF2F2",
+            backgroundColor: "#FFB1C2",
             data: stageDays
         }]
     };
@@ -128,6 +128,15 @@ Total submissions: @Model.TotalSubmissions<br/>
                 type: 'bar',
                 data: barChartData,
                 options: {
+                    
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }]
+                    },
+
             // Elements options apply to all of the options unless overridden in a dataset
             // In this case, we are setting the border of each bar to be 2px wide and green
             elements: {
@@ -159,7 +168,7 @@ Total submissions: @Model.TotalSubmissions<br/>
                     elements: {
                         rectangle: {
                             borderWidth: 2,
-                            borderColor: '#4BC0C0',
+                            borderColor: '#FF6384',
                             borderSkipped: 'bottom'
                         }
                     },
@@ -170,6 +179,13 @@ Total submissions: @Model.TotalSubmissions<br/>
                     title: {
                         display: true,
                         text: 'Time by stage (days)'
+                    },
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }]
                     }
                 }
             });

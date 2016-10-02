@@ -131,9 +131,7 @@ namespace HOA.Controllers
 
                 Tuple<TimeSpan, int> time = times[sub.Status];
 
-                times[sub.Status] = new Tuple<TimeSpan, int>(time.Item1.Add(elapsed), time.Item2 + 1);
-
-                
+                times[sub.Status] = new Tuple<TimeSpan, int>(time.Item1.Add(elapsed), time.Item2 + 1);                
             }
 
 
@@ -146,15 +144,15 @@ namespace HOA.Controllers
                     continue;
 
                 TimeSpan total = new TimeSpan(tuple.Item1.Ticks / tuple.Item2);
+                float d = (float)Math.Round(total.TotalHours / 24f, 1);
 
                 if (status == Status.Approved)
-                    results.Approved = total.Days;
+                    results.Approved = d;
                 if (status == Status.Rejected)
-                    results.Rejected = total.Days;
+                    results.Rejected = d;
                 if (status == Status.MissingInformation)
-                    results.MissingInformation = total.Days;
+                    results.MissingInformation = d;
             }
-
 
             return results;
         }
@@ -200,23 +198,40 @@ namespace HOA.Controllers
                     continue;
 
                 TimeSpan total = new TimeSpan(tuple.Item1.Ticks / tuple.Item2);
+                float d = (float)Math.Round(total.TotalHours / 24f, 1);
 
                 if (status == Status.Submitted)
-                    results.CheckCompleteness = total.Days;
+                    results.CheckCompleteness = d;
                 if (status == Status.ARBIncoming)
-                    results.ARBCheck = total.Days;
+                    results.ARBCheck = d;
                 if (status == Status.UnderReview)
-                    results.UnderReview = total.Days;
+                    results.UnderReview = d;
                 if (status == Status.ARBFinal)
-                    results.TallyVotes = total.Days;
+                    results.TallyVotes = d;
                 if (status == Status.ReviewComplete)
-                    results.HOALiason = total.Days;
+                    results.HOALiason = d;
                 if (status == Status.PrepApproval)
-                    results.PrepApproval = total.Days;
+                    results.PrepApproval = d;
             }
 
 
             return results;
+        }
+
+        public static int GetTurnaroundTime(ApplicationDbContext db)
+        {
+            List<Submission> subs = db.Submissions.Where(s => s.Status == Status.Approved).OrderByDescending(s => s.LastModified).Take(5).ToList();
+            if (subs.Count == 0)
+                return 0;
+
+            TimeSpan total = TimeSpan.Zero;
+
+            foreach (Submission s in subs)
+            {
+                total = total.Add(s.ElapsedTime);
+            }
+
+            return (int)Math.Round(new TimeSpan(total.Ticks / subs.Count).TotalHours / 24f);
         }
     }
 
@@ -239,19 +254,19 @@ namespace HOA.Controllers
 
     public class ResponseDays
     {
-        public int Rejected { get; set; }
-        public int Approved { get; set; }
-        public int MissingInformation { get; set; }
+        public float Rejected { get; set; }
+        public float Approved { get; set; }
+        public float MissingInformation { get; set; }
     }
 
     public class DaysByCategory
     {
-        public int CheckCompleteness { get; set; }
-        public int ARBCheck { get; set; }
-        public int UnderReview { get; set; }
-        public int TallyVotes { get; set; }
-        public int HOALiason { get; set; }
-        public int PrepApproval { get; set; }
+        public float CheckCompleteness { get; set; }
+        public float ARBCheck { get; set; }
+        public float UnderReview { get; set; }
+        public float TallyVotes { get; set; }
+        public float HOALiason { get; set; }
+        public float PrepApproval { get; set; }
     }
 
 }

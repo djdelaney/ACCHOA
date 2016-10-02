@@ -23,7 +23,11 @@ namespace HOA.Controllers
 
         public IActionResult Index()
         {
-            return View();
+            HomeIndexModel model = new HomeIndexModel
+            {
+                fiveDayTurnaround = StatsController.GetTurnaroundTime(_applicationDbContext)
+            };
+            return View(model);
         }
 
         public IActionResult Forms()
@@ -37,5 +41,10 @@ namespace HOA.Controllers
             var error = feature?.Error;
             return View(error);
         }
+    }
+
+    public class HomeIndexModel
+    {
+        public int fiveDayTurnaround { get; set; }
     }
 }
