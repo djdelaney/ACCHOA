@@ -64,7 +64,7 @@ Please reset your password by clicking here:<br>
         {
             link = String.Format("{0}{1}", BaseHost, link);
             string emailHtml = String.Format(m_ResetPasswordEmail, link);
-            mail.SendEmailAsync(new List<string> { email }, "ARB: Forgot Password", emailHtml, null, null);
+            mail.SendEmailAsync(email, "ARB: Forgot Password", emailHtml, null, null);
         }
 
         public static void NotifyFinalResponse(ApplicationDbContext context, Submission submission, string comments, IEmailSender mail, Stream file, string attachmentName)
@@ -73,14 +73,14 @@ Please reset your password by clicking here:<br>
             string status = GetStatusText(submission.Status);
             var link = String.Format("{0}/Submission/ViewStatus/{1}", BaseHost, submission.Code);
             string emailHtml = String.Format(m_homeownerFinalEmail, submission.FirstName, submission.LastName, comments, link);
-            mail.SendEmailAsync(new List<string> { submission.Email }, subject, emailHtml, file, attachmentName);
+            mail.SendEmailAsync(submission.Email, subject, emailHtml, file, attachmentName);
         }
 
         public static void NotifyPrecedentSetting(ApplicationDbContext context, Submission submission, IEmailSender mail)
         {
             var link = String.Format("{0}/Submission/ViewStatus/{1}", BaseHost, submission.Code);
             string emailHtml = String.Format(m_PrecedentSettingEmail, submission.FirstName, submission.LastName, link);
-            mail.SendEmailAsync(new List<string> { submission.Email }, string.Format("ARB: New submission {0}", submission.Code), emailHtml, null, null);
+            mail.SendEmailAsync(submission.Email, string.Format("ARB: New submission {0}", submission.Code), emailHtml, null, null);
         }
 
         public static void NotifyStatusChanged(ApplicationDbContext context, Submission submission, IEmailSender mail, Stream file = null, string attachmentName = null)
@@ -138,7 +138,7 @@ Please reset your password by clicking here:<br>
 
             foreach (string email in emails)
             {
-                mail.SendEmailAsync(new List<string>() { email }, string.Format("ARB: Available for processing {0}", submission.Code), emailHtml, null, null);
+                mail.SendEmailAsync(email, string.Format("ARB: Available for processing {0}", submission.Code), emailHtml, null, null);
             }
         }
 
@@ -146,7 +146,7 @@ Please reset your password by clicking here:<br>
         {
             var link = String.Format("{0}/Account/Login/?returnUrl=/Account/ChangePassword/", BaseHost);
             string emailHtml = string.Format(m_newAccount, email, password, link);
-            mail.SendEmailAsync(new List<string> { email }, "ACC ARB: New Account", emailHtml, null, null);
+            mail.SendEmailAsync(email, "ACC ARB: New Account", emailHtml, null, null);
         }
 
         private static List<String> GetRoleMembers(ApplicationDbContext context, string roleName)
@@ -162,7 +162,7 @@ Please reset your password by clicking here:<br>
             string status = GetStatusText(submission.Status);
             var link = String.Format("{0}/Submission/ViewStatus/{1}", BaseHost, submission.Code);
             string emailHtml = String.Format(m_homeownerEmail, submission.FirstName, submission.LastName, status, submission.Code, link);
-            mail.SendEmailAsync(new List<string> { submission.Email }, string.Format("ARB: New submission {0}", submission.Code), emailHtml, file, attachmentName);
+            mail.SendEmailAsync(submission.Email, string.Format("ARB: New submission {0}", submission.Code), emailHtml, file, attachmentName);
         }
 
         private static string GetStatusText(Status s)
@@ -254,7 +254,7 @@ Please reset your password by clicking here:<br>
             }
                                    
             var emailHtml = String.Format(m_overdueEmail, body);
-            mail.SendEmailAsync(new List<string> { email }, "ARB: Overdue submission", emailHtml, null, null);
+            mail.SendEmailAsync(email, "ARB: Overdue submission", emailHtml, null, null);
         }
     }
 }

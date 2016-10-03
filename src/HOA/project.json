@@ -24,7 +24,7 @@
     "Microsoft.Extensions.Logging.Debug": "1.0.0",
     "Microsoft.Extensions.Options.ConfigurationExtensions": "1.0.0",
     "Microsoft.VisualStudio.Web.BrowserLink.Loader": "14.0.0",
-    "Sendgrid": "6.3.4",
+    "Sendgrid": "8.0.5",
     "WindowsAzure.Storage": "7.2.1"
   },
 

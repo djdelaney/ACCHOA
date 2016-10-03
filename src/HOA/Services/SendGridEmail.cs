@@ -1,44 +1,56 @@
-﻿using System;
+﻿using SendGrid.Helpers.Mail;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Net.Mail;
-using SendGrid;
 using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace HOA.Services
 {
     public class SendGridEmail : IEmailSender
     {
-        public static string ApiUser;
-        public static string ApiPass;
+        public static string ApiKey;
         public static string EmailSource;
 
-        public Task SendEmailAsync(List<string> recipients, string subject, string message, Stream attachment, string attachmentName)
+        public Task SendEmailAsync(string recipient, string subject, string message, Stream attachmentStream, string attachmentName)
         {
-            // Create the email object first, then add the properties.
-            var myMessage = new SendGridMessage();
+            dynamic sg = new SendGrid.SendGridAPIClient(ApiKey, "https://api.sendgrid.com");
 
-            // Add the message properties.
-            myMessage.From = new MailAddress(EmailSource, "Applecross ARB");
+            Email from = new Email(EmailSource);
+            Email to = new Email(recipient);
+            Content content = new Content("text/html", message);
+            Mail mail = new Mail(from, subject, to, content);
             
-            myMessage.AddTo(recipients);
+            if (attachmentStream != null && !string.IsNullOrEmpty(attachmentName))
+            {
+                byte[] bytes = ReadFully(attachmentStream);
+                Attachment attachment = new Attachment();
+                attachment.Content = Convert.ToBase64String(bytes);
+                attachment.Type = "application/pdf";
+                attachment.Filename = attachmentName;
+                attachment.Disposition = "attachment";
+                mail.AddAttachment(attachment);
+            }
 
-            myMessage.Subject = subject;
+            return Task.Run(async () =>
+            {
+                dynamic response = await sg.client.mail.send.post(requestBody: mail.Get());
+            });
+        }
 
-            //Add the HTML and Text bodies
-            myMessage.Html = message;
-            //myMessage.Text = "Hello World plain text!";
-
-            if (attachment != null && !string.IsNullOrEmpty(attachmentName))
-                myMessage.AddAttachment(attachment, attachmentName);
-
-            var credentials = new System.Net.NetworkCredential(ApiUser, ApiPass);
-            
-            var transportWeb = new Web(credentials);
-            
-            // Send the email.
-            return transportWeb.DeliverAsync(myMessage);
+        private static byte[] ReadFully(Stream input)
+        {
+            byte[] buffer = new byte[16 * 1024];
+            using (MemoryStream ms = new MemoryStream())
+            {
+                int read;
+                while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
+                {
+                    ms.Write(buffer, 0, read);
+                }
+                return ms.ToArray();
+            }
         }
     }
 }
