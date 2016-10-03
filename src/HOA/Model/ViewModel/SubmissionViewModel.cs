@@ -227,6 +227,8 @@ namespace HOA.Model.ViewModel
         [Required]
         [MaxLength(256)]
         public string Description { get; set; }
+
+        public IList<IFormFile> Files { get; set; }
     }
 
     public class SearchViewModel : IValidatableObject

@@ -1150,6 +1150,31 @@ namespace HOA.Controllers
                 if (submission == null)
                     return NotFound("Submission not found");
 
+                List<IFormFile> files = new List<IFormFile>();
+                if(model.Files != null && model.Files.Count > 0)
+                {
+                    foreach(var fileContent in model.Files)
+                    {
+                        var fileName = FormUtils.GetUploadedFilename(fileContent);
+                        if (!FormUtils.IsValidFileType(fileName))
+                        {
+                            ModelState.AddModelError(string.Empty, "Invalid file type.");
+                            return View(model);
+                        }
+                        
+                        var blobId = await _storage.StoreFile(submission.Code, fileContent.OpenReadStream());
+                        var file = new File
+                        {
+                            Name = fileName,
+                            BlobName = blobId
+                        };
+
+                        submission.Files.Add(file);
+                        _applicationDbContext.Files.Add(file);
+                    }
+                }
+
+
                 var user = await _userManager.GetUserAsync(HttpContext.User);
 
                 submission.Address = model.Address;
