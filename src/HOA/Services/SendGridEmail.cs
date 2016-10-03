@@ -17,7 +17,7 @@ namespace HOA.Services
         {
             dynamic sg = new SendGrid.SendGridAPIClient(ApiKey, "https://api.sendgrid.com");
 
-            Email from = new Email(EmailSource);
+            Email from = new Email(EmailSource, "Applecross ARB");
             Email to = new Email(recipient);
             Content content = new Content("text/html", message);
             Mail mail = new Mail(from, subject, to, content);
