@@ -700,11 +700,25 @@ namespace HOA.Controllers
         }
 
         [HttpGet]
-        public IActionResult Review(int id)
+        public async Task<IActionResult> Review(int id)
         {
-            var submission = _applicationDbContext.Submissions.FirstOrDefault(s => s.Id == id);
+            var submission = _applicationDbContext.Submissions.Include(s => s.Reviews)
+                    .Include(s => s.Audits)
+                    .Include(s => s.Responses)
+                    .Include(s => s.Files)
+                    .Include(s => s.StateHistory)
+                    .Include(s => s.Comments)
+                    .Include(s => s.Reviews)
+                    .ThenInclude(r => r.Reviewer)
+                    .FirstOrDefault(s => s.Id == id);
             if (submission == null)
                 return NotFound("Submission not found");
+
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            if (submission.Reviews != null && submission.Reviews.Any(r => r.Reviewer.Id == user.Id))
+            {
+                return RedirectToAction(nameof(View), new { id = submission.Id });
+            }
 
             ReviewSubmissionViewModel model = new ReviewSubmissionViewModel
             {
@@ -728,11 +742,16 @@ namespace HOA.Controllers
                     .Include(s => s.Files)
                     .Include(s => s.StateHistory)
                     .Include(s => s.Comments)
+                    .Include(s => s.Reviews)
                     .FirstOrDefault(s => s.Id == model.SubmissionId);
                 if (submission == null)
                     return NotFound("Submission not found");
 
                 var user = await _userManager.GetUserAsync(HttpContext.User);
+                if (submission.Reviews != null && submission.Reviews.Any(r => r.Reviewer.Id == user.Id))
+                {
+                    throw new Exception("Already reviewed!");
+                }
 
                 var review = new Review
                 {

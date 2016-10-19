@@ -141,10 +141,18 @@ namespace HOA
             user = await _userManager.FindByEmailAsync("kkrama06@gmail.com");
             if (user == null)
             {
-                user = new ApplicationUser { UserName = "kkrama06@gmail.com", Email = "kkrama06@gmail.com", FirstName = "Keith", LastName = "Rama", Enabled = true };
+                user = new ApplicationUser { UserName = "kkrama06@gmail.com", Email = "kkrama06@gmail.com", FirstName = "Keith", LastName = "Rama", Enabled = false };
                 await _userManager.CreateAsync(user, "Password");
                 await _userManager.AddToRoleAsync(user, RoleNames.HOALiaison);
-            }     
+            }
+
+            user = await _userManager.FindByEmailAsync("mellomba0526@gmail.com");
+            if (user == null)
+            {
+                user = new ApplicationUser { UserName = "mellomba0526@gmail.com", Email = "mellomba0526@gmail.com", FirstName = "Melissa", LastName = "Parada", Enabled = true };
+                await _userManager.CreateAsync(user, "Password");
+                await _userManager.AddToRoleAsync(user, RoleNames.HOALiaison);
+            }
         }
     }
 }
