@@ -743,6 +743,7 @@ namespace HOA.Controllers
                     .Include(s => s.StateHistory)
                     .Include(s => s.Comments)
                     .Include(s => s.Reviews)
+                    .ThenInclude(r => r.Reviewer)
                     .FirstOrDefault(s => s.Id == model.SubmissionId);
                 if (submission == null)
                     return NotFound("Submission not found");
