@@ -259,7 +259,7 @@ namespace HOA.Controllers
 
                     //Filter to ones that the current user hasnt reviewed
                     var user = _userManager.GetUserAsync(HttpContext.User).Result;
-                    subs = subs.Where(s => !s.Reviews.Any(r => r.Reviewer.Id == user.Id));
+                    subs = subs.Where(s => !s.Reviews.Any(r => r.Reviewer.Id == user.Id && r.SubmissionRevision == s.Revision));
 
                 }
                 else if (User.IsInRole(RoleNames.HOALiaison))
@@ -715,7 +715,7 @@ namespace HOA.Controllers
                 return NotFound("Submission not found");
 
             var user = await _userManager.GetUserAsync(HttpContext.User);
-            if (submission.Reviews != null && submission.Reviews.Any(r => r.Reviewer.Id == user.Id))
+            if (submission.Reviews != null && submission.Reviews.Any(r => r.Reviewer.Id == user.Id && r.SubmissionRevision == submission.Revision))
             {
                 return RedirectToAction(nameof(View), new { id = submission.Id });
             }
@@ -749,7 +749,7 @@ namespace HOA.Controllers
                     return NotFound("Submission not found");
 
                 var user = await _userManager.GetUserAsync(HttpContext.User);
-                if (submission.Reviews != null && submission.Reviews.Any(r => r.Reviewer.Id == user.Id))
+                if (submission.Reviews != null && submission.Reviews.Any(r => r.Reviewer.Id == user.Id && r.SubmissionRevision == submission.Revision))
                 {
                     throw new Exception("Already reviewed!");
                 }
