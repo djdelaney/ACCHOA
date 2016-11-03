@@ -230,7 +230,7 @@ Please reset your password by clicking here:<br>
                 var role = context.Roles.Include(r => r.Users).FirstOrDefault(r => r.Name.Equals(RoleNames.ARBBoardMember));
                 List<string> userIds = role.Users.Select(u => u.UserId).ToList();
                 var board = context.Users.Where(u => userIds.Contains(u.Id) && u.Enabled && !u.DisableNotification).Select(u => u.Id).ToList();
-                var alreadyReviewed = context.Reviews.Where(r => r.Submission.Id == submission.Id).Select(r => r.Reviewer.Id).ToList();
+                var alreadyReviewed = context.Reviews.Where(r => r.Submission.Id == submission.Id && r.SubmissionRevision == submission.Revision).Select(r => r.Reviewer.Id).ToList();
                 var toReview = board.Except(alreadyReviewed);
                 emails = context.Users.Where(u => toReview.Contains(u.Id) && u.Enabled && !u.DisableNotification).Select(u => u.Email).ToList();
             }
