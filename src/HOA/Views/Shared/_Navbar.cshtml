@@ -33,7 +33,7 @@
             @if (User.Identity.IsAuthenticated)
             {
                 <form action="/Account/LogOff" method="post" id="logoutForm">
-                    <p class="navbar-text navbar-right"><a href="/Account/">Hello @User.Identity.Name!</a></p>
+                    <p class="navbar-text navbar-right"><a href="/Account/">Hello @await Component.InvokeAsync("Profile", User)</a></p>
                     <ul class="nav navbar-nav navbar-right">
 
                         @Html.AntiForgeryToken()
