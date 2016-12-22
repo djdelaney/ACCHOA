@@ -1030,7 +1030,9 @@ namespace HOA.Controllers
                 submission.StatusChangeTime = DateTime.UtcNow;
 
                 //Add new comments
-                submission.Description = string.Format("{0}\n\nResubmitted {1}:\n\n{2}", submission.Description, DateTime.UtcNow.ToString("MM/dd/yyyy hh:mm tt"), model.Description);
+                submission.Description = string.Format("Resubmitted {0}:\n\n{1}\n\n{2}", model.Description, DateTime.UtcNow.ToString("MM/dd/yyyy hh:mm tt"), submission.Description);
+                if (submission.Description.Length > 255)
+                    submission.Description = submission.Description.Substring(0, 255); //todo, expand this field
 
                 //any new files
                 if (model.Files != null)
