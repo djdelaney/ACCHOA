@@ -1031,8 +1031,8 @@ namespace HOA.Controllers
 
                 //Add new comments
                 submission.Description = string.Format("Resubmitted {0}:\n\n{1}\n\n{2}", model.Description, DateTime.UtcNow.ToString("MM/dd/yyyy hh:mm tt"), submission.Description);
-                if (submission.Description.Length > 255)
-                    submission.Description = submission.Description.Substring(0, 255); //todo, expand this field
+                if (submission.Description.Length > 2047)
+                    submission.Description = submission.Description.Substring(0, 2047); //todo, expand this field
 
                 //any new files
                 if (model.Files != null)

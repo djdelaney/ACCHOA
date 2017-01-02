@@ -13,7 +13,7 @@ namespace HOA.Model
         {
         }
 
-        protected ApplicationDbContext()
+        public ApplicationDbContext()
         {
         }
 

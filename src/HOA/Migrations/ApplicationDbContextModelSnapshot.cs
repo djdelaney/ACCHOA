@@ -13,12 +13,13 @@ namespace HOA.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
             modelBuilder
-                .HasAnnotation("ProductVersion", "1.0.1")
+                .HasAnnotation("ProductVersion", "1.1.0-rtm-22752")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("HOA.Model.ApplicationUser", b =>
                 {
-                    b.Property<string>("Id");
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd();
 
                     b.Property<int>("AccessFailedCount");
 
@@ -28,7 +29,7 @@ namespace HOA.Migrations
                     b.Property<bool>("DisableNotification");
 
                     b.Property<string>("Email")
-                        .HasAnnotation("MaxLength", 256);
+                        .HasMaxLength(256);
 
                     b.Property<bool>("EmailConfirmed");
 
@@ -36,21 +37,21 @@ namespace HOA.Migrations
 
                     b.Property<string>("FirstName")
                         .IsRequired()
-                        .HasAnnotation("MaxLength", 20);
+                        .HasMaxLength(20);
 
                     b.Property<string>("LastName")
                         .IsRequired()
-                        .HasAnnotation("MaxLength", 20);
+                        .HasMaxLength(20);
 
                     b.Property<bool>("LockoutEnabled");
 
                     b.Property<DateTimeOffset?>("LockoutEnd");
 
                     b.Property<string>("NormalizedEmail")
-                        .HasAnnotation("MaxLength", 256);
+                        .HasMaxLength(256);
 
                     b.Property<string>("NormalizedUserName")
-                        .HasAnnotation("MaxLength", 256);
+                        .HasMaxLength(256);
 
                     b.Property<string>("PasswordHash");
 
@@ -63,7 +64,7 @@ namespace HOA.Migrations
                     b.Property<bool>("TwoFactorEnabled");
 
                     b.Property<string>("UserName")
-                        .HasAnnotation("MaxLength", 256);
+                        .HasMaxLength(256);
 
                     b.HasKey("Id");
 
@@ -83,7 +84,7 @@ namespace HOA.Migrations
                         .ValueGeneratedOnAdd();
 
                     b.Property<string>("Comments")
-                        .HasAnnotation("MaxLength", 512);
+                        .HasMaxLength(512);
 
                     b.Property<DateTime>("Created");
 
@@ -128,7 +129,7 @@ namespace HOA.Migrations
 
                     b.Property<string>("Action")
                         .IsRequired()
-                        .HasAnnotation("MaxLength", 64);
+                        .HasMaxLength(64);
 
                     b.Property<DateTime>("DateTime");
 
@@ -152,7 +153,7 @@ namespace HOA.Migrations
                         .ValueGeneratedOnAdd();
 
                     b.Property<string>("Comments")
-                        .HasAnnotation("MaxLength", 512);
+                        .HasMaxLength(512);
 
                     b.Property<DateTime>("Created");
 
@@ -171,7 +172,7 @@ namespace HOA.Migrations
                         .ValueGeneratedOnAdd();
 
                     b.Property<string>("Comments")
-                        .HasAnnotation("MaxLength", 512);
+                        .HasMaxLength(512);
 
                     b.Property<DateTime>("Created");
 
@@ -220,18 +221,18 @@ namespace HOA.Migrations
 
                     b.Property<string>("Address")
                         .IsRequired()
-                        .HasAnnotation("MaxLength", 64);
+                        .HasMaxLength(64);
 
                     b.Property<string>("Code")
                         .IsRequired();
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasAnnotation("MaxLength", 256);
+                        .HasMaxLength(2048);
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasAnnotation("MaxLength", 64);
+                        .HasMaxLength(64);
 
                     b.Property<string>("FinalApprovalBlob");
 
@@ -239,13 +240,13 @@ namespace HOA.Migrations
 
                     b.Property<string>("FirstName")
                         .IsRequired()
-                        .HasAnnotation("MaxLength", 32);
+                        .HasMaxLength(32);
 
                     b.Property<DateTime>("LastModified");
 
                     b.Property<string>("LastName")
                         .IsRequired()
-                        .HasAnnotation("MaxLength", 32);
+                        .HasMaxLength(32);
 
                     b.Property<bool>("PrecedentSetting");
 
@@ -264,20 +265,22 @@ namespace HOA.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityRole", b =>
                 {
-                    b.Property<string>("Id");
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd();
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken();
 
                     b.Property<string>("Name")
-                        .HasAnnotation("MaxLength", 256);
+                        .HasMaxLength(256);
 
                     b.Property<string>("NormalizedName")
-                        .HasAnnotation("MaxLength", 256);
+                        .HasMaxLength(256);
 
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedName")
+                        .IsUnique()
                         .HasName("RoleNameIndex");
 
                     b.ToTable("AspNetRoles");
@@ -348,8 +351,6 @@ namespace HOA.Migrations
                     b.HasKey("UserId", "RoleId");
 
                     b.HasIndex("RoleId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("AspNetUserRoles");
                 });
