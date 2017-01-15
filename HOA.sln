@@ -12,6 +12,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "HOA", "src\HOA\HOA.xproj", "{40E52D9C-776D-4ABF-9BA0-C2B557E9B604}"
 EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Tests", "src\Tests\Tests.xproj", "{C6684A7E-1120-41DB-BB85-6344E1A4FD6C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -22,11 +24,16 @@ Global
 		{40E52D9C-776D-4ABF-9BA0-C2B557E9B604}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{40E52D9C-776D-4ABF-9BA0-C2B557E9B604}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{40E52D9C-776D-4ABF-9BA0-C2B557E9B604}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C6684A7E-1120-41DB-BB85-6344E1A4FD6C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C6684A7E-1120-41DB-BB85-6344E1A4FD6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C6684A7E-1120-41DB-BB85-6344E1A4FD6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C6684A7E-1120-41DB-BB85-6344E1A4FD6C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{40E52D9C-776D-4ABF-9BA0-C2B557E9B604} = {0B4EE810-AF8F-44E8-B6A9-C6F6102BD6A6}
+		{C6684A7E-1120-41DB-BB85-6344E1A4FD6C} = {0B4EE810-AF8F-44E8-B6A9-C6F6102BD6A6}
 	EndGlobalSection
 EndGlobal
