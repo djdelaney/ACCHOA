@@ -28,7 +28,7 @@ namespace Tests
         private ApplicationDbContext _db;
         private SubmissionController _controller;
 
-        public SubmissionCreationTester()
+        public void Setup()
         {
             _email = new TestEmail();
             _files = new FileMock();
@@ -67,6 +67,8 @@ namespace Tests
         [Fact]
         public void Submission_Success()
         {
+            Setup();
+
             //Current user mock
             var mockPrincipal = GetMockUser();
             _controller.ControllerContext.HttpContext =  new DefaultHttpContext() { User = mockPrincipal.Object };
@@ -107,6 +109,8 @@ namespace Tests
         [Fact]
         public void Submission_FileTooLarge()
         {
+            Setup();
+
             //Current user mock
             var mockPrincipal = GetMockUser();
             _controller.ControllerContext.HttpContext = new DefaultHttpContext() { User = mockPrincipal.Object };
@@ -136,6 +140,8 @@ namespace Tests
         [Fact]
         public void Submission_InvalidFileType()
         {
+            Setup();
+
             //Current user mock
             var mockPrincipal = GetMockUser();
             _controller.ControllerContext.HttpContext = new DefaultHttpContext() { User = mockPrincipal.Object };
@@ -165,6 +171,8 @@ namespace Tests
         [Fact]
         public void Submission_FileRequired()
         {
+            Setup();
+
             //Current user mock
             var mockPrincipal = GetMockUser();
             _controller.ControllerContext.HttpContext = new DefaultHttpContext() { User = mockPrincipal.Object };
