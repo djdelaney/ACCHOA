@@ -62,6 +62,8 @@ namespace HOA
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 
+            services.AddResponseCompression();
+
             // Add MVC services to the services container.
             services.AddMvc();
 
@@ -101,6 +103,8 @@ namespace HOA
             app.UseApplicationInsightsRequestTelemetry();
 
             app.UseStatusCodePages();
+
+            app.UseResponseCompression();
 
             if (env.IsDevelopment())
             {
