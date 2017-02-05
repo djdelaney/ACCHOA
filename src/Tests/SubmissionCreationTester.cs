@@ -38,6 +38,7 @@ namespace Tests
             optionsBuilder.UseInMemoryDatabase();
 
             _db = new ApplicationDbContext(optionsBuilder.Options);
+            _db.Database.EnsureDeleted();
             _db.Database.EnsureCreated();
             SampleTestData.SetupUsersAndRoles(_db);
 
