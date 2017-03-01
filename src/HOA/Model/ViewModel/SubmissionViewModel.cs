@@ -35,9 +35,11 @@ namespace HOA.Model.ViewModel
         public bool Approve { get; set; }
         
         [Display(Name = "Internal Comments")]
+        [MaxLength(512)]
         public string Comments { get; set; }
 
         [Display(Name = "Homeowner Feedback (sent via email)")]
+        [MaxLength(2048)]
         public string UserFeedback { get; set; }
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)

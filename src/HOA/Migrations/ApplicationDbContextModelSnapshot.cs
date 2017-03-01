@@ -153,7 +153,7 @@ namespace HOA.Migrations
                         .ValueGeneratedOnAdd();
 
                     b.Property<string>("Comments")
-                        .HasMaxLength(512);
+                        .HasMaxLength(2048);
 
                     b.Property<DateTime>("Created");
 
