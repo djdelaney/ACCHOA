@@ -8,13 +8,13 @@ using HOA.Model;
 namespace HOA.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20170301014731_ExpandResponse")]
-    partial class ExpandResponse
+    [Migration("20170308181738_BaseSchema")]
+    partial class BaseSchema
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
-                .HasAnnotation("ProductVersion", "1.1.0-rtm-22752")
+                .HasAnnotation("ProductVersion", "1.1.1")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("HOA.Model.ApplicationUser", b =>
