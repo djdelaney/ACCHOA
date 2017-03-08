@@ -1,18 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26228.4
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{0B4EE810-AF8F-44E8-B6A9-C6F6102BD6A6}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C77CFAD6-8789-4558-845D-75F57DE9247E}"
-	ProjectSection(SolutionItems) = preProject
-		global.json = global.json
-	EndProjectSection
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "HOA", "src\HOA\HOA.xproj", "{40E52D9C-776D-4ABF-9BA0-C2B557E9B604}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HOA", "src\HOA\HOA.csproj", "{40E52D9C-776D-4ABF-9BA0-C2B557E9B604}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Tests", "src\Tests\Tests.xproj", "{C6684A7E-1120-41DB-BB85-6344E1A4FD6C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests", "src\Tests\Tests.csproj", "{C6684A7E-1120-41DB-BB85-6344E1A4FD6C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
