@@ -31,8 +31,6 @@ namespace HOA
 
             if (env.IsDevelopment())
             {
-                // This will push telemetry data through Application Insights pipeline faster, allowing you to view results immediately.
-                //builder.AddApplicationInsightsSettings(developerMode: true);
                 builder.AddUserSecrets("aspnet-HOANEW-b9a2d01d-ce96-40a1-8b4a-fc668192a400");
             }
             Configuration = builder.Build();
@@ -89,9 +87,6 @@ namespace HOA
                 SendGridEmail.EmailSource = emailSource;
                 services.AddTransient<IEmailSender, SendGridEmail>();
             }
-
-            // Add framework services.
-            //services.AddApplicationInsightsTelemetry(Configuration);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -99,9 +94,7 @@ namespace HOA
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
-
-            //app.UseApplicationInsightsRequestTelemetry();
-
+            
             app.UseStatusCodePages();
 
             app.UseResponseCompression();
@@ -115,8 +108,6 @@ namespace HOA
             {
                 app.UseExceptionHandler("/Home/Error");
             }
-
-            //app.UseApplicationInsightsExceptionTelemetry();
 
             // Add static files to the request pipeline.
             app.UseStaticFiles(new StaticFileOptions()
