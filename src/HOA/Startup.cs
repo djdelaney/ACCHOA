@@ -31,6 +31,9 @@ namespace HOA
 
             if (env.IsDevelopment())
             {
+                // This will push telemetry data through Application Insights 
+                // pipeline faster, allowing you to view results immediately.
+                builder.AddApplicationInsightsSettings(developerMode: true);
                 builder.AddUserSecrets("aspnet-HOANEW-b9a2d01d-ce96-40a1-8b4a-fc668192a400");
             }
             Configuration = builder.Build();
