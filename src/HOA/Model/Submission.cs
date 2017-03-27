@@ -9,13 +9,15 @@ namespace HOA.Model
 {
     public enum Status
     {
-        Submitted = 0,
-        ARBIncoming = 1,
-        UnderReview = 2,
-        ARBFinal = 3,
-        ReviewComplete = 4,
-        PrepApproval = 5,
-        PrepConditionalApproval = 6,
+        CommunityMgrReview = 0,
+        ARBChairReview = 1,
+        CommitteeReview = 2,
+        ARBTallyVotes = 3,
+        HOALiasonReview = 4,
+        FinalResponse = 5,
+
+        CommunityMgrReturn = 6,
+        
         Rejected = 7,
         MissingInformation = 8,
         Approved = 9,

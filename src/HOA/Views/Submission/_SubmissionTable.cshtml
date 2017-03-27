@@ -25,63 +25,65 @@
                     </td>
                     <td>@submission.Address</td>
                     <td>
+                        
+                        @submission.Status
 
-                        @if (submission.Status == Status.Submitted)
-                        {
-                            @:Submitted
-                        }
-                        else if (submission.Status == Status.ARBIncoming)
-                        {
-                            @:Sent to ARB Chair
-                        }
-                        else if (submission.Status == Status.UnderReview)
-                        {
-                            @:Being reviewed
-                        }
-                        else if (submission.Status == Status.ARBFinal)
-                        {
-                            @:Tallying votes
-                        }
-                        else if (submission.Status == Status.ReviewComplete)
-                        {
-                            @:Sent to HOA Liaison
-                        }
-                        else if (submission.Status == Status.PrepApproval)
-                        {
-                            @:Preparing approval response
-                        }
-                        else if (submission.Status == Status.PrepConditionalApproval)
-                        {
-                            @:Preparing conditional response
-                        }
-                        else if (submission.Status == Status.Approved)
-                        {
-                            @:Approved
-                            @if(submission.FinalApprovalBlob == null)
-                            {
-                                @:(Missing attachment)
-                            }
-                        }
-                        else if (submission.Status == Status.ConditionallyApproved)
-                        {
-                            @:Conditionally Approved
-                            @if(submission.FinalApprovalBlob == null)
-                            {
-                                @:(Missing attachment)
-                            }
-                        }
-                        else if (submission.Status == Status.Rejected)
-                        {
-                            @:Rejected
-                        }
-                        else if (submission.Status == Status.MissingInformation)
-                        {
-                            @:Missing Information
-                        }
-                        else if (submission.Status == Status.Retracted)
-                        {
-                            @:Retracted
-                        }
+                        @* @if (submission.Status == Status.Submitted)
+    {
+        @:Submitted
+    }
+    else if (submission.Status == Status.ARBIncoming)
+    {
+        @:Sent to ARB Chair
+    }
+    else if (submission.Status == Status.UnderReview)
+    {
+        @:Being reviewed
+    }
+    else if (submission.Status == Status.ARBFinal)
+    {
+        @:Tallying votes
+    }
+    else if (submission.Status == Status.ReviewComplete)
+    {
+        @:Sent to HOA Liaison
+    }
+    else if (submission.Status == Status.PrepApproval)
+    {
+        @:Preparing approval response
+    }
+    else if (submission.Status == Status.PrepConditionalApproval)
+    {
+        @:Preparing conditional response
+    }
+    else if (submission.Status == Status.Approved)
+    {
+        @:Approved
+        @if(submission.FinalApprovalBlob == null)
+        {
+            @:(Missing attachment)
+        }
+    }
+    else if (submission.Status == Status.ConditionallyApproved)
+    {
+        @:Conditionally Approved
+        @if(submission.FinalApprovalBlob == null)
+        {
+            @:(Missing attachment)
+        }
+    }
+    else if (submission.Status == Status.Rejected)
+    {
+        @:Rejected
+    }
+    else if (submission.Status == Status.MissingInformation)
+    {
+        @:Missing Information
+    }
+    else if (submission.Status == Status.Retracted)
+    {
+        @:Retracted
+    }*@
 
                     </td>
                     <td>

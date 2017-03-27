@@ -134,6 +134,7 @@ namespace HOA.Controllers
             return View(model);
         }
 
+        /*
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = RoleNames.CommunityManager)]
@@ -212,13 +213,13 @@ namespace HOA.Controllers
             model.Submission = _applicationDbContext.Submissions.FirstOrDefault(s => s.Id == model.SubmissionId);
             return View(model);
         }
-
+        */
 
         public IActionResult List(int page = 1, string filter = null)
         {
             IQueryable<Submission> subs = _applicationDbContext.Submissions;
 
-            if(string.IsNullOrEmpty(filter))
+            /*if(string.IsNullOrEmpty(filter))
             {
                 filter = "Todo";
             }
@@ -292,7 +293,7 @@ namespace HOA.Controllers
             else if (filter.Equals("Rejected"))
             {
                 subs = subs.Where(s => s.Status == Status.Rejected || s.Status == Status.MissingInformation);
-            }
+            }*/
 
             var pager = new Pager(subs.Count(), page);
             IList<Submission> results = subs.Include(s => s.Audits).OrderByDescending(s => s.LastModified).Skip((pager.CurrentPage - 1) * pager.PageSize).Take(pager.PageSize).ToList();
@@ -339,6 +340,8 @@ namespace HOA.Controllers
         {
             return View();
         }
+
+        /*
 
         [HttpPost]
         [AllowAnonymous]
@@ -495,7 +498,7 @@ namespace HOA.Controllers
 
             var stream = await _storage.RetriveFile(submission.FinalApprovalBlob);
             return File(stream, "application/octet", submission.FinalApprovalFileName);
-        }
+        }*/
 
         [HttpGet]
         [AllowAnonymous]
@@ -547,7 +550,7 @@ namespace HOA.Controllers
                         Address = model.Address,
                         Email = model.Email,
                         Description = model.Description,
-                        Status = Status.Submitted,
+                        Status = Status.CommunityMgrReview,
                         LastModified = DateTime.UtcNow,
                         Code = DBUtil.GenerateUniqueCode(_applicationDbContext),
                         Revision = 1,
@@ -618,9 +621,9 @@ namespace HOA.Controllers
 
             if (!User.IsInRole(RoleNames.Administrator))
             {
-                if (submission.Status == Status.Submitted && !User.IsInRole(RoleNames.CommunityManager))
+                if (submission.Status == Status.CommunityMgrReview && !User.IsInRole(RoleNames.CommunityManager))
                     return NotFound("Not authorized");
-                if (submission.Status == Status.ARBIncoming && !User.IsInRole(RoleNames.BoardChairman))
+                if (submission.Status == Status.ARBChairReview && !User.IsInRole(RoleNames.BoardChairman))
                     return NotFound("Not authorized");
             }
 
@@ -652,29 +655,39 @@ namespace HOA.Controllers
 
                 if (model.Approve)
                 {
-                    if (submission.Status == Status.Submitted)
+                    if (submission.Status == Status.CommunityMgrReview)
                     {
-                        submission.Status = Status.ARBIncoming;
+                        submission.Status = Status.ARBChairReview;
                     }
                     else
                     {
-                        submission.Status = Status.UnderReview;
+                        submission.Status = Status.CommitteeReview;
                     }
                 }
                 else
                 {
-                    submission.Status = Status.MissingInformation;
-                    if(submission.Responses == null)
-                        submission.Responses = new List<Response>();
-
-                    var response = new Response
+                    //Community manager can directly respond
+                    if (submission.Status == Status.CommunityMgrReview)
                     {
-                        Created = DateTime.UtcNow,
-                        Comments = model.UserFeedback,
-                        Submission = submission
-                    };
-                    submission.Responses.Add(response);
-                    _applicationDbContext.Responses.Add(response);
+                        submission.Status = Status.MissingInformation;
+
+                        if (submission.Responses == null)
+                            submission.Responses = new List<Response>();
+
+                        var response = new Response
+                        {
+                            Created = DateTime.UtcNow,
+                            Comments = model.UserFeedback,
+                            Submission = submission
+                        };
+                        submission.Responses.Add(response);
+                        _applicationDbContext.Responses.Add(response);
+                    }
+                    else
+                    {
+                        //Send to mgr for formal response
+                        submission.Status = Status.CommunityMgrReturn;
+                    }
                 }
 
                 AddStateSwitch(submission);
@@ -699,6 +712,7 @@ namespace HOA.Controllers
             return View(model);
         }
 
+        /*
         [HttpGet]
         public async Task<IActionResult> Review(int id)
         {
@@ -1428,5 +1442,6 @@ namespace HOA.Controllers
             model.Submission = _applicationDbContext.Submissions.FirstOrDefault(s => s.Id == model.SubmissionId);
             return View(model);
         }
+        */
     }
 }

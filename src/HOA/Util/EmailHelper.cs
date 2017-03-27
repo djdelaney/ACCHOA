@@ -95,32 +95,36 @@ Please reset your password by clicking here:<br>
             }
 
             string roleToNofity;
-            if (submission.Status == Status.Submitted)
+            if (submission.Status == Status.CommunityMgrReview)
             {
                 NotifyHomeowner(context, submission, mail, file, attachmentName);
                 roleToNofity = RoleNames.CommunityManager;
             }
-            else if (submission.Status == Status.ARBIncoming)
+            else if (submission.Status == Status.ARBChairReview)
             {
                 roleToNofity = RoleNames.BoardChairman;
             }
-            else if (submission.Status == Status.UnderReview)
+            else if (submission.Status == Status.CommitteeReview)
             {
                 roleToNofity = RoleNames.ARBBoardMember;
             }
-            else if (submission.Status == Status.ARBFinal)
+            else if (submission.Status == Status.ARBTallyVotes)
             {
                 roleToNofity = RoleNames.BoardChairman;
             }
-            else if (submission.Status == Status.ReviewComplete)
+            else if (submission.Status == Status.HOALiasonReview)
             {
                 roleToNofity = RoleNames.HOALiaison;
             }
-            else if (submission.Status == Status.PrepConditionalApproval || submission.Status == Status.PrepApproval)
+            else if (submission.Status == Status.FinalResponse)
             {
                 roleToNofity = RoleNames.CommunityManager;
             }
             else if (submission.Status == Status.Retracted)
+            {
+                roleToNofity = RoleNames.CommunityManager;
+            }
+            else if (submission.Status == Status.CommunityMgrReturn)
             {
                 roleToNofity = RoleNames.CommunityManager;
             }
@@ -167,8 +171,8 @@ Please reset your password by clicking here:<br>
 
         private static string GetStatusText(Status s)
         {
-            string status;
-            if (s == Status.Submitted)
+            string status = null;
+            if (s == Status.CommunityMgrReview)
             {
                 status = "has been received";
             }
@@ -195,28 +199,27 @@ Please reset your password by clicking here:<br>
         public static List<string> GetOverdueRecipients(ApplicationDbContext context, Submission submission)
         {
             string roleToNofity = null;
-            List<string> emails;
-            if (submission.Status == Status.Submitted)
+            List<string> emails = new List<string>();
+            if (submission.Status == Status.CommunityMgrReview)
             {
                 roleToNofity = RoleNames.CommunityManager;
             }
-            else if (submission.Status == Status.ARBIncoming)
+            else if (submission.Status == Status.ARBChairReview)
             {
                 roleToNofity = RoleNames.BoardChairman;
             }
-            else if (submission.Status == Status.UnderReview)
+            else if (submission.Status == Status.CommitteeReview)
             {
             }
-            else if (submission.Status == Status.ARBFinal)
+            else if (submission.Status == Status.ARBTallyVotes)
             {
                 roleToNofity = RoleNames.BoardChairman;
             }
-            else if (submission.Status == Status.ReviewComplete)
+            else if (submission.Status == Status.HOALiasonReview)
             {
                 roleToNofity = RoleNames.HOALiaison;
             }
-            else if(submission.Status == Status.PrepApproval ||
-                submission.Status == Status.PrepConditionalApproval)
+            else if(submission.Status == Status.FinalResponse)
             {
                 roleToNofity = RoleNames.CommunityManager;
             }
@@ -225,7 +228,7 @@ Please reset your password by clicking here:<br>
                 throw new Exception("Unknown status");
             }
 
-            if (submission.Status == Status.UnderReview)
+            if (submission.Status == Status.CommitteeReview)
             {
                 var role = context.Roles.Include(r => r.Users).FirstOrDefault(r => r.Name.Equals(RoleNames.ARBBoardMember));
                 List<string> userIds = role.Users.Select(u => u.UserId).ToList();

@@ -55,6 +55,7 @@ namespace HOA.Controllers
             return View();
         }
 
+        /*
         [HttpGet]
         [Authorize(Roles = RoleNames.Administrator)]
         public IActionResult CreateSample()
@@ -309,5 +310,6 @@ namespace HOA.Controllers
             s.Audits.Add(history);
             _applicationDbContext.Histories.Add(history);
         }
+        */
     }
 }

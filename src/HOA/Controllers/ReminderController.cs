@@ -40,6 +40,7 @@ namespace HOA.Controllers
             _email = mail;
         }
 
+        /*
         [AllowAnonymous]
         public IActionResult Process()
         {
@@ -139,6 +140,6 @@ namespace HOA.Controllers
             }
 
             return Content("Processed");
-        }
+        }*/
     }
 }

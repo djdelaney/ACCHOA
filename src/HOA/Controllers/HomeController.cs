@@ -25,7 +25,7 @@ namespace HOA.Controllers
         {
             HomeIndexModel model = new HomeIndexModel
             {
-                fiveDayTurnaround = StatsController.GetTurnaroundTime(_applicationDbContext)
+                fiveDayTurnaround = 0//StatsController.GetTurnaroundTime(_applicationDbContext)
             };
             return View(model);
         }

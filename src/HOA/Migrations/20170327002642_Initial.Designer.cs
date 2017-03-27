@@ -8,8 +8,8 @@ using HOA.Model;
 namespace HOA.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20170308181738_BaseSchema")]
-    partial class BaseSchema
+    [Migration("20170327002642_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

@@ -96,7 +96,7 @@ namespace Tests
             Submission sub = result.Model as Submission;
             Assert.NotNull(sub);
             Assert.Equal(1, _db.Submissions.ToList().Count);
-            Assert.Equal(Status.Submitted, sub.Status);
+            Assert.Equal(Status.CommunityMgrReview, sub.Status);
 
             //Assert incoming email sent to josh, and homeowner
             Assert.Equal(2, _email.Emails.Count);

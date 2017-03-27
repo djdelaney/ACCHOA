@@ -18,7 +18,7 @@ using Microsoft.EntityFrameworkCore;
 // For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace HOA.Controllers
-{
+{/*
     [RequireHttps]
     [Authorize]
     public class StatsController : Controller
@@ -268,5 +268,5 @@ namespace HOA.Controllers
         public float HOALiason { get; set; }
         public float PrepApproval { get; set; }
     }
-
+*/
 }

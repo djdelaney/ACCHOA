@@ -31,7 +31,7 @@ namespace Tests
         private SubmissionController _controller;
         private Submission _sub;
 
-        public void Setup()
+        public void Setup(string username)
         {
             _email = new TestEmail();
             _files = new FileMock();
@@ -47,7 +47,7 @@ namespace Tests
             // Setup
             var store = new Mock<IUserStore<ApplicationUser>>();
             var mockUsers = new Mock<UserManager<ApplicationUser>>(store.Object, null, null, null, null, null, null, null, null);
-            var josh = _db.Users.FirstOrDefault(u => u.Email.Equals("josh.rozzi@fsresidential.com"));
+            var josh = _db.Users.FirstOrDefault(u => u.Email.Equals(username));
 
             mockUsers.Setup(x => x.GetUserAsync(It.IsAny<ClaimsPrincipal>())).Returns(Task.FromResult<HOA.Model.ApplicationUser>(josh));
             var user = mockUsers.Object;
@@ -64,7 +64,7 @@ namespace Tests
                 Address = "123 Address",
                 Email = "Test@gmail.com",
                 Description = "Deck",
-                Status = Status.Submitted,
+                Status = Status.CommunityMgrReview,
                 StatusChangeTime = DateTime.UtcNow,
                 LastModified = DateTime.UtcNow,
                 SubmissionDate = DateTime.UtcNow.AddHours(-1),
@@ -94,11 +94,12 @@ namespace Tests
 
             return mockPrincipal;
         }
-
+        
         [Fact]
-        public void Submitted_Approve()
+        public void CommunityReview_Approve()
         {
-            Setup();
+            Setup("josh.rozzi@fsresidential.com");
+            Assert.Equal(Status.CommunityMgrReview, _sub.Status);
 
             //Current user mock
             var mockPrincipal = GetMockUser();
@@ -128,8 +129,8 @@ namespace Tests
                     .Include(s => s.Comments)
                     .FirstOrDefault(s => s.Id == _sub.Id);
 
-            //Submisison should have moved to ARB incoming
-            Assert.Equal(Status.ARBIncoming, _sub.Status);
+            //Submisison should have moved to ARB chair
+            Assert.Equal(Status.ARBChairReview, _sub.Status);
 
             //internal comment
             Assert.Equal(1, _sub.Comments.Count);
@@ -138,7 +139,7 @@ namespace Tests
             //history entry
             Assert.Equal(1, _sub.StateHistory.Count);
             StateChange change = _sub.StateHistory.FirstOrDefault();
-            Assert.Equal(Status.ARBIncoming, change.State);
+            Assert.Equal(Status.ARBChairReview, change.State);
 
             //email to ARB chair
             Assert.Equal(1, _email.Emails.Count);
@@ -147,15 +148,15 @@ namespace Tests
         }
 
         [Fact]
-        public void ARBIncoming_Approve()
+        public void ARBReview_Approve()
         {
-            Setup();
-
+            Setup("kfinnis@gmail.com");
+            
             //Current user mock
             var mockPrincipal = GetMockUser();
             _controller.ControllerContext.HttpContext = new DefaultHttpContext() { User = mockPrincipal.Object };
 
-            _sub.Status = Status.ARBIncoming;
+            _sub.Status = Status.ARBChairReview;
             _db.SaveChanges();
 
             CheckCompletenessViewModel vm = new CheckCompletenessViewModel()
@@ -182,8 +183,8 @@ namespace Tests
                     .Include(s => s.Comments)
                     .FirstOrDefault(s => s.Id == _sub.Id);
 
-            //Submisison should have moved to ARB incoming
-            Assert.Equal(Status.UnderReview, _sub.Status);
+            //Submisison should have moved to review
+            Assert.Equal(Status.CommitteeReview, _sub.Status);
 
             //internal comment
             Assert.Equal(1, _sub.Comments.Count);
@@ -192,7 +193,7 @@ namespace Tests
             //history entry
             Assert.Equal(1, _sub.StateHistory.Count);
             StateChange change = _sub.StateHistory.FirstOrDefault();
-            Assert.Equal(Status.UnderReview, change.State);
+            Assert.Equal(Status.CommitteeReview, change.State);
 
             //email reviewers
             Assert.Equal(3, _email.Emails.Count);
@@ -201,15 +202,16 @@ namespace Tests
         }
 
         [Fact]
-        public void MissingInformation()
+        public void CommunityReview_MissingInformation()
         {
-            Setup();
+            Setup("josh.rozzi@fsresidential.com");
+            Assert.Equal(Status.CommunityMgrReview, _sub.Status);
 
             //Current user mock
             var mockPrincipal = GetMockUser();
             _controller.ControllerContext.HttpContext = new DefaultHttpContext() { User = mockPrincipal.Object };
 
-            _sub.Status = Status.ARBIncoming;
+            _sub.Status = Status.CommunityMgrReview;
             _db.SaveChanges();
 
             CheckCompletenessViewModel vm = new CheckCompletenessViewModel()
@@ -251,6 +253,60 @@ namespace Tests
             //email reviewers
             Assert.Equal(1, _email.Emails.Count);
             TestEmail.Email email = _email.Emails.First(e => e.Recipient.Equals("Test@gmail.com"));
+            Assert.NotNull(email);
+        }
+
+        [Fact]
+        public void ARBReview_MissingInformation()
+        {
+            Setup("kfinnis@gmail.com");
+
+            //Current user mock
+            var mockPrincipal = GetMockUser();
+            _controller.ControllerContext.HttpContext = new DefaultHttpContext() { User = mockPrincipal.Object };
+
+            _sub.Status = Status.ARBChairReview;
+            _db.SaveChanges();
+
+            CheckCompletenessViewModel vm = new CheckCompletenessViewModel()
+            {
+                SubmissionId = _sub.Id,
+                Approve = false,
+                Comments = "MissingInfo",
+                Submission = null,
+                UserFeedback = "asdas"
+            };
+
+            RedirectToActionResult result = _controller.CheckCompleteness(vm).Result as RedirectToActionResult;
+
+            //should redirect to submission id
+            Assert.NotNull(result);
+            Assert.Equal(_sub.Id, result.RouteValues.Values.FirstOrDefault());
+
+            _sub = _db.Submissions
+                    .Include(s => s.Reviews)
+                    .Include(s => s.Audits)
+                    .Include(s => s.Responses)
+                    .Include(s => s.Files)
+                    .Include(s => s.StateHistory)
+                    .Include(s => s.Comments)
+                    .FirstOrDefault(s => s.Id == _sub.Id);
+
+            //Submisison should have moved to community manager return
+            Assert.Equal(Status.CommunityMgrReturn, _sub.Status);
+
+            //internal comment
+            Assert.Equal(1, _sub.Comments.Count);
+            Assert.Equal("MissingInfo", _sub.Comments.FirstOrDefault().Comments);
+
+            //history entry
+            Assert.Equal(1, _sub.StateHistory.Count);
+            StateChange change = _sub.StateHistory.FirstOrDefault();
+            Assert.Equal(Status.CommunityMgrReturn, change.State);
+
+            //email community mgr
+            Assert.Equal(1, _email.Emails.Count);
+            TestEmail.Email email = _email.Emails.First(e => e.Recipient.Equals("josh.rozzi@fsresidential.com"));
             Assert.NotNull(email);
         }
     }
