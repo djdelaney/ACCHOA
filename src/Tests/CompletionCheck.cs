@@ -110,8 +110,7 @@ namespace Tests
                 SubmissionId = _sub.Id,
                 Approve = true,
                 Comments = "COMMENT",
-                Submission = null,
-                UserFeedback = "asdas"
+                Submission = null
             };
 
             RedirectToActionResult result = _controller.CheckCompleteness(vm).Result as RedirectToActionResult;
@@ -164,8 +163,7 @@ namespace Tests
                 SubmissionId = _sub.Id,
                 Approve = true,
                 Comments = "COMMENT",
-                Submission = null,
-                UserFeedback = "asdas"
+                Submission = null
             };
 
             RedirectToActionResult result = _controller.CheckCompleteness(vm).Result as RedirectToActionResult;
@@ -219,8 +217,7 @@ namespace Tests
                 SubmissionId = _sub.Id,
                 Approve = false,
                 Comments = "MissingInfo",
-                Submission = null,
-                UserFeedback = "asdas"
+                Submission = null
             };
 
             RedirectToActionResult result = _controller.CheckCompleteness(vm).Result as RedirectToActionResult;
@@ -238,8 +235,8 @@ namespace Tests
                     .Include(s => s.Comments)
                     .FirstOrDefault(s => s.Id == _sub.Id);
 
-            //Submisison should have moved to ARB incoming
-            Assert.Equal(Status.MissingInformation, _sub.Status);
+            //Submisison should have moved to community manager response
+            Assert.Equal(Status.CommunityMgrReturn, _sub.Status);
 
             //internal comment
             Assert.Equal(1, _sub.Comments.Count);
@@ -248,11 +245,11 @@ namespace Tests
             //history entry
             Assert.Equal(1, _sub.StateHistory.Count);
             StateChange change = _sub.StateHistory.FirstOrDefault();
-            Assert.Equal(Status.MissingInformation, change.State);
+            Assert.Equal(Status.CommunityMgrReturn, change.State);
 
-            //email reviewers
+            //email community mgr
             Assert.Equal(1, _email.Emails.Count);
-            TestEmail.Email email = _email.Emails.First(e => e.Recipient.Equals("Test@gmail.com"));
+            TestEmail.Email email = _email.Emails.First(e => e.Recipient.Equals("josh.rozzi@fsresidential.com"));
             Assert.NotNull(email);
         }
 
@@ -273,8 +270,7 @@ namespace Tests
                 SubmissionId = _sub.Id,
                 Approve = false,
                 Comments = "MissingInfo",
-                Submission = null,
-                UserFeedback = "asdas"
+                Submission = null
             };
 
             RedirectToActionResult result = _controller.CheckCompleteness(vm).Result as RedirectToActionResult;

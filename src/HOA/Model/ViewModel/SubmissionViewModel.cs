@@ -38,20 +38,11 @@ namespace HOA.Model.ViewModel
         [MaxLength(512)]
         public string Comments { get; set; }
 
-        [Display(Name = "Homeowner Feedback (sent via email)")]
-        [MaxLength(2048)]
-        public string UserFeedback { get; set; }
-
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             if (!Approve && string.IsNullOrEmpty(Comments))
             {
                 yield return new ValidationResult("You must supply internal comments for rejections.");
-            }
-
-            if (!Approve && string.IsNullOrEmpty(UserFeedback))
-            {
-                yield return new ValidationResult("You must supply user feedback for rejections.");
             }
         }
     }

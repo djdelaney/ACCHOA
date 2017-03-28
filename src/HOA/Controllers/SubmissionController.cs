@@ -666,28 +666,8 @@ namespace HOA.Controllers
                 }
                 else
                 {
-                    //Community manager can directly respond
-                    if (submission.Status == Status.CommunityMgrReview)
-                    {
-                        submission.Status = Status.MissingInformation;
-
-                        if (submission.Responses == null)
-                            submission.Responses = new List<Response>();
-
-                        var response = new Response
-                        {
-                            Created = DateTime.UtcNow,
-                            Comments = model.UserFeedback,
-                            Submission = submission
-                        };
-                        submission.Responses.Add(response);
-                        _applicationDbContext.Responses.Add(response);
-                    }
-                    else
-                    {
-                        //Send to mgr for formal response
-                        submission.Status = Status.CommunityMgrReturn;
-                    }
+                    //Send to mgr for formal response
+                    submission.Status = Status.CommunityMgrReturn;
                 }
 
                 AddStateSwitch(submission);
