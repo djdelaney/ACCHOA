@@ -692,7 +692,7 @@ namespace HOA.Controllers
             return View(model);
         }
 
-        /*
+        
         [HttpGet]
         public async Task<IActionResult> Review(int id)
         {
@@ -730,6 +730,14 @@ namespace HOA.Controllers
         {
             if (ModelState.IsValid)
             {
+                if (((ReviewStatus) Enum.Parse(typeof(ReviewStatus), model.Status)) != ReviewStatus.Approved &&
+                    string.IsNullOrEmpty(model.Comments))
+                {
+                    ModelState.AddModelError(string.Empty, "You must supply comments for non-approvals.");
+                    model.Submission = _applicationDbContext.Submissions.FirstOrDefault(s => s.Id == model.SubmissionId);
+                    return View(model);
+                }
+
                 var submission = _applicationDbContext.Submissions.Include(s => s.Reviews)
                     .Include(s => s.Audits)
                     .Include(s => s.Responses)
@@ -769,7 +777,7 @@ namespace HOA.Controllers
                 //Final review!
                 if (submission.Reviews.Where(r => r.SubmissionRevision == submission.Revision).Count() == GetReviewerCount(_applicationDbContext))
                 {
-                    submission.Status = Status.ARBFinal;
+                    submission.Status = Status.ARBTallyVotes;
                     submission.LastModified = DateTime.UtcNow;
                     submission.StatusChangeTime = DateTime.UtcNow;
                     AddHistoryEntry(submission, "System", "All reviews in, sent to chairman");
@@ -788,6 +796,7 @@ namespace HOA.Controllers
             return View(model);
         }
 
+        /*
         [HttpGet]
         public IActionResult TallyVotes(int id)
         {
