@@ -112,7 +112,7 @@ Please reset your password by clicking here:<br>
             {
                 roleToNofity = RoleNames.BoardChairman;
             }
-            else if (submission.Status == Status.HOALiasonReview)
+            else if (submission.Status == Status.HOALiasonReview || submission.Status == Status.HOALiasonInput)
             {
                 roleToNofity = RoleNames.HOALiaison;
             }

@@ -47,6 +47,15 @@ namespace HOA.Model.ViewModel
         }
     }
 
+    public enum TallyStatus
+    {
+        Approved,
+        Rejected,
+        ConditionallyApproved,
+        MissingInformation,
+        HOAInputRequired
+    }
+
     public class TallyVotesViewModel : IValidatableObject
     {
         public Submission Submission { get; set; }
@@ -59,18 +68,11 @@ namespace HOA.Model.ViewModel
         
         [Display(Name = "Internal Comments")]
         public string Comments { get; set; }
-
-        [Display(Name = "Homeowner Feedback (sent via email)")]
-        public string UserFeedback { get; set; }
-
+        
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            var status = (ReviewStatus)Enum.Parse(typeof(ReviewStatus), Status);
-            if (status == ReviewStatus.MissingInformation && string.IsNullOrEmpty(UserFeedback))
-            {
-                yield return new ValidationResult("You must supply user feedback for missing info.");
-            }
-            if(status != ReviewStatus.Approved && string.IsNullOrEmpty(Comments))
+            var status = (TallyStatus)Enum.Parse(typeof(TallyStatus), Status);
+            if(status != TallyStatus.Approved && string.IsNullOrEmpty(Comments))
             {
                 yield return new ValidationResult("You must supply internal comments for non-approvals.");
             }

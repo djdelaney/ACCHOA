@@ -796,7 +796,7 @@ namespace HOA.Controllers
             return View(model);
         }
 
-        /*
+       
         [HttpGet]
         public IActionResult TallyVotes(int id)
         {
@@ -830,35 +830,25 @@ namespace HOA.Controllers
                 if (submission == null)
                     return NotFound("Submission not found");
 
-                var status = (ReviewStatus)Enum.Parse(typeof(ReviewStatus), model.Status);
+                var status = (TallyStatus)Enum.Parse(typeof(TallyStatus), model.Status);
 
-                if (status == ReviewStatus.Approved || status == ReviewStatus.ConditionallyApproved)
+                if (status == TallyStatus.Approved || status == TallyStatus.ConditionallyApproved || status == TallyStatus.Rejected)
                 {
-                    submission.Status = Status.ReviewComplete;
+                    submission.Status = Status.HOALiasonReview;
                 }
-                else if (status == ReviewStatus.MissingInformation)
+                else if (status == TallyStatus.MissingInformation)
                 {
-                    submission.Status = Status.MissingInformation;
-
-                    var response = new Response
-                    {
-                        Created = DateTime.UtcNow,
-                        Comments = model.UserFeedback,
-                        Submission = submission
-                    };
-                    if (submission.Responses == null)
-                        submission.Responses = new List<Response>();
-                    submission.Responses.Add(response);
-                    _applicationDbContext.Responses.Add(response);
+                    submission.Status = Status.CommunityMgrReturn;
                 }
-                else if (status == ReviewStatus.Rejected) //Still send rejections for final review
+                else if (status == TallyStatus.HOAInputRequired)
                 {
-                    submission.Status = Status.ReviewComplete;
+                    submission.Status = Status.HOALiasonInput;
                 }
                 else
                 {
                     throw new Exception("Invalid option");
                 }
+
                 AddStateSwitch(submission);
                 submission.StatusChangeTime = DateTime.UtcNow;
 
@@ -881,6 +871,7 @@ namespace HOA.Controllers
             return View(model);
         }
 
+        /*
         [HttpGet]
         [AuthorizeRoles(RoleNames.HOALiaison, RoleNames.Administrator)]
         public IActionResult FinalCheck(int id)

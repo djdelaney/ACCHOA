@@ -17,12 +17,14 @@ namespace HOA.Model
         FinalResponse = 5,
 
         CommunityMgrReturn = 6,
-        
-        Rejected = 7,
-        MissingInformation = 8,
-        Approved = 9,
-        ConditionallyApproved = 10,
-        Retracted = 11
+
+        HOALiasonInput = 7,
+
+        Rejected = 8,
+        MissingInformation = 9,
+        Approved = 10,
+        ConditionallyApproved = 11,
+        Retracted = 12
     }
 
     public class Submission
