@@ -178,7 +178,142 @@ namespace Tests
             CheckReviewStatus(ReviewStatus.Rejected, true, "REJECT!");
         }
 
+        [Fact]
+        public void Review_ConditionallyApproved()
+        {
+            Setup("dletscher@brenntag.com");
+            CheckReviewStatus(ReviewStatus.ConditionallyApproved, true, null);
+        }
 
-        //already reviewed test
+        [Fact]
+        public void Review_ConditionallyApproved_Comments()
+        {
+            Setup("dletscher@brenntag.com");
+            CheckReviewStatus(ReviewStatus.ConditionallyApproved, true, "REJECT!");
+        }
+
+        [Fact]
+        public void Review_MissingInformation()
+        {
+            Setup("dletscher@brenntag.com");
+            CheckReviewStatus(ReviewStatus.MissingInformation, true, null);
+        }
+
+        [Fact]
+        public void Review_MissingInformation_Comments()
+        {
+            Setup("dletscher@brenntag.com");
+            CheckReviewStatus(ReviewStatus.MissingInformation, true, "REJECT!");
+        }
+
+        [Fact]
+        public void Review_Abstain()
+        {
+            Setup("dletscher@brenntag.com");
+            CheckReviewStatus(ReviewStatus.Abstain, true, null);
+        }
+
+        [Fact]
+        public void Review_Abstain_Comments()
+        {
+            Setup("dletscher@brenntag.com");
+            CheckReviewStatus(ReviewStatus.Abstain, true, "REJECT!");
+        }
+
+        [Fact]
+        public void AlreadyReviewed()
+        {
+            Setup("dletscher@brenntag.com");
+
+            //Current user mock
+            var mockPrincipal = GetMockUser();
+            _controller.ControllerContext.HttpContext = new DefaultHttpContext() { User = mockPrincipal.Object };
+
+            ReviewSubmissionViewModel vm = new ReviewSubmissionViewModel()
+            {
+                SubmissionId = _sub.Id,
+                Comments = "Comment1",
+                Submission = null,
+                Status = ReviewStatus.Approved.ToString()
+            };
+
+            RedirectToActionResult result = _controller.Review(vm).Result as RedirectToActionResult;
+            Assert.NotNull(result);
+
+            //Try reviewing again
+            AggregateException ex = Assert.Throws<AggregateException>(() => _controller.Review(vm).Result);
+            Assert.NotNull(ex);
+            Assert.True(ex.ToString().Contains("Already reviewed!"));
+        }
+
+
+        [Fact]
+        public void FinalReview()
+        {
+            Setup("dletscher@brenntag.com");
+
+            //Current user mock
+            var mockPrincipal = GetMockUser();
+            _controller.ControllerContext.HttpContext = new DefaultHttpContext() { User = mockPrincipal.Object };
+
+            ApplicationUser deana = _db.Users.FirstOrDefault(u => u.Email.Equals("deanaclymer@verizon.net"));
+            ApplicationUser sergio = _db.Users.FirstOrDefault(u => u.Email.Equals("sergio.carrillo@alumni.duke.edu"));
+
+            var review1 = new Review()
+                {
+                Comments = "1",
+                Created = DateTime.Now,
+                Status = ReviewStatus.Approved,
+                Submission = _sub,
+                SubmissionRevision = _sub.Revision,
+                Reviewer = deana
+                };
+
+            var review2 = new Review()
+            {
+                Comments = "2",
+                Created = DateTime.Now,
+                Status = ReviewStatus.Approved,
+                Submission = _sub,
+                SubmissionRevision = _sub.Revision,
+                Reviewer = sergio
+            };
+
+            _sub.Reviews.Add(review1);
+            _sub.Reviews.Add(review2);
+            _db.SaveChanges();
+
+            //final review
+            ReviewSubmissionViewModel vm = new ReviewSubmissionViewModel()
+            {
+                SubmissionId = _sub.Id,
+                Comments = "Final",
+                Submission = null,
+                Status = ReviewStatus.Approved.ToString()
+            };
+
+            RedirectToActionResult result = _controller.Review(vm).Result as RedirectToActionResult;
+
+            //should redirect to submission id
+            Assert.NotNull(result);
+            Assert.Equal(_sub.Id, result.RouteValues.Values.FirstOrDefault());
+
+            _sub = _db.Submissions
+                    .Include(s => s.Reviews)
+                    .Include(s => s.Audits)
+                    .Include(s => s.Responses)
+                    .Include(s => s.Files)
+                    .Include(s => s.StateHistory)
+                    .Include(s => s.Comments)
+                    .FirstOrDefault(s => s.Id == _sub.Id);
+
+            //Submisison should be moved to tallying votes
+            Assert.Equal(Status.ARBTallyVotes, _sub.Status);
+
+            //email chairman for tallying votes
+            Assert.Equal(1, _email.Emails.Count);
+            TestEmail.Email email = _email.Emails.First(e => e.Recipient.Equals("kfinnis@gmail.com"));
+            Assert.NotNull(email);
+        }
     }
 }
