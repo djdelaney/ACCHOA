@@ -168,7 +168,7 @@ namespace HOA.Model.ViewModel
         public IList<IFormFile> Files { get; set; }
     }
 
-    public class FinalReview : IValidatableObject
+    public class FinalReview
     {
         public Submission Submission { get; set; }
 
@@ -183,19 +183,6 @@ namespace HOA.Model.ViewModel
 
         [Display(Name = "Homeowner Feedback (sent via email)")]
         public string UserFeedback { get; set; }
-
-        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
-        {
-            var status = (ReviewStatus)Enum.Parse(typeof(ReviewStatus), Status);
-            if ((status == ReviewStatus.ConditionallyApproved || status == ReviewStatus.MissingInformation || status == ReviewStatus.Rejected) && string.IsNullOrEmpty(UserFeedback))
-            {
-                yield return new ValidationResult("You must supply user feedback for non approvals.");
-            }
-            if(status != ReviewStatus.Approved && string.IsNullOrEmpty(Comments))
-            {
-                yield return new ValidationResult("You must supply comments for non approvals.");
-            }
-        }
     }
 
     public class EditSubmissionViewModel

@@ -27,6 +27,15 @@ namespace HOA.Model
         Retracted = 12
     }
 
+    public enum ReturnStatus
+    {
+        None = 0,
+        Reject = 1,
+        MissingInformation = 2,
+        Approved = 3,
+        ConditionallyApproved = 4
+    }
+
     public class Submission
     {
         [Required]
@@ -57,6 +66,9 @@ namespace HOA.Model
 
         [Required]
         public Status Status { get; set; }
+
+        [Required]
+        public ReturnStatus ReturnStatus { get; set; }
 
         [Required]
         public int Revision { get; set; }

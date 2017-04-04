@@ -551,6 +551,7 @@ namespace HOA.Controllers
                         Email = model.Email,
                         Description = model.Description,
                         Status = Status.CommunityMgrReview,
+                        ReturnStatus = ReturnStatus.None,
                         LastModified = DateTime.UtcNow,
                         Code = DBUtil.GenerateUniqueCode(_applicationDbContext),
                         Revision = 1,
@@ -667,6 +668,7 @@ namespace HOA.Controllers
                 else
                 {
                     //Send to mgr for formal response
+                    submission.ReturnStatus = ReturnStatus.MissingInformation;
                     submission.Status = Status.CommunityMgrReturn;
                 }
 
@@ -838,6 +840,7 @@ namespace HOA.Controllers
                 }
                 else if (status == TallyStatus.MissingInformation)
                 {
+                    submission.ReturnStatus = ReturnStatus.MissingInformation;
                     submission.Status = Status.CommunityMgrReturn;
                 }
                 else if (status == TallyStatus.HOAInputRequired)
@@ -871,7 +874,7 @@ namespace HOA.Controllers
             return View(model);
         }
 
-        /*
+
         [HttpGet]
         [AuthorizeRoles(RoleNames.HOALiaison, RoleNames.Administrator)]
         public IActionResult FinalCheck(int id)
@@ -912,44 +915,9 @@ namespace HOA.Controllers
                 string action = string.Format("Final Check {0}", model.Status);
                 AddHistoryEntry(submission, user.FullName, action);
 
-                var status = (Status)Enum.Parse(typeof(Status), model.Status);
-                if (status == Status.Approved)
-                {
-                    submission.Status = Status.PrepApproval;
-                }
-                else if (status == Status.ConditionallyApproved)
-                {
-                    submission.Status = Status.PrepConditionalApproval;
-
-                    var response = new Response
-                    {
-                        Created = DateTime.UtcNow,
-                        Comments = model.UserFeedback,
-                        Submission = submission
-                    };
-                    if (submission.Responses == null)
-                        submission.Responses = new List<Response>();
-                    submission.Responses.Add(response);
-                    _applicationDbContext.Responses.Add(response);
-                }
-                else
-                {
-                    if (status == Status.MissingInformation)
-                        submission.Status = Status.MissingInformation;
-                    else
-                        submission.Status = Status.Rejected;
-
-                    var response = new Response
-                    {
-                        Created = DateTime.UtcNow,
-                        Comments = model.UserFeedback,
-                        Submission = submission
-                    };
-                    if (submission.Responses == null)
-                        submission.Responses = new List<Response>();
-                    submission.Responses.Add(response);
-                    _applicationDbContext.Responses.Add(response);
-                }
+                //Store status for return
+                submission.ReturnStatus = (ReturnStatus)Enum.Parse(typeof(ReturnStatus), model.Status);
+                submission.Status = Status.CommunityMgrReturn;
 
                 AddStateSwitch(submission);
                 submission.StatusChangeTime = DateTime.UtcNow;
@@ -965,6 +933,7 @@ namespace HOA.Controllers
             return View(model);
         }
 
+        /*
         [HttpGet]
         [AllowAnonymous]
         public IActionResult Resubmit(int id)
