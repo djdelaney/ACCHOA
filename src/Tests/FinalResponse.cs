@@ -64,7 +64,7 @@ namespace Tests
                 Address = "123 Address",
                 Email = "Test@gmail.com",
                 Description = "Deck",
-                Status = Status.CommunityMgrReturn,
+                Status = Status.FinalResponse,
                 StatusChangeTime = DateTime.UtcNow,
                 LastModified = DateTime.UtcNow,
                 SubmissionDate = DateTime.UtcNow.AddHours(-1),

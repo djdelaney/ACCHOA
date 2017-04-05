@@ -94,10 +94,9 @@ namespace HOA.Model.ViewModel
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            ReviewStatus statusEnum;
-            if(Enum.TryParse(Status, out statusEnum))
+            if (Enum.TryParse(Status, out ReviewStatus statusEnum))
             {
-                if(statusEnum != ReviewStatus.Approved && string.IsNullOrEmpty(Comments))
+                if (statusEnum != ReviewStatus.Approved && string.IsNullOrEmpty(Comments))
                 {
                     yield return new ValidationResult("You must supply comments for non-approvals.");
                 }
@@ -168,6 +167,17 @@ namespace HOA.Model.ViewModel
         public IList<IFormFile> Files { get; set; }
     }
 
+    public class ReturnCommentsViewModel
+    {
+        public Submission Submission { get; set; }
+
+        [Required]
+        public int SubmissionId { get; set; }
+
+        [Required]
+        public string UserFeedback { get; set; }
+    }
+
     public class FinalReview
     {
         public Submission Submission { get; set; }
@@ -180,9 +190,6 @@ namespace HOA.Model.ViewModel
         
         [Display(Name = "Internal Comments")]
         public string Comments { get; set; }
-
-        [Display(Name = "Homeowner Feedback (sent via email)")]
-        public string UserFeedback { get; set; }
     }
 
     public class EditSubmissionViewModel

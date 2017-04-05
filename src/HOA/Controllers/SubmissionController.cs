@@ -159,6 +159,9 @@ namespace HOA.Controllers
                 if (submission == null)
                     return NotFound("Submission not found");
 
+                if (submission.Status != Status.FinalResponse)
+                    throw new Exception("Invalid status");
+
                 var user = await _userManager.GetUserAsync(HttpContext.User);
 
                 if (submission.ReturnStatus == ReturnStatus.Approved)
@@ -216,7 +219,80 @@ namespace HOA.Controllers
             model.Submission = _applicationDbContext.Submissions.FirstOrDefault(s => s.Id == model.SubmissionId);
             return View(model);
         }
-       
+
+        [HttpGet]
+        [Authorize(Roles = "CommunityManager")]
+        public IActionResult CommunityMgrReturn(int id)
+        {
+            var submission = _applicationDbContext.Submissions.FirstOrDefault(s => s.Id == id);
+            if (submission == null)
+                return NotFound("Submission not found");
+
+            ReturnCommentsViewModel model = new ReturnCommentsViewModel
+            {
+                Submission = submission,
+                SubmissionId = submission.Id
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = RoleNames.CommunityManager)]
+        public async Task<IActionResult> CommunityMgrReturn(ReturnCommentsViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var submission = _applicationDbContext.Submissions.Include(s => s.Reviews)
+                    .Include(s => s.Audits)
+                    .Include(s => s.Responses)
+                    .Include(s => s.Files)
+                    .Include(s => s.StateHistory)
+                    .Include(s => s.Comments)
+                    .FirstOrDefault(s => s.Id == model.SubmissionId);
+                if (submission == null)
+                    return NotFound("Submission not found");
+
+                if (submission.Status != Status.CommunityMgrReturn)
+                    throw new Exception("Invalid status");
+
+                var user = await _userManager.GetUserAsync(HttpContext.User);
+
+                if (submission.ReturnStatus == ReturnStatus.MissingInformation)
+                else if (submission.ReturnStatus == ReturnStatus.Reject)
+                    submission.Status = Status.Rejected;
+                else
+                    throw new Exception("Invalid status");
+
+                AddStateSwitch(submission);
+                
+                var response = new Response
+                {
+                    Created = DateTime.UtcNow,
+                    Comments = model.UserFeedback,
+                    Submission = submission
+                };
+                if (submission.Responses == null)
+                    submission.Responses = new List<Response>();
+                submission.Responses.Add(response);
+                _applicationDbContext.Responses.Add(response);
+                
+                AddHistoryEntry(submission, user.FullName, "Sent response");
+                
+                submission.LastModified = DateTime.UtcNow;
+                _applicationDbContext.SaveChanges();
+
+                EmailHelper.NotifyFinalResponse(_applicationDbContext, submission, model.UserFeedback, _email, null, null);
+
+                return RedirectToAction(nameof(View), new { id = submission.Id });
+            }
+
+            // If we got this far, something failed, redisplay form
+            model.Submission = _applicationDbContext.Submissions.FirstOrDefault(s => s.Id == model.SubmissionId);
+            return View(model);
+        }
+
 
         public IActionResult List(int page = 1, string filter = null)
         {
@@ -920,7 +996,21 @@ namespace HOA.Controllers
 
                 //Store status for return
                 submission.ReturnStatus = (ReturnStatus)Enum.Parse(typeof(ReturnStatus), model.Status);
-                submission.Status = Status.CommunityMgrReturn;
+
+                if (submission.ReturnStatus == ReturnStatus.Approved ||
+                    submission.ReturnStatus == ReturnStatus.ConditionallyApproved ||
+                    submission.ReturnStatus == ReturnStatus.Reject)
+                {
+                    submission.Status = Status.FinalResponse;
+                }
+                else if (submission.ReturnStatus == ReturnStatus.MissingInformation) //missing info goes back through mgr
+                {
+                    submission.Status = Status.CommunityMgrReturn;
+                }
+                else
+                {
+                    throw new Exception("Invalid status");
+                }
 
                 AddStateSwitch(submission);
                 submission.StatusChangeTime = DateTime.UtcNow;

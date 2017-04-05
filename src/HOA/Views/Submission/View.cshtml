@@ -193,6 +193,10 @@
     {
         <a href="/Submission/FinalResponse/@Model.Submission.Id">Homeowner final response</a>
     }
+    else if (Model.Submission.Status == Status.CommunityMgrReturn && User.IsInRole(RoleNames.CommunityManager))
+    {
+        <a href="/Submission/CommunityMgrReturn/@Model.Submission.Id">Return to homeowner</a>
+    }
     else
     {
         @: None

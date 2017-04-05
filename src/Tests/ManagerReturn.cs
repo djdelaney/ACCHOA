@@ -22,7 +22,7 @@ using Tests.Helpers;
 
 namespace Tests
 {
-    public class LiasonCheck
+    public class ManagerReturn
     {
         private TestEmail _email;
         private IFileStore _files;
@@ -64,7 +64,7 @@ namespace Tests
                 Address = "123 Address",
                 Email = "Test@gmail.com",
                 Description = "Deck",
-                Status = Status.HOALiasonInput,
+                Status = Status.CommunityMgrReturn,
                 StatusChangeTime = DateTime.UtcNow,
                 LastModified = DateTime.UtcNow,
                 SubmissionDate = DateTime.UtcNow.AddHours(-1),
@@ -96,22 +96,24 @@ namespace Tests
         }
 
         [Fact]
-        public void Liason_Approve()
+        public void Return_MissingInfo()
         {
-            Setup("mellomba0526@gmail.com");
+            Setup("josh.rozzi@fsresidential.com");
+
+            _sub.ReturnStatus = ReturnStatus.MissingInformation;
+            _db.SaveChanges();
 
             //Current user mock
             var mockPrincipal = GetMockUser();
             _controller.ControllerContext.HttpContext = new DefaultHttpContext() { User = mockPrincipal.Object };
 
-            FinalReview vm = new FinalReview()
+            ReturnCommentsViewModel vm = new ReturnCommentsViewModel()
             {
                 SubmissionId = _sub.Id,
-                Status = ReturnStatus.Approved.ToString(),
-                Comments = "COMMENT3"
+                UserFeedback = "blah"
             };
 
-            RedirectToActionResult result = _controller.FinalCheck(vm).Result as RedirectToActionResult;
+            RedirectToActionResult result = _controller.CommunityMgrReturn(vm).Result as RedirectToActionResult;
 
             //should redirect to submission id
             Assert.NotNull(result);
@@ -126,72 +128,20 @@ namespace Tests
                     .Include(s => s.Comments)
                     .FirstOrDefault(s => s.Id == _sub.Id);
 
-            //Submisison should be marked for return, to be approved
-            Assert.Equal(Status.FinalResponse, _sub.Status);
-            Assert.Equal(ReturnStatus.Approved, _sub.ReturnStatus);
-
-            //internal comment
-            Assert.Equal(1, _sub.Comments.Count);
-            Assert.Equal("COMMENT3", _sub.Comments.FirstOrDefault().Comments);
-
-            //history entry
-            Assert.Equal(1, _sub.StateHistory.Count);
-            StateChange change = _sub.StateHistory.FirstOrDefault();
-            Assert.Equal(Status.FinalResponse, change.State);
-
-            //email to ARB chair
-            Assert.Equal(1, _email.Emails.Count);
-            TestEmail.Email email = _email.Emails.First(e => e.Recipient.Equals("josh.rozzi@fsresidential.com"));
-            Assert.NotNull(email);
-        }
-
-        [Fact]
-        public void Liason_MissingInfo()
-        {
-            Setup("mellomba0526@gmail.com");
-
-            //Current user mock
-            var mockPrincipal = GetMockUser();
-            _controller.ControllerContext.HttpContext = new DefaultHttpContext() { User = mockPrincipal.Object };
-
-            FinalReview vm = new FinalReview()
-            {
-                SubmissionId = _sub.Id,
-                Status = ReturnStatus.MissingInformation.ToString(),
-                Comments = "COMMENT3"
-            };
-
-            RedirectToActionResult result = _controller.FinalCheck(vm).Result as RedirectToActionResult;
-
-            //should redirect to submission id
-            Assert.NotNull(result);
-            Assert.Equal(_sub.Id, result.RouteValues.Values.FirstOrDefault());
-
-            _sub = _db.Submissions
-                    .Include(s => s.Reviews)
-                    .Include(s => s.Audits)
-                    .Include(s => s.Responses)
-                    .Include(s => s.Files)
-                    .Include(s => s.StateHistory)
-                    .Include(s => s.Comments)
-                    .FirstOrDefault(s => s.Id == _sub.Id);
-
-            //Submisison should be marked for return, to be marked missing info
-            Assert.Equal(Status.CommunityMgrReturn, _sub.Status);
+            //Submisison should be marked missing info
             Assert.Equal(ReturnStatus.MissingInformation, _sub.ReturnStatus);
 
             //internal comment
-            Assert.Equal(1, _sub.Comments.Count);
-            Assert.Equal("COMMENT3", _sub.Comments.FirstOrDefault().Comments);
+            Assert.Equal(0, _sub.Comments.Count);
 
             //history entry
             Assert.Equal(1, _sub.StateHistory.Count);
             StateChange change = _sub.StateHistory.FirstOrDefault();
-            Assert.Equal(Status.CommunityMgrReturn, change.State);
+            Assert.Equal(Status.MissingInformation, change.State);
 
-            //email to ARB chair
+            //email to homeowner
             Assert.Equal(1, _email.Emails.Count);
-            TestEmail.Email email = _email.Emails.First(e => e.Recipient.Equals("josh.rozzi@fsresidential.com"));
+            TestEmail.Email email = _email.Emails.First(e => e.Recipient.Equals("Test@gmail.com"));
             Assert.NotNull(email);
         }
     }
