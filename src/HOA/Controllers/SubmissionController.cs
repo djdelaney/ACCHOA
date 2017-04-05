@@ -260,6 +260,7 @@ namespace HOA.Controllers
                 var user = await _userManager.GetUserAsync(HttpContext.User);
 
                 if (submission.ReturnStatus == ReturnStatus.MissingInformation)
+                    submission.Status = Status.MissingInformation;
                 else if (submission.ReturnStatus == ReturnStatus.Reject)
                     submission.Status = Status.Rejected;
                 else
