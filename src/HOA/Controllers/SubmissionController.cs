@@ -384,8 +384,7 @@ namespace HOA.Controllers
 
             return View(submission);
         }
-
-        /*
+        
         [AuthorizeRoles(RoleNames.BoardChairman)]
         public async Task<IActionResult> SkipQuorum(int id)
         {
@@ -399,14 +398,14 @@ namespace HOA.Controllers
             if (submission == null)
                 return NotFound("Submission not found");
 
-            if (submission.Status != Status.UnderReview)
+            if (submission.Status != Status.CommitteeReview)
             {
                 throw new Exception("Invliad state!");
             }
 
             var user = await _userManager.GetUserAsync(HttpContext.User);
 
-            submission.Status = Status.ARBFinal;
+            submission.Status = Status.ARBTallyVotes;
             submission.LastModified = DateTime.UtcNow;
             submission.StatusChangeTime = DateTime.UtcNow;
             AddHistoryEntry(submission, user.FullName, "Manually skiped quorum");
@@ -459,7 +458,7 @@ namespace HOA.Controllers
 
             _applicationDbContext.SaveChanges();
             return RedirectToAction("List");
-        }*/
+        }
 
         public async Task<ActionResult> File(int id)
         {
@@ -1034,7 +1033,7 @@ namespace HOA.Controllers
 
             // If we got this far, something failed, redisplay form
             return View(model);
-        }
+        }*/
 
         [AllowAnonymous]
         public IActionResult Retract(int id)
@@ -1068,7 +1067,7 @@ namespace HOA.Controllers
             EmailHelper.NotifyStatusChanged(_applicationDbContext, submission, _email);
 
             return RedirectToAction(nameof(ViewStatus), new { id = submission.Code });
-        }*/
+        }
 
         [Authorize(Roles = RoleNames.BoardChairman)]
         public async Task<IActionResult> PrecedentSetting(int id)
@@ -1100,8 +1099,7 @@ namespace HOA.Controllers
 
             return RedirectToAction(nameof(View), new { id = submission.Id });
         }
-
-        /*
+        
         [HttpGet]
         [AuthorizeRoles(RoleNames.CommunityManager, RoleNames.Administrator)]
         public IActionResult Edit(int id)
@@ -1182,7 +1180,7 @@ namespace HOA.Controllers
 
             // If we got this far, something failed, redisplay form
             return View(model);
-        }*/
+        }
 
         [HttpGet]
         [Authorize]
@@ -1226,8 +1224,7 @@ namespace HOA.Controllers
             // If we got this far, something failed, redisplay form
             return View(model);
         }
-
-        /*
+        
         [HttpGet]
         [Authorize(Roles = "CommunityManager")]
         public IActionResult AddApprovalDoc(int id)
@@ -1345,7 +1342,7 @@ namespace HOA.Controllers
                 if (submission == null)
                     return NotFound("Submission not found");
 
-                if (submission.Status != Status.Submitted)
+                if (submission.Status != Status.CommunityMgrReview)
                     return NotFound("Incorrect status");
 
                 var user = await _userManager.GetUserAsync(HttpContext.User);
@@ -1397,6 +1394,5 @@ namespace HOA.Controllers
             model.Submission = _applicationDbContext.Submissions.FirstOrDefault(s => s.Id == model.SubmissionId);
             return View(model);
         }
-        */
     }
 }
