@@ -8,7 +8,7 @@ using HOA.Model;
 namespace HOA.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20170327002642_Initial")]
+    [Migration("20170405002958_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -250,6 +250,8 @@ namespace HOA.Migrations
                         .HasMaxLength(32);
 
                     b.Property<bool>("PrecedentSetting");
+
+                    b.Property<int>("ReturnStatus");
 
                     b.Property<int>("Revision");
 

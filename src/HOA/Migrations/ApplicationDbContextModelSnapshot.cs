@@ -250,6 +250,8 @@ namespace HOA.Migrations
 
                     b.Property<bool>("PrecedentSetting");
 
+                    b.Property<int>("ReturnStatus");
+
                     b.Property<int>("Revision");
 
                     b.Property<int>("Status");

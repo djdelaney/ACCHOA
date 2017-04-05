@@ -51,7 +51,7 @@
 
     <b>Status:</b> @Model.Submission.Status<br />
 
-    @if (Model.Submission.Status == Status.UnderReview)
+    @if (Model.Submission.Status == Status.CommitteeReview)
     {
         @Model.CurrentReviewCount
         @: review(s) submitted of @Model.ReviewerCount  <br />
@@ -64,7 +64,7 @@
 
         
 
-        @foreach (var review in Model.Submission.Reviews)
+        foreach (var review in Model.Submission.Reviews)
         {
             if (review.SubmissionRevision != Model.Submission.Revision)
             {
@@ -73,7 +73,7 @@
 
             @review.Reviewer.FullName@:, @HOA.Util.DateHtmlHelper.ConvertToLocalDate(review.Created, "MM/dd/yyyy") <br />
 
-            @if (review.Status == ReviewStatus.Approved)
+            if (review.Status == ReviewStatus.Approved)
             {
                 @: Approved
             }
@@ -100,7 +100,7 @@
         }
 
         bool oldReviewsShown = false;
-        @foreach (var review in Model.Submission.Reviews)
+        foreach (var review in Model.Submission.Reviews)
         {
             if (review.SubmissionRevision == Model.Submission.Revision)
             {
@@ -116,7 +116,7 @@
             @review.Reviewer.FullName@:, @HOA.Util.DateHtmlHelper.ConvertToLocalDate(review.Created, "MM/dd/yyyy") <br />
 
 
-            @if (review.Status == ReviewStatus.Approved)
+            if (review.Status == ReviewStatus.Approved)
             {
                 @: Approved
             }
@@ -148,7 +148,7 @@
     @if (Model.Submission.Comments != null && Model.Submission.Comments.Count > 0)
     {
         @: <h3>Internal Comments:</h3>
-        @foreach (var comment in Model.Submission.Comments)
+        foreach (var comment in Model.Submission.Comments)
         {
             @comment.User.FullName@:, @HOA.Util.DateHtmlHelper.ConvertToLocalDate(comment.Created, "g") <br />
             @comment.Comments<br />
@@ -158,21 +158,21 @@
 
 
     <h3>Action:</h3>
-    @if (Model.Submission.Status == Status.Submitted && (User.IsInRole(RoleNames.CommunityManager)))
+    @if (Model.Submission.Status == Status.CommunityMgrReview && (User.IsInRole(RoleNames.CommunityManager)))
     {
         <a href="/Submission/QuickApprove/@Model.Submission.Id">Quick Approve</a><br />
         <br />
     }
 
-    @if ((Model.Submission.Status == Status.Submitted && (User.IsInRole(RoleNames.CommunityManager) || User.IsInRole(RoleNames.Administrator))) ||
-                    (Model.Submission.Status == Status.ARBIncoming && (User.IsInRole(RoleNames.BoardChairman) || User.IsInRole(RoleNames.Administrator))))
+    @if ((Model.Submission.Status == Status.CommunityMgrReview && (User.IsInRole(RoleNames.CommunityManager) || User.IsInRole(RoleNames.Administrator))) ||
+                    (Model.Submission.Status == Status.ARBChairReview && (User.IsInRole(RoleNames.BoardChairman) || User.IsInRole(RoleNames.Administrator))))
     {
         <a href="/Submission/CheckCompleteness/@Model.Submission.Id">Check for completeness</a><br />
         <br />
     }
-    else if (Model.Submission.Status == Status.UnderReview && User.IsInRole(RoleNames.ARBBoardMember))
+    else if (Model.Submission.Status == Status.CommitteeReview && User.IsInRole(RoleNames.ARBBoardMember))
     {
-        @if (!Model.Reviewed)
+        if (!Model.Reviewed)
         {
             <a href="/Submission/Review/@Model.Submission.Id">Review</a>
         }
@@ -181,15 +181,15 @@
             @: Already reviewed
     }
     }
-    else if (Model.Submission.Status == Status.ARBFinal && (User.IsInRole(RoleNames.BoardChairman) || User.IsInRole(RoleNames.Administrator)))
+    else if (Model.Submission.Status == Status.ARBTallyVotes && (User.IsInRole(RoleNames.BoardChairman) || User.IsInRole(RoleNames.Administrator)))
     {
         <a href="/Submission/TallyVotes/@Model.Submission.Id">Tally votes</a>
     }
-    else if (Model.Submission.Status == Status.ReviewComplete && (User.IsInRole(RoleNames.HOALiaison) || User.IsInRole(RoleNames.Administrator)))
+    else if (Model.Submission.Status == Status.HOALiasonReview && (User.IsInRole(RoleNames.HOALiaison) || User.IsInRole(RoleNames.Administrator)))
     {
         <a href="/Submission/FinalCheck/@Model.Submission.Id">Final check</a>
     }
-    else if ((Model.Submission.Status == Status.PrepApproval || Model.Submission.Status == Status.PrepConditionalApproval) && User.IsInRole(RoleNames.CommunityManager))
+    else if (Model.Submission.Status == Status.FinalResponse && User.IsInRole(RoleNames.CommunityManager))
     {
         <a href="/Submission/FinalResponse/@Model.Submission.Id">Homeowner final response</a>
     }
@@ -198,7 +198,7 @@
         @: None
     }
 
-    @if ((Model.Submission.Status == Status.Submitted || Model.Submission.Status == Status.ARBIncoming) &&
+    @if ((Model.Submission.Status == Status.CommunityMgrReview || Model.Submission.Status == Status.ARBChairReview) &&
                                     (User.IsInRole(RoleNames.CommunityManager) || User.IsInRole(RoleNames.Administrator)))
     {
         
@@ -213,7 +213,7 @@
     }
 
     
-    @if ((Model.Submission.Status == Status.ARBIncoming || Model.Submission.Status == Status.UnderReview) &&
+    @if ((Model.Submission.Status == Status.ARBChairReview || Model.Submission.Status == Status.CommitteeReview) &&
                 (!Model.Submission.PrecedentSetting && User.IsInRole(RoleNames.BoardChairman)))
     {
         <br />
@@ -221,7 +221,7 @@
     }
 
 
-     @if (Model.Submission.Status == Status.UnderReview && User.IsInRole(RoleNames.BoardChairman))
+     @if (Model.Submission.Status == Status.CommitteeReview && User.IsInRole(RoleNames.BoardChairman))
      {
         <br />
         <a href="/Submission/SkipQuorum/@Model.Submission.Id" onclick="if (!confirm('Are you sure?')) return false;">Skip Quorum</a>

@@ -133,8 +133,7 @@ namespace HOA.Controllers
 
             return View(model);
         }
-
-        /*
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = RoleNames.CommunityManager)]
@@ -162,10 +161,14 @@ namespace HOA.Controllers
 
                 var user = await _userManager.GetUserAsync(HttpContext.User);
 
-                if (submission.Status == Status.PrepApproval)
+                if (submission.ReturnStatus == ReturnStatus.Approved)
                     submission.Status = Status.Approved;
-                else
+                else if (submission.ReturnStatus == ReturnStatus.ConditionallyApproved)
                     submission.Status = Status.ConditionallyApproved;
+                else if (submission.ReturnStatus == ReturnStatus.Reject)
+                    submission.Status = Status.Rejected;
+                else
+                    throw new Exception("Invalid status");
 
                 AddStateSwitch(submission);
 
@@ -213,13 +216,13 @@ namespace HOA.Controllers
             model.Submission = _applicationDbContext.Submissions.FirstOrDefault(s => s.Id == model.SubmissionId);
             return View(model);
         }
-        */
+       
 
         public IActionResult List(int page = 1, string filter = null)
         {
             IQueryable<Submission> subs = _applicationDbContext.Submissions;
 
-            /*if(string.IsNullOrEmpty(filter))
+            if(string.IsNullOrEmpty(filter))
             {
                 filter = "Todo";
             }
@@ -246,17 +249,19 @@ namespace HOA.Controllers
                 }
                 else if (User.IsInRole(RoleNames.CommunityManager))
                 {
-                    subs = subs.Where(s => s.Status == Status.Submitted || s.Status == Status.PrepApproval || s.Status == Status.PrepConditionalApproval ||
-                                    (s.FinalApprovalBlob == null && (s.Status == Status.Approved || s.Status == Status.ConditionallyApproved))
-                                    ); //include approved items missing final attachment
+                    subs = subs.Where(s => s.Status == Status.CommunityMgrReview ||
+                                        s.Status == Status.FinalResponse || 
+                                        s.Status == Status.CommunityMgrReturn ||
+                                        (s.FinalApprovalBlob == null && (s.Status == Status.Approved || s.Status == Status.ConditionallyApproved)));
+                                        //include approved items missing final attachment
                 }
                 else if (User.IsInRole(RoleNames.BoardChairman))
                 {
-                    subs = subs.Where(s => s.Status == Status.ARBIncoming || s.Status == Status.ARBFinal);
+                    subs = subs.Where(s => s.Status == Status.ARBChairReview || s.Status == Status.ARBTallyVotes);
                 }
                 else if (User.IsInRole(RoleNames.ARBBoardMember))
                 {
-                    subs = subs.Where(s => s.Status == Status.UnderReview);
+                    subs = subs.Where(s => s.Status == Status.CommitteeReview);
 
                     //Filter to ones that the current user hasnt reviewed
                     var user = _userManager.GetUserAsync(HttpContext.User).Result;
@@ -265,7 +270,7 @@ namespace HOA.Controllers
                 }
                 else if (User.IsInRole(RoleNames.HOALiaison))
                 {
-                    subs = subs.Where(s => s.Status == Status.ReviewComplete);
+                    subs = subs.Where(s => s.Status == Status.HOALiasonReview || s.Status == Status.HOALiasonInput);
                 }
             }
             else if (filter.Equals("Open"))
@@ -293,7 +298,7 @@ namespace HOA.Controllers
             else if (filter.Equals("Rejected"))
             {
                 subs = subs.Where(s => s.Status == Status.Rejected || s.Status == Status.MissingInformation);
-            }*/
+            }
 
             var pager = new Pager(subs.Count(), page);
             IList<Submission> results = subs.Include(s => s.Audits).OrderByDescending(s => s.LastModified).Skip((pager.CurrentPage - 1) * pager.PageSize).Take(pager.PageSize).ToList();
@@ -340,9 +345,7 @@ namespace HOA.Controllers
         {
             return View();
         }
-
-        /*
-
+        
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -382,6 +385,7 @@ namespace HOA.Controllers
             return View(submission);
         }
 
+        /*
         [AuthorizeRoles(RoleNames.BoardChairman)]
         public async Task<IActionResult> SkipQuorum(int id)
         {
@@ -455,7 +459,7 @@ namespace HOA.Controllers
 
             _applicationDbContext.SaveChanges();
             return RedirectToAction("List");
-        }
+        }*/
 
         public async Task<ActionResult> File(int id)
         {
@@ -498,7 +502,7 @@ namespace HOA.Controllers
 
             var stream = await _storage.RetriveFile(submission.FinalApprovalBlob);
             return File(stream, "application/octet", submission.FinalApprovalFileName);
-        }*/
+        }
 
         [HttpGet]
         [AllowAnonymous]
@@ -1064,7 +1068,7 @@ namespace HOA.Controllers
             EmailHelper.NotifyStatusChanged(_applicationDbContext, submission, _email);
 
             return RedirectToAction(nameof(ViewStatus), new { id = submission.Code });
-        }
+        }*/
 
         [Authorize(Roles = RoleNames.BoardChairman)]
         public async Task<IActionResult> PrecedentSetting(int id)
@@ -1081,8 +1085,8 @@ namespace HOA.Controllers
 
             var user = await _userManager.GetUserAsync(HttpContext.User);
 
-            if (submission.Status != Status.ARBIncoming &&
-                submission.Status != Status.UnderReview)
+            if (submission.Status != Status.ARBChairReview &&
+                submission.Status != Status.CommitteeReview)
             {
                 throw new Exception("Invliad state!");
             }
@@ -1097,6 +1101,7 @@ namespace HOA.Controllers
             return RedirectToAction(nameof(View), new { id = submission.Id });
         }
 
+        /*
         [HttpGet]
         [AuthorizeRoles(RoleNames.CommunityManager, RoleNames.Administrator)]
         public IActionResult Edit(int id)
@@ -1177,7 +1182,7 @@ namespace HOA.Controllers
 
             // If we got this far, something failed, redisplay form
             return View(model);
-        }
+        }*/
 
         [HttpGet]
         [Authorize]
@@ -1222,6 +1227,7 @@ namespace HOA.Controllers
             return View(model);
         }
 
+        /*
         [HttpGet]
         [Authorize(Roles = "CommunityManager")]
         public IActionResult AddApprovalDoc(int id)

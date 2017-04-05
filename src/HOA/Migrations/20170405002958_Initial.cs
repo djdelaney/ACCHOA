@@ -54,6 +54,7 @@ namespace HOA.Migrations
                     LastModified = table.Column<DateTime>(nullable: false),
                     LastName = table.Column<string>(maxLength: 32, nullable: false),
                     PrecedentSetting = table.Column<bool>(nullable: false),
+                    ReturnStatus = table.Column<int>(nullable: false),
                     Revision = table.Column<int>(nullable: false),
                     Status = table.Column<int>(nullable: false),
                     StatusChangeTime = table.Column<DateTime>(nullable: false),
