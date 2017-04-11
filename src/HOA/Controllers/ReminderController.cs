@@ -17,12 +17,7 @@ namespace HOA.Controllers
     [Authorize]
     public class ReminderController : Controller
     {
-        private static readonly TimeSpan ReminderTime_Submitted = new TimeSpan(3, 0, 0, 0); //3 days
-        private static readonly TimeSpan ReminderTime_ARBIncoming = new TimeSpan(3, 0, 0, 0); //3 days
-        private static readonly TimeSpan ReminderTime_Review = new TimeSpan(3, 0, 0, 0); //3 days
-        private static readonly TimeSpan ReminderTime_ARBPost = new TimeSpan(3, 0, 0, 0); //3 days
-        private static readonly TimeSpan ReminderTime_PrepApproval = new TimeSpan(3, 0, 0, 0); //3 days
-        private static readonly TimeSpan ReminderTime_Final = new TimeSpan(3, 0, 0, 0); //3 days
+        private static readonly TimeSpan ReminderTime_General = new TimeSpan(3, 0, 0, 0); //3 days
 
         private static readonly TimeSpan Quorum_Final = new TimeSpan(5, 0, 0, 0); //5 days
 
@@ -39,44 +34,31 @@ namespace HOA.Controllers
             _applicationDbContext = applicationDbContext;
             _email = mail;
         }
-
-        /*
+        
         [AllowAnonymous]
         public IActionResult Process()
         {
             Dictionary<string, List<Submission>> toNotify = new Dictionary<string, List<Submission>>();
 
-            var allOpen = _applicationDbContext.Submissions.Where(
-                s => s.Status != Status.Approved && s.Status != Status.Rejected && s.Status != Status.ConditionallyApproved && s.Status != Status.MissingInformation
+            var allOpen = _applicationDbContext.Submissions.Where(s => 
+                    s.Status != Status.Approved && 
+                    s.Status != Status.Rejected &&
+                    s.Status != Status.ConditionallyApproved &&
+                    s.Status != Status.MissingInformation &&
+                    s.Status != Status.Retracted
                 ).ToList();
 
             foreach(var submission in allOpen)
             {
-                TimeSpan timeAllowance = TimeSpan.MaxValue;
-                switch (submission.Status)
+                TimeSpan timeAllowance = ReminderTime_General;
+                /*switch (submission.Status)
                 {
-                    case Status.Submitted:
-                        timeAllowance = ReminderTime_Submitted;
-                        break;
-                    case Status.ARBIncoming:
-                        timeAllowance = ReminderTime_ARBIncoming;
-                        break;
-                    case Status.UnderReview:
-                        timeAllowance = ReminderTime_Review;
-                        break;
-                    case Status.ARBFinal:
-                        timeAllowance = ReminderTime_ARBPost;
-                        break;
-                    case Status.ReviewComplete:
-                        timeAllowance = ReminderTime_Final;
-                        break;
-                    case Status.PrepApproval:
-                    case Status.PrepConditionalApproval:
-                        timeAllowance = ReminderTime_PrepApproval;
+                    case Status.CommitteeReview:
+                        timeAllowance = ReminderTime_General;
                         break;
                     default:
                         continue;
-                }
+                }*/
 
                 if(DateTime.Now > submission.StatusChangeTime.Add(timeAllowance))
                 {
@@ -106,7 +88,7 @@ namespace HOA.Controllers
             int totalReviewers = SubmissionController.GetReviewerCount(_applicationDbContext);
             int quorum = (int)Math.Ceiling((double)totalReviewers / (double)2);
 
-            var allOpen = _applicationDbContext.Submissions.Where(s => s.Status == Status.UnderReview).Include(s => s.Reviews)
+            var allOpen = _applicationDbContext.Submissions.Where(s => s.Status == Status.CommitteeReview).Include(s => s.Reviews)
                     .Include(s => s.Audits)
                     .Include(s => s.Responses)
                     .Include(s => s.Files)
@@ -116,7 +98,7 @@ namespace HOA.Controllers
             {
                 if (submission.Reviews.Count >= quorum && DateTime.Now > submission.StatusChangeTime.Add(Quorum_Final))
                 {
-                    submission.Status = Status.ARBFinal;
+                    submission.Status = Status.ARBTallyVotes;
                     submission.LastModified = DateTime.UtcNow;
                     submission.StatusChangeTime = DateTime.UtcNow;
 
@@ -140,6 +122,6 @@ namespace HOA.Controllers
             }
 
             return Content("Processed");
-        }*/
+        }
     }
 }
