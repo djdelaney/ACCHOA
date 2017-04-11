@@ -37,13 +37,18 @@
     @:User feedback (email): <br />    
     @Html.TextAreaFor(model => model.UserFeedback, new { @class = "form-control", @maxlength = "512" })<br />
 
-    @:Final approval file <br />
-    <input type="file" name="Files" id="Files" /> <br />
+    if (Model.Submission.Status == Status.Approved || Model.Submission.Status == Status.ConditionallyApproved)
+    {
+        @:Final approval file <br/>
+        <input type="file" name="Files" id="Files"/>
+        <br/>
+        <br />
+    }
+
 
     <br />
-    <br />
 
 
-    <input type="submit" value="Send final approval" class="btn btn-lg btn-primary" />
+    <input type="submit" value="Send response" class="btn btn-lg btn-primary" />
 
 }

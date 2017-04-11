@@ -54,8 +54,7 @@ namespace HOA.Controllers
         {
             return View();
         }
-
-        /*
+        
         [HttpGet]
         [Authorize(Roles = RoleNames.Administrator)]
         public IActionResult CreateSample()
@@ -63,7 +62,7 @@ namespace HOA.Controllers
             CreateTestViewModel model = new CreateTestViewModel()
             {
                 Count = 1,
-                Type = Status.Submitted.ToString()
+                Type = Status.CommunityMgrReview.ToString()
             };
             return View(model);
         }
@@ -167,7 +166,25 @@ namespace HOA.Controllers
                 for (int x = 0; x < model.Count; x++)
                 {
                     var sub = CreateSubmission();
-                    Status[] statuses = { Status.ARBIncoming, Status.UnderReview, Status.ARBFinal, Status.ReviewComplete, Status.Approved, Status.Rejected, Status.PrepApproval, Status.PrepConditionalApproval };
+                    Status[] statuses =
+                    {
+                        Status.CommunityMgrReview,
+                        Status.ARBChairReview,
+                        Status.CommitteeReview,
+                        Status.ARBTallyVotes,
+                        Status.HOALiasonReview,
+                        Status.FinalResponse,
+
+                        Status.CommunityMgrReturn,
+
+                        Status.HOALiasonInput,
+
+                        Status.Rejected,
+                        Status.MissingInformation,
+                        Status.Approved,
+                        Status.ConditionallyApproved,
+                        Status.Retracted,
+                    };
                     var status = statuses[_rand.Next(statuses.Length)];
                     SetStatus(sub, status);
                     _applicationDbContext.SaveChanges();
@@ -193,7 +210,7 @@ namespace HOA.Controllers
                 Address = string.Format("{0} {1}", _rand.Next(200), streets[_rand.Next(streets.Length)]),
                 Email = string.Format("{0}@mailinator.com", name),
                 Description = string.Format("Build a {0}", objects[_rand.Next(objects.Length)]),
-                Status = Status.Submitted,
+                Status = Status.CommunityMgrReview,
                 StatusChangeTime = DateTime.UtcNow,
                 LastModified = DateTime.UtcNow,
                 SubmissionDate = DateTime.UtcNow.AddHours(-1),
@@ -227,19 +244,19 @@ namespace HOA.Controllers
 
             AddHistoryEntry(sub, "Test user", string.Format("Moving to {0}", status));
 
-            if (status == Status.ARBIncoming)
+            if (status == Status.ARBChairReview)
             {
-                sub.Status = Status.ARBIncoming;
+                sub.Status = Status.ARBChairReview;
             }
-            else if (status == Status.UnderReview)
+            else if (status == Status.CommitteeReview)
             {
-                SetStatus(sub, Status.ARBIncoming);
-                sub.Status = Status.UnderReview;
+                SetStatus(sub, Status.ARBChairReview);
+                sub.Status = Status.CommitteeReview;
             }
-            else if (status == Status.ARBFinal)
+            else if (status == Status.ARBTallyVotes)
             {
-                SetStatus(sub, Status.UnderReview);
-                sub.Status = Status.ARBFinal;
+                SetStatus(sub, Status.CommitteeReview);
+                sub.Status = Status.ARBTallyVotes;
 
                 var user = _userManager.FindByIdAsync(_userManager.GetUserId(User)).Result;
                 var review = new Review
@@ -256,39 +273,41 @@ namespace HOA.Controllers
                 sub.Reviews.Add(review);
                 _applicationDbContext.Reviews.Add(review);
             }
-            else if (status == Status.ReviewComplete)
+            else if (status == Status.HOALiasonReview)
             {
-                SetStatus(sub, Status.ARBFinal);
-                sub.Status = Status.ReviewComplete;
+                SetStatus(sub, Status.ARBTallyVotes);
+                sub.Status = Status.HOALiasonReview;
             }
-            else if (status == Status.PrepApproval)
+            else if (status == Status.FinalResponse)
             {
-                SetStatus(sub, Status.ReviewComplete);
-                sub.Status = Status.PrepApproval;
+                SetStatus(sub, Status.HOALiasonReview);
+                sub.ReturnStatus = ReturnStatus.Approved;
+                sub.Status = Status.FinalResponse;
             }
-            else if (status == Status.PrepConditionalApproval)
+            else if (status == Status.CommunityMgrReturn)
             {
-                SetStatus(sub, Status.ReviewComplete);
-                sub.Status = Status.PrepConditionalApproval;
+                SetStatus(sub, Status.HOALiasonReview);
+                sub.ReturnStatus = ReturnStatus.MissingInformation;
+                sub.Status = Status.CommunityMgrReturn;
             }
             else if (status == Status.Rejected)
             {
-                SetStatus(sub, Status.ReviewComplete);
+                SetStatus(sub, Status.CommunityMgrReturn);
                 sub.Status = Status.Rejected;
             }
             else if (status == Status.Approved)
             {
-                SetStatus(sub, Status.ReviewComplete);
+                SetStatus(sub, Status.CommunityMgrReturn);
                 sub.Status = Status.Approved;
             }
             else if (status == Status.ConditionallyApproved)
             {
-                SetStatus(sub, Status.ReviewComplete);
+                SetStatus(sub, Status.FinalResponse);
                 sub.Status = Status.ConditionallyApproved;
             }
             else if (status == Status.MissingInformation)
             {
-                SetStatus(sub, Status.Submitted);
+                SetStatus(sub, Status.CommunityMgrReturn);
                 sub.Status = Status.MissingInformation;
             }
 
@@ -310,6 +329,5 @@ namespace HOA.Controllers
             s.Audits.Add(history);
             _applicationDbContext.Histories.Add(history);
         }
-        */
     }
 }

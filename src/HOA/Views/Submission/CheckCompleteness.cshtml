@@ -8,29 +8,6 @@
     ViewBag.Title = "Check completeness";
 }
 
-@section HeaderExtras
-{
-<script>
-    function UpdateCommentField()
-    {
-        var dd = document.getElementById("Approve");
-        var val = dd.options[dd.selectedIndex].value;
-
-        if (val == 'true') {
-            document.getElementById("UserFeedback").disabled = true;
-        }
-        else {
-            document.getElementById("UserFeedback").disabled = false;
-        }
-    }
-
-    window.onload = function() {
-
-    };
-
-</script>
-}
-
 <h3>Submission</h3>
 @Model.Submission.FirstName @Model.Submission.LastName<br />
 @Model.Submission.Email <br />
@@ -74,7 +51,7 @@
         "Text",
         Model.Approve
     ),
-    new { @class = "form-control", @onchange = "UpdateCommentField()" })
+    new { @class = "form-control" })
     <br />
     <br />
 
