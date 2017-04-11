@@ -18,7 +18,7 @@ using Microsoft.EntityFrameworkCore;
 // For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace HOA.Controllers
-{/*
+{
     [RequireHttps]
     [Authorize]
     public class StatsController : Controller
@@ -161,21 +161,19 @@ namespace HOA.Controllers
         {
             Dictionary<Status, Tuple<TimeSpan, int>> times = new Dictionary<Status, Tuple<TimeSpan, int>>
             {
-                {Status.Submitted, new Tuple<TimeSpan, int>(TimeSpan.Zero, 0) },
-                {Status.ARBIncoming, new Tuple<TimeSpan, int>(TimeSpan.Zero, 0) },
-                {Status.UnderReview, new Tuple<TimeSpan, int>(TimeSpan.Zero, 0) },
-                {Status.ARBFinal, new Tuple<TimeSpan, int>(TimeSpan.Zero, 0) },
-                {Status.ReviewComplete, new Tuple<TimeSpan, int>(TimeSpan.Zero, 0) },
-                {Status.PrepApproval, new Tuple<TimeSpan, int>(TimeSpan.Zero, 0) },                
+                {Status.CommunityMgrReview, new Tuple<TimeSpan, int>(TimeSpan.Zero, 0) },
+                {Status.ARBChairReview, new Tuple<TimeSpan, int>(TimeSpan.Zero, 0) },
+                {Status.CommitteeReview, new Tuple<TimeSpan, int>(TimeSpan.Zero, 0) },
+                {Status.ARBTallyVotes, new Tuple<TimeSpan, int>(TimeSpan.Zero, 0) },
+                {Status.HOALiasonReview, new Tuple<TimeSpan, int>(TimeSpan.Zero, 0) },
+                {Status.FinalResponse, new Tuple<TimeSpan, int>(TimeSpan.Zero, 0) },
+                {Status.CommunityMgrReturn, new Tuple<TimeSpan, int>(TimeSpan.Zero, 0) },
+                {Status.HOALiasonInput, new Tuple<TimeSpan, int>(TimeSpan.Zero, 0) },
             };
             var states = _applicationDbContext.StateChanges.Where(s => s.EndTime != DateTime.MinValue).ToList();
             
             foreach (var change in states)
             {
-                if (change.State == Status.PrepConditionalApproval)
-                {
-                    change.State = Status.PrepApproval;
-                }
                 TimeSpan elapsed = change.EndTime.Subtract(change.StartTime);
 
                 if(!times.Keys.Any(k => k == change.State))
@@ -200,18 +198,22 @@ namespace HOA.Controllers
                 TimeSpan total = new TimeSpan(tuple.Item1.Ticks / tuple.Item2);
                 float d = (float)Math.Round(total.TotalHours / 24f, 1);
 
-                if (status == Status.Submitted)
-                    results.CheckCompleteness = d;
-                if (status == Status.ARBIncoming)
-                    results.ARBCheck = d;
-                if (status == Status.UnderReview)
-                    results.UnderReview = d;
-                if (status == Status.ARBFinal)
-                    results.TallyVotes = d;
-                if (status == Status.ReviewComplete)
-                    results.HOALiason = d;
-                if (status == Status.PrepApproval)
-                    results.PrepApproval = d;
+                if (status == Status.CommunityMgrReview)
+                    results.CommunityMgrReview = d;
+                else if (status == Status.ARBChairReview)
+                    results.ARBChairReview = d;
+                else if (status == Status.CommitteeReview)
+                    results.CommitteeReview = d;
+                else if (status == Status.ARBTallyVotes)
+                    results.ARBTallyVotes = d;
+                else if (status == Status.HOALiasonReview)
+                    results.HOALiasonReview = d;
+                else if (status == Status.FinalResponse)
+                    results.FinalResponse = d;
+                else if (status == Status.CommunityMgrReturn)
+                    results.CommunityMgrReturn = d;
+                else if (status == Status.HOALiasonInput)
+                    results.HOALiasonInput = d;
             }
 
 
@@ -261,12 +263,13 @@ namespace HOA.Controllers
 
     public class DaysByCategory
     {
-        public float CheckCompleteness { get; set; }
-        public float ARBCheck { get; set; }
-        public float UnderReview { get; set; }
-        public float TallyVotes { get; set; }
-        public float HOALiason { get; set; }
-        public float PrepApproval { get; set; }
+        public float CommunityMgrReview { get; set; }
+        public float ARBChairReview { get; set; }
+        public float CommitteeReview { get; set; }
+        public float ARBTallyVotes { get; set; }
+        public float HOALiasonReview { get; set; }
+        public float FinalResponse { get; set; }
+        public float CommunityMgrReturn { get; set; }
+        public float HOALiasonInput { get; set; }
     }
-*/
 }

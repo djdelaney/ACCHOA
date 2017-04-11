@@ -101,14 +101,16 @@ Total submissions: @Model.TotalSubmissions<br/>
 
 
 
-    var STAGES = ["Initial Check", "ARB Check", "Review", "Tally Votes", "HOA Check", "Final Approval"];
+    var STAGES = ["Community Manager Review", "ARB Chair Review", "Committee Review", "Tally Votes", "Liason Review", "Final Response", "Community Mgr Return", "Liason Input"];
     var stageDays = [
-        @Html.Raw(Model.DaysByCategory.CheckCompleteness),
-        @Html.Raw(Model.DaysByCategory.ARBCheck),
-        @Html.Raw(Model.DaysByCategory.UnderReview),
-        @Html.Raw(Model.DaysByCategory.TallyVotes),
-        @Html.Raw(Model.DaysByCategory.HOALiason),
-        @Html.Raw(Model.DaysByCategory.PrepApproval)
+        @Html.Raw(Model.DaysByCategory.CommunityMgrReview),
+        @Html.Raw(Model.DaysByCategory.ARBChairReview),
+        @Html.Raw(Model.DaysByCategory.CommitteeReview),
+        @Html.Raw(Model.DaysByCategory.ARBTallyVotes),
+        @Html.Raw(Model.DaysByCategory.HOALiasonReview),
+        @Html.Raw(Model.DaysByCategory.FinalResponse),
+        @Html.Raw(Model.DaysByCategory.CommunityMgrReturn),
+        @Html.Raw(Model.DaysByCategory.HOALiasonInput)
     ];
 
 
@@ -128,7 +130,7 @@ Total submissions: @Model.TotalSubmissions<br/>
                 type: 'bar',
                 data: barChartData,
                 options: {
-                    
+
                     scales: {
                         yAxes: [{
                             ticks: {
@@ -189,7 +191,7 @@ Total submissions: @Model.TotalSubmissions<br/>
                     }
                 }
             });
-            
+
 
 
             var ctxPie = document.getElementById("pieChart").getContext("2d");
