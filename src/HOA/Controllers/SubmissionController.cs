@@ -1026,8 +1026,7 @@ namespace HOA.Controllers
             model.Submission = _applicationDbContext.Submissions.FirstOrDefault(s => s.Id == model.SubmissionId);
             return View(model);
         }
-
-        /*
+        
         [HttpGet]
         [AllowAnonymous]
         public IActionResult Resubmit(int id)
@@ -1111,7 +1110,7 @@ namespace HOA.Controllers
 
                 //Increment revision
                 submission.Revision = submission.Revision + 1;
-                submission.Status = Status.Submitted;
+                submission.Status = Status.CommunityMgrReview;
 
                 AddHistoryEntry(submission, submission.FirstName + " " + submission.LastName, "Resubmitted");
 
@@ -1124,7 +1123,7 @@ namespace HOA.Controllers
 
             // If we got this far, something failed, redisplay form
             return View(model);
-        }*/
+        }
 
         [AllowAnonymous]
         public IActionResult Retract(int id)

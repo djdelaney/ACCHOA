@@ -61,7 +61,7 @@ namespace HOA.Model
         public string Email { get; set; }
 
         [Required]
-        [MaxLength(2048)]
+        [MaxLength(10240)]
         public string Description { get; set; }
 
         [Required]
