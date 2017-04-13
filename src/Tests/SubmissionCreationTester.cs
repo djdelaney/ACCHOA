@@ -20,60 +20,13 @@ using Tests.Helpers;
 
 namespace Tests
 {
-    public class SubmissionCreationTester
+    public class SubmissionCreationTester : TestBase
     {
-        private TestEmail _email;
-        private IFileStore _files;
-        private ILogger<SubmissionController> _logger;
-        private ApplicationDbContext _db;
-        private SubmissionController _controller;
-
-        public void Setup()
-        {
-            _email = new TestEmail();
-            _files = new FileMock();
-            _logger = new MockLogging<SubmissionController>();
-
-            var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
-            optionsBuilder.UseInMemoryDatabase();
-
-            _db = new ApplicationDbContext(optionsBuilder.Options);
-            _db.Database.EnsureDeleted();
-            _db.Database.EnsureCreated();
-            SampleTestData.SetupUsersAndRoles(_db);
-
-            // Setup
-            var mockUsers = MockHelpers.MockUserManager<ApplicationUser>();
-            var user = mockUsers.Object;
-
-            var mockRoles = MockHelpers.MockRoleManager<IdentityRole>();
-            var role = mockRoles.Object;
-
-            _controller = new SubmissionController(_db, user, _email, _files, role, _logger);
-        }
-
-        private Mock<ClaimsPrincipal> GetMockUser()
-        {
-            var username = "FakeUserName";
-            var identity = new GenericIdentity(username, "");
-
-            var mockPrincipal = new Mock<ClaimsPrincipal>();
-            mockPrincipal.Setup(x => x.Identity).Returns(identity);
-            mockPrincipal.Setup(x => x.IsInRole(It.IsAny<string>())).Returns(true);
-            mockPrincipal.Setup(x => x.HasClaim(It.IsAny<Predicate<Claim>>())).Returns(true);
-
-            return mockPrincipal;
-        }
-
         [Fact]
         public void Submission_Success()
         {
-            Setup();
-
-            //Current user mock
-            var mockPrincipal = GetMockUser();
-            _controller.ControllerContext.HttpContext =  new DefaultHttpContext() { User = mockPrincipal.Object };
-
+            Setup("josh.rozzi@fsresidential.com");
+            
             var fileMock = new Mock<IFormFile>();
             fileMock.Setup(m => m.OpenReadStream()).Returns(Stream.Null);
             fileMock.Setup(m => m.ContentDisposition).Returns("filename=AAA.pdf");
@@ -95,7 +48,6 @@ namespace Tests
             //Results
             Submission sub = result.Model as Submission;
             Assert.NotNull(sub);
-            Assert.Equal(1, _db.Submissions.ToList().Count);
             Assert.Equal(Status.CommunityMgrReview, sub.Status);
 
             //Assert incoming email sent to josh, and homeowner
@@ -110,12 +62,8 @@ namespace Tests
         [Fact]
         public void Submission_FileTooLarge()
         {
-            Setup();
-
-            //Current user mock
-            var mockPrincipal = GetMockUser();
-            _controller.ControllerContext.HttpContext = new DefaultHttpContext() { User = mockPrincipal.Object };
-
+            Setup("josh.rozzi@fsresidential.com");
+            
             var fileMock = new Mock<IFormFile>();
             fileMock.Setup(m => m.OpenReadStream()).Returns(Stream.Null);
             fileMock.Setup(m => m.ContentDisposition).Returns("filename=AAA.pdf");
@@ -141,11 +89,7 @@ namespace Tests
         [Fact]
         public void Submission_InvalidFileType()
         {
-            Setup();
-
-            //Current user mock
-            var mockPrincipal = GetMockUser();
-            _controller.ControllerContext.HttpContext = new DefaultHttpContext() { User = mockPrincipal.Object };
+            Setup("josh.rozzi@fsresidential.com");
 
             var fileMock = new Mock<IFormFile>();
             fileMock.Setup(m => m.OpenReadStream()).Returns(Stream.Null);
@@ -172,11 +116,7 @@ namespace Tests
         [Fact]
         public void Submission_FileRequired()
         {
-            Setup();
-
-            //Current user mock
-            var mockPrincipal = GetMockUser();
-            _controller.ControllerContext.HttpContext = new DefaultHttpContext() { User = mockPrincipal.Object };
+            Setup("josh.rozzi@fsresidential.com");
 
             CreateSubmissionViewModel vm = new CreateSubmissionViewModel()
             {

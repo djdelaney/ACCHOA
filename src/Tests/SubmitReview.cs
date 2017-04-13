@@ -22,85 +22,10 @@ using Tests.Helpers;
 
 namespace Tests
 {
-    public class SubmitReview
+    public class SubmitReview : TestBase
     {
-        private TestEmail _email;
-        private IFileStore _files;
-        private ILogger<SubmissionController> _logger;
-        private ApplicationDbContext _db;
-        private SubmissionController _controller;
-        private Submission _sub;
-
-        public void Setup(string username)
-        {
-            _email = new TestEmail();
-            _files = new FileMock();
-            _logger = new MockLogging<SubmissionController>();
-
-            var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
-            optionsBuilder.UseInMemoryDatabase();
-
-            _db = new ApplicationDbContext(optionsBuilder.Options);
-            _db.Database.EnsureCreated();
-            SampleTestData.SetupUsersAndRoles(_db);
-
-            // Setup
-            var store = new Mock<IUserStore<ApplicationUser>>();
-            var mockUsers = new Mock<UserManager<ApplicationUser>>(store.Object, null, null, null, null, null, null, null, null);
-            var josh = _db.Users.FirstOrDefault(u => u.Email.Equals(username));
-
-            mockUsers.Setup(x => x.GetUserAsync(It.IsAny<ClaimsPrincipal>())).Returns(Task.FromResult<HOA.Model.ApplicationUser>(josh));
-            var user = mockUsers.Object;
-
-            var mockRoles = MockHelpers.MockRoleManager<IdentityRole>();
-            var role = mockRoles.Object;
-
-            _controller = new SubmissionController(_db, user, _email, _files, role, _logger);
-
-            _sub = new Submission()
-            {
-                FirstName = "Joe",
-                LastName = "Smith",
-                Address = "123 Address",
-                Email = "Test@gmail.com",
-                Description = "Deck",
-                Status = Status.CommitteeReview,
-                StatusChangeTime = DateTime.UtcNow,
-                LastModified = DateTime.UtcNow,
-                SubmissionDate = DateTime.UtcNow.AddHours(-1),
-                Code = "ABC123",
-                Reviews = new List<Review>(),
-                Audits = new List<History>(),
-                Responses = new List<Response>(),
-                Files = new List<HOA.Model.File>(),
-                StateHistory = new List<StateChange>(),
-                Comments = new List<Comment>(),
-                Revision = 1,
-                PrecedentSetting = false
-            };
-            _db.Submissions.Add(_sub);
-            _db.SaveChanges();
-        }
-
-        private Mock<ClaimsPrincipal> GetMockUser()
-        {
-            var username = "FakeUserName";
-            var identity = new GenericIdentity(username, "");
-
-            var mockPrincipal = new Mock<ClaimsPrincipal>();
-            mockPrincipal.Setup(x => x.Identity).Returns(identity);
-            mockPrincipal.Setup(x => x.IsInRole(It.IsAny<string>())).Returns(true);
-            mockPrincipal.Setup(x => x.HasClaim(It.IsAny<Predicate<Claim>>())).Returns(true);
-
-            return mockPrincipal;
-        }
-
         private void CheckReviewStatus(ReviewStatus status, bool commentsRequired, string comment)
         {
-            //Current user mock
-            var mockPrincipal = GetMockUser();
-            _controller.ControllerContext.HttpContext = new DefaultHttpContext() { User = mockPrincipal.Object };
-
             ReviewSubmissionViewModel vm = new ReviewSubmissionViewModel()
             {
                 SubmissionId = _sub.Id,
@@ -154,6 +79,8 @@ namespace Tests
         public void Review_Approve()
         {
             Setup("dletscher@brenntag.com");
+            _sub.Status = Status.CommitteeReview;
+            _db.SaveChanges();
             CheckReviewStatus(ReviewStatus.Approved, false, null);
         }
 
@@ -161,6 +88,8 @@ namespace Tests
         public void Review_Approve_Comments()
         {
             Setup("dletscher@brenntag.com");
+            _sub.Status = Status.CommitteeReview;
+            _db.SaveChanges();
             CheckReviewStatus(ReviewStatus.Approved, false, "Approve!");
         }
 
@@ -168,6 +97,8 @@ namespace Tests
         public void Review_Reject()
         {
             Setup("dletscher@brenntag.com");
+            _sub.Status = Status.CommitteeReview;
+            _db.SaveChanges();
             CheckReviewStatus(ReviewStatus.Rejected, true, null);
         }
 
@@ -175,6 +106,8 @@ namespace Tests
         public void Review_Reject_Comments()
         {
             Setup("dletscher@brenntag.com");
+            _sub.Status = Status.CommitteeReview;
+            _db.SaveChanges();
             CheckReviewStatus(ReviewStatus.Rejected, true, "REJECT!");
         }
 
@@ -182,6 +115,8 @@ namespace Tests
         public void Review_ConditionallyApproved()
         {
             Setup("dletscher@brenntag.com");
+            _sub.Status = Status.CommitteeReview;
+            _db.SaveChanges();
             CheckReviewStatus(ReviewStatus.ConditionallyApproved, true, null);
         }
 
@@ -189,6 +124,8 @@ namespace Tests
         public void Review_ConditionallyApproved_Comments()
         {
             Setup("dletscher@brenntag.com");
+            _sub.Status = Status.CommitteeReview;
+            _db.SaveChanges();
             CheckReviewStatus(ReviewStatus.ConditionallyApproved, true, "REJECT!");
         }
 
@@ -196,6 +133,8 @@ namespace Tests
         public void Review_MissingInformation()
         {
             Setup("dletscher@brenntag.com");
+            _sub.Status = Status.CommitteeReview;
+            _db.SaveChanges();
             CheckReviewStatus(ReviewStatus.MissingInformation, true, null);
         }
 
@@ -203,6 +142,8 @@ namespace Tests
         public void Review_MissingInformation_Comments()
         {
             Setup("dletscher@brenntag.com");
+            _sub.Status = Status.CommitteeReview;
+            _db.SaveChanges();
             CheckReviewStatus(ReviewStatus.MissingInformation, true, "REJECT!");
         }
 
@@ -210,6 +151,8 @@ namespace Tests
         public void Review_Abstain()
         {
             Setup("dletscher@brenntag.com");
+            _sub.Status = Status.CommitteeReview;
+            _db.SaveChanges();
             CheckReviewStatus(ReviewStatus.Abstain, true, null);
         }
 
@@ -217,6 +160,8 @@ namespace Tests
         public void Review_Abstain_Comments()
         {
             Setup("dletscher@brenntag.com");
+            _sub.Status = Status.CommitteeReview;
+            _db.SaveChanges();
             CheckReviewStatus(ReviewStatus.Abstain, true, "REJECT!");
         }
 
@@ -224,10 +169,8 @@ namespace Tests
         public void AlreadyReviewed()
         {
             Setup("dletscher@brenntag.com");
-
-            //Current user mock
-            var mockPrincipal = GetMockUser();
-            _controller.ControllerContext.HttpContext = new DefaultHttpContext() { User = mockPrincipal.Object };
+            _sub.Status = Status.CommitteeReview;
+            _db.SaveChanges();
 
             ReviewSubmissionViewModel vm = new ReviewSubmissionViewModel()
             {
@@ -251,10 +194,8 @@ namespace Tests
         public void FinalReview()
         {
             Setup("dletscher@brenntag.com");
-
-            //Current user mock
-            var mockPrincipal = GetMockUser();
-            _controller.ControllerContext.HttpContext = new DefaultHttpContext() { User = mockPrincipal.Object };
+            _sub.Status = Status.CommitteeReview;
+            _db.SaveChanges();
 
             ApplicationUser deana = _db.Users.FirstOrDefault(u => u.Email.Equals("deanaclymer@verizon.net"));
             ApplicationUser sergio = _db.Users.FirstOrDefault(u => u.Email.Equals("sergio.carrillo@alumni.duke.edu"));
