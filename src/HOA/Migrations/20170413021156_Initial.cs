@@ -46,7 +46,7 @@ namespace HOA.Migrations
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     Address = table.Column<string>(maxLength: 64, nullable: false),
                     Code = table.Column<string>(nullable: false),
-                    Description = table.Column<string>(maxLength: 2048, nullable: false),
+                    Description = table.Column<string>(maxLength: 10240, nullable: false),
                     Email = table.Column<string>(maxLength: 64, nullable: false),
                     FinalApprovalBlob = table.Column<string>(nullable: true),
                     FinalApprovalFileName = table.Column<string>(nullable: true),

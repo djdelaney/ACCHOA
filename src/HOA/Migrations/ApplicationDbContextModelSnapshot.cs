@@ -228,7 +228,7 @@ namespace HOA.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasMaxLength(2048);
+                        .HasMaxLength(10240);
 
                     b.Property<string>("Email")
                         .IsRequired()
