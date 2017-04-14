@@ -214,7 +214,7 @@ namespace HOA.Model.ViewModel
         public string Email { get; set; }
 
         [Required]
-        [MaxLength(2048)]
+        [MaxLength(10240)]
         public string Description { get; set; }
 
         public IList<IFormFile> Files { get; set; }

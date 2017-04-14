@@ -218,5 +218,46 @@ namespace Tests
             TestEmail.Email email = _email.Emails.First(e => e.Recipient.Equals("josh.rozzi@fsresidential.com"));
             Assert.NotNull(email);
         }
+
+        [Fact]
+        public void EditSubmission()
+        {
+            Setup("kfinnis@gmail.com");
+            
+            EditSubmissionViewModel vm = new EditSubmissionViewModel()
+            {
+                SubmissionId = _sub.Id,
+                Address = "A",
+                Description = "D",
+                Email = "E",
+                Files = new List<IFormFile>(),
+                FirstName = "F",
+                LastName = "L"
+            };
+
+            RedirectToActionResult result = _controller.Edit(vm).Result as RedirectToActionResult;
+
+            //should redirect to submission id
+            Assert.NotNull(result);
+            Assert.Equal(_sub.Id, result.RouteValues.Values.FirstOrDefault());
+
+            _sub = _db.Submissions
+                    .Include(s => s.Reviews)
+                    .Include(s => s.Audits)
+                    .Include(s => s.Responses)
+                    .Include(s => s.Files)
+                    .Include(s => s.StateHistory)
+                    .Include(s => s.Comments)
+                    .FirstOrDefault(s => s.Id == _sub.Id);
+
+            //Submisison should still be submitted
+            Assert.Equal(Status.CommunityMgrReview, _sub.Status);
+            
+            Assert.Equal("A", _sub.Address);
+            Assert.Equal("D", _sub.Description);
+            Assert.Equal("E", _sub.Email);
+            Assert.Equal("F", _sub.FirstName);
+            Assert.Equal("L", _sub.LastName);
+        }
     }
 }

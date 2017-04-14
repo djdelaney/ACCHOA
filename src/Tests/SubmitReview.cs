@@ -256,5 +256,94 @@ namespace Tests
             TestEmail.Email email = _email.Emails.First(e => e.Recipient.Equals("kfinnis@gmail.com"));
             Assert.NotNull(email);
         }
+
+        [Fact]
+        public void SkipQuorum()
+        {
+            Setup("kfinnis@gmail.com");
+            _sub.Status = Status.CommitteeReview;
+            _db.SaveChanges();
+
+            ApplicationUser deana = _db.Users.FirstOrDefault(u => u.Email.Equals("deanaclymer@verizon.net"));
+            ApplicationUser sergio = _db.Users.FirstOrDefault(u => u.Email.Equals("sergio.carrillo@alumni.duke.edu"));
+
+            var review1 = new Review()
+            {
+                Comments = "1",
+                Created = DateTime.Now,
+                Status = ReviewStatus.Approved,
+                Submission = _sub,
+                SubmissionRevision = _sub.Revision,
+                Reviewer = deana
+            };
+
+            var review2 = new Review()
+            {
+                Comments = "2",
+                Created = DateTime.Now,
+                Status = ReviewStatus.Approved,
+                Submission = _sub,
+                SubmissionRevision = _sub.Revision,
+                Reviewer = sergio
+            };
+
+            _sub.Reviews.Add(review1);
+            _sub.Reviews.Add(review2);
+            _db.SaveChanges();
+            
+            RedirectToActionResult result = _controller.SkipQuorum(_sub.Id).Result as RedirectToActionResult;
+
+            //should redirect to submission id
+            Assert.NotNull(result);
+            Assert.Equal(_sub.Id, result.RouteValues.Values.FirstOrDefault());
+
+            _sub = _db.Submissions
+                    .Include(s => s.Reviews)
+                    .Include(s => s.Audits)
+                    .Include(s => s.Responses)
+                    .Include(s => s.Files)
+                    .Include(s => s.StateHistory)
+                    .Include(s => s.Comments)
+                    .FirstOrDefault(s => s.Id == _sub.Id);
+
+            //Submisison should be moved to tallying votes
+            Assert.Equal(Status.ARBTallyVotes, _sub.Status);
+
+            //email chairman for tallying votes
+            Assert.Equal(1, _email.Emails.Count);
+            TestEmail.Email email = _email.Emails.First(e => e.Recipient.Equals("kfinnis@gmail.com"));
+            Assert.NotNull(email);
+        }
+
+        [Fact]
+        public void PrecedentSetting()
+        {
+            Setup("kfinnis@gmail.com");
+            _sub.Status = Status.CommitteeReview;
+            _db.SaveChanges();
+
+            RedirectToActionResult result = _controller.PrecedentSetting(_sub.Id).Result as RedirectToActionResult;
+
+            //should redirect to submission id
+            Assert.NotNull(result);
+            Assert.Equal(_sub.Id, result.RouteValues.Values.FirstOrDefault());
+
+            _sub = _db.Submissions
+                    .Include(s => s.Reviews)
+                    .Include(s => s.Audits)
+                    .Include(s => s.Responses)
+                    .Include(s => s.Files)
+                    .Include(s => s.StateHistory)
+                    .Include(s => s.Comments)
+                    .FirstOrDefault(s => s.Id == _sub.Id);
+
+            //Submisison should still be under review
+            Assert.Equal(Status.CommitteeReview, _sub.Status);
+
+            //email homeowner
+            Assert.Equal(1, _email.Emails.Count);
+            TestEmail.Email email = _email.Emails.First(e => e.Recipient.Equals("Test@gmail.com"));
+            Assert.NotNull(email);
+        }
     }
 }
