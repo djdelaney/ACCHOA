@@ -29,6 +29,7 @@ namespace Tests
         protected ILogger<SubmissionController> _logger;
         protected ApplicationDbContext _db;
         protected SubmissionController _controller;
+        protected ReminderController _reminder;
         protected Submission _sub;
 
         protected void Setup(string currentUserEmail)
@@ -41,6 +42,7 @@ namespace Tests
             optionsBuilder.UseInMemoryDatabase();
 
             _db = new ApplicationDbContext(optionsBuilder.Options);
+            _db.Database.EnsureDeleted();
             _db.Database.EnsureCreated();
             SampleTestData.SetupUsersAndRoles(_db);
 
@@ -56,6 +58,7 @@ namespace Tests
             var role = mockRoles.Object;
 
             _controller = new SubmissionController(_db, user, _email, _files, role, _logger);
+            _reminder = new ReminderController(user, _db, _email);
 
             _sub = new Submission()
             {

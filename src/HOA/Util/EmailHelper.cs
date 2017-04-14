@@ -215,11 +215,15 @@ Please reset your password by clicking here:<br>
             {
                 roleToNofity = RoleNames.BoardChairman;
             }
-            else if (submission.Status == Status.HOALiasonReview)
+            else if (submission.Status == Status.HOALiasonReview || submission.Status == Status.HOALiasonInput)
             {
                 roleToNofity = RoleNames.HOALiaison;
             }
             else if(submission.Status == Status.FinalResponse)
+            {
+                roleToNofity = RoleNames.CommunityManager;
+            }
+            else if (submission.Status == Status.CommunityMgrReturn)
             {
                 roleToNofity = RoleNames.CommunityManager;
             }
