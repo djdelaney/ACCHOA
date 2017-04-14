@@ -5,6 +5,22 @@ using System.Threading.Tasks;
 
 namespace HOA.Model.Backup.V1
 {
+    public enum StatusV1
+    {
+        Submitted = 0,
+        ARBIncoming = 1,
+        UnderReview = 2,
+        ARBFinal = 3,
+        ReviewComplete = 4,
+        PrepApproval = 5,
+        PrepConditionalApproval = 6,
+        Rejected = 7,
+        MissingInformation = 8,
+        Approved = 9,
+        ConditionallyApproved = 10,
+        Retracted = 11
+    }
+
     public class SubmissionV1
     {
         public string Code { get; set; }

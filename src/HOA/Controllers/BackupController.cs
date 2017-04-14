@@ -365,7 +365,7 @@ namespace HOA.Controllers
 
         private void ImportSubmission(SubmissionV1 oldSub, List<ApplicationUser> identityUsers)
         {
-            Status stat = (HOA.Model.Status)Enum.Parse(typeof(HOA.Model.Status), oldSub.Status);
+            Status stat = TranslateV1Status(oldSub.Status);
 
             Submission sub = new Submission
             {
@@ -463,7 +463,7 @@ namespace HOA.Controllers
                 {
                     StartTime = s.StartTime,
                     EndTime = s.EndTime,
-                    State = (HOA.Model.Status)Enum.Parse(typeof(HOA.Model.Status), s.State),
+                    State = TranslateV1Status(s.State),
                     Submission = sub
                 };
                 sub.StateHistory.Add(history);
@@ -484,6 +484,43 @@ namespace HOA.Controllers
             }
 
             _applicationDbContext.Submissions.Add(sub);
+        }
+
+        private Status TranslateV1Status(string status)
+        {
+            StatusV1 oldStatus = (StatusV1) Enum.Parse(typeof(StatusV1), status);
+
+            switch (oldStatus)
+            {
+                case StatusV1.Submitted:
+                    return Status.CommunityMgrReview;
+                case StatusV1.ARBIncoming:
+                    return Status.ARBChairReview;
+                case StatusV1.UnderReview:
+                    return Status.CommitteeReview;
+                case StatusV1.ARBFinal:
+                    return Status.ARBTallyVotes;
+                case StatusV1.ReviewComplete:
+                    return Status.HOALiasonReview;
+
+                case StatusV1.PrepApproval:
+                    return Status.FinalResponse;
+                case StatusV1.PrepConditionalApproval:
+                    return Status.FinalResponse;
+
+                case StatusV1.Rejected:
+                    return Status.Rejected;
+                case StatusV1.MissingInformation:
+                    return Status.MissingInformation;
+                case StatusV1.Approved:
+                    return Status.Approved;
+                case StatusV1.ConditionallyApproved:
+                    return Status.ConditionallyApproved;
+                case StatusV1.Retracted:
+                    return Status.Retracted;
+                default:
+                    throw new Exception("Invalid status");
+            }
         }
     }
 
