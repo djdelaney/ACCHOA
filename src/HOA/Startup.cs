@@ -113,10 +113,7 @@ namespace HOA
             }
 
             // Add static files to the request pipeline.
-            app.UseStaticFiles(new StaticFileOptions()
-            {
-                RequestPath = new PathString("/assets"),
-            });
+            app.UseStaticFiles();
 
             // Add cookie-based authentication to the request pipeline.
             app.UseIdentity();
