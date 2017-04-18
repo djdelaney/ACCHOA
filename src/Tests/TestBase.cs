@@ -35,7 +35,7 @@ namespace Tests
         protected void Setup(string currentUserEmail)
         {
             _email = new TestEmail();
-            _files = new FileMock();
+            _files = new MockFileStorage();
             _logger = new MockLogging<SubmissionController>();
 
             var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
