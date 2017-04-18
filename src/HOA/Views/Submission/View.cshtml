@@ -197,6 +197,11 @@
     {
         <a href="/Submission/CommunityMgrReturn/@Model.Submission.Id">Return to homeowner</a>
     }
+    else if (Model.Submission.Status == Status.HOALiasonInput && User.IsInRole(RoleNames.HOALiaison))
+    {
+    <br />
+    <a href="/Submission/LiasonInput/@Model.Submission.Id" role="button">Add HOA board input</a><br />
+    }
     else
     {
         @: None
@@ -214,6 +219,12 @@
     {
         <br />
         <a href="/Submission/Delete/@Model.Submission.Id" onclick="if (!confirm('Are you sure?')) return false;">Delete</a>
+    }
+    
+    @if (Model.Submission.Status == Status.ARBTallyVotes && User.IsInRole(RoleNames.BoardChairman))
+    {
+        <br />
+        <a href="/Submission/GetHOAInput/@Model.Submission.Id">Send to HOA for input</a>
     }
 
     
@@ -237,6 +248,8 @@
         <br />
         <a href="/Submission/AddApprovalDoc/@Model.Submission.Id" role="button">Add approval document</a><br />
     }
+    
+
 
 
 </div>

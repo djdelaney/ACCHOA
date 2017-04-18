@@ -192,6 +192,18 @@ namespace HOA.Model.ViewModel
         public string Comments { get; set; }
     }
 
+    public class CommentsViewModel
+    {
+        public Submission Submission { get; set; }
+
+        [Required]
+        public int SubmissionId { get; set; }
+
+        [Required]
+        [Display(Name = "Comments")]
+        public string Comments { get; set; }
+    }
+
     public class EditSubmissionViewModel
     {
         [Required]

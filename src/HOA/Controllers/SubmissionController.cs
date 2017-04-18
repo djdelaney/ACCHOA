@@ -1158,6 +1158,100 @@ namespace HOA.Controllers
 
             return RedirectToAction(nameof(ViewStatus), new { id = submission.Code });
         }
+        
+        [Authorize(Roles = RoleNames.BoardChairman)]
+        public async Task<IActionResult> GetHOAInput(int id)
+        {
+            var submission = _applicationDbContext.Submissions.Include(s => s.Reviews)
+                .Include(s => s.Audits)
+                .Include(s => s.Responses)
+                .Include(s => s.Files)
+                .Include(s => s.StateHistory)
+                .Include(s => s.Comments)
+                .FirstOrDefault(s => s.Id == id);
+            if (submission == null)
+                return NotFound("Submission not found");
+
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+
+            if (submission.Status != Status.ARBTallyVotes)
+            {
+                throw new Exception("Invliad state!");
+            }
+
+            submission.Status = Status.HOALiasonInput;
+            AddStateSwitch(submission);
+
+            AddHistoryEntry(submission, user.FullName, "Sent to HOA for input");
+            submission.LastModified = DateTime.UtcNow;
+            _applicationDbContext.SaveChanges();
+
+            EmailHelper.NotifyStatusChanged(_applicationDbContext, submission, _email);
+
+            return RedirectToAction(nameof(View), new { id = submission.Id });
+        }
+
+
+        [HttpGet]
+        [AuthorizeRoles(RoleNames.HOALiaison)]
+        public IActionResult LiasonInput(int id)
+        {
+            var submission = _applicationDbContext.Submissions.FirstOrDefault(s => s.Id == id);
+            if (submission == null)
+                return NotFound("Submission not found");
+
+            CommentsViewModel model = new CommentsViewModel
+            {
+                SubmissionId = submission.Id,
+                Submission = submission
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [AuthorizeRoles(RoleNames.HOALiaison)]
+        public async Task<IActionResult> LiasonInput(CommentsViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var submission = _applicationDbContext.Submissions.Include(s => s.Reviews)
+                    .Include(s => s.Audits)
+                    .Include(s => s.Responses)
+                    .Include(s => s.Files)
+                    .Include(s => s.StateHistory)
+                    .Include(s => s.Comments)
+                    .FirstOrDefault(s => s.Id == model.SubmissionId);
+                if (submission == null)
+                    return NotFound("Submission not found");
+
+                if (submission.Status != Status.HOALiasonInput)
+                {
+                    throw new Exception("Invliad state!");
+                }
+
+                var user = await _userManager.GetUserAsync(HttpContext.User);
+
+                AddInternalComment(submission, user, model.Comments);
+
+                AddHistoryEntry(submission, user.FullName, "Added HOA Input");
+                submission.LastModified = DateTime.UtcNow;
+
+                submission.Status = Status.ARBTallyVotes;
+                AddStateSwitch(submission);
+
+                _applicationDbContext.SaveChanges();
+
+                EmailHelper.NotifyStatusChanged(_applicationDbContext, submission, _email);
+
+                return RedirectToAction(nameof(View), new { id = submission.Id });
+            }
+
+            // If we got this far, something failed, redisplay form
+            model.Submission = _applicationDbContext.Submissions.FirstOrDefault(s => s.Id == model.SubmissionId);
+            return View(model);
+        }
 
         [Authorize(Roles = RoleNames.BoardChairman)]
         public async Task<IActionResult> PrecedentSetting(int id)
