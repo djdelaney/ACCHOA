@@ -133,7 +133,7 @@ namespace HOA
             user = await _userManager.FindByEmailAsync("gsz@aol.com");
             if (user == null)
             {
-                user = new ApplicationUser { UserName = "gsz@aol.com", Email = "gsz@aol.com", FirstName = "Gordon", LastName = "Zeigler", Enabled = true };
+                user = new ApplicationUser { UserName = "gsz@aol.com", Email = "gsz@aol.com", FirstName = "Gordon", LastName = "Ziegler", Enabled = true };
                 await _userManager.CreateAsync(user, "Password");
                 await _userManager.AddToRoleAsync(user, RoleNames.ARBBoardMember);
             }
