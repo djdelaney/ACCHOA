@@ -39,7 +39,7 @@ namespace Tests
             _logger = new MockLogging<SubmissionController>();
 
             var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
-            optionsBuilder.UseInMemoryDatabase();
+            optionsBuilder.UseInMemoryDatabase(Guid.NewGuid().ToString());
 
             _db = new ApplicationDbContext(optionsBuilder.Options);
             _db.Database.EnsureDeleted();
