@@ -97,9 +97,9 @@ namespace HOA.Model
 
         public virtual IList<Comment> Comments { get; set; }
 
-        public string FinalApprovalBlob { get; set; }
+        public string ResponseDocumentBlob { get; set; }
 
-        public string FinalApprovalFileName { get; set; }
+        public string ResponseDocumentFileName { get; set; }
 
         [NotMapped]
         public TimeSpan ElapsedTime

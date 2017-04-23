@@ -234,10 +234,6 @@ namespace HOA.Migrations
                         .IsRequired()
                         .HasMaxLength(64);
 
-                    b.Property<string>("FinalApprovalBlob");
-
-                    b.Property<string>("FinalApprovalFileName");
-
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasMaxLength(32);
@@ -249,6 +245,10 @@ namespace HOA.Migrations
                         .HasMaxLength(32);
 
                     b.Property<bool>("PrecedentSetting");
+
+                    b.Property<string>("ResponseDocumentBlob");
+
+                    b.Property<string>("ResponseDocumentFileName");
 
                     b.Property<int>("ReturnStatus");
 

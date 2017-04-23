@@ -29,7 +29,7 @@ namespace Tests
 
         public Task DeleteFile(string id)
         {
-            throw new NotImplementedException();
+            return Task.FromResult<object>(null);
         }
     }
 }

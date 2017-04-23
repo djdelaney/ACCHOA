@@ -15,7 +15,14 @@ namespace HOA.Services
 
         Task<Stream> IFileStore.RetriveFile(string id)
         {
-            throw new NotImplementedException();
+            MemoryStream stream = new MemoryStream();
+            StreamWriter writer = new StreamWriter(stream);
+            writer.Write("filecontent");
+            writer.Flush();
+            stream.Position = 0;
+            System.IO.Stream result = stream;
+
+            return Task.FromResult(result);
         }
 
         Task<string> IFileStore.StoreFile(string code, Stream data)

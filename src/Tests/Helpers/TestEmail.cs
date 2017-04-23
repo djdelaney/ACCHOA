@@ -14,6 +14,7 @@ namespace Tests.Helpers
             public string Recipient { get; set; }
             public string Subject { get; set; }
             public string Message { get; set; }
+            public string Attachment { get; set; }
         }
 
         public List<Email> Emails = new List<Email>();
@@ -24,7 +25,8 @@ namespace Tests.Helpers
             {
                 Message = message,
                 Subject = subject,
-                Recipient = recipient
+                Recipient = recipient,
+                Attachment = attachmentName
             });
 
             return Task.Factory.StartNew(() => Console.WriteLine("EMAIL!"));

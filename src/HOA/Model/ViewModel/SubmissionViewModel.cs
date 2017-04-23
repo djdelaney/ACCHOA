@@ -176,6 +176,8 @@ namespace HOA.Model.ViewModel
 
         [Required]
         public string UserFeedback { get; set; }
+
+        public IList<IFormFile> Files { get; set; }
     }
 
     public class FinalReview

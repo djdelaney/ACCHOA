@@ -60,7 +60,7 @@ namespace Tests
             Assert.Equal(Status.Approved, _sub.Status);
 
             //NO approval doc
-            Assert.Null(_sub.FinalApprovalFileName);
+            Assert.Null(_sub.ResponseDocumentFileName);
 
             //internal comment
             Assert.Equal(1, _sub.Comments.Count);
@@ -73,6 +73,7 @@ namespace Tests
             Assert.Equal(1, _email.Emails.Count);
             TestEmail.Email email = _email.Emails.First(e => e.Recipient.Equals("Test@gmail.com"));
             Assert.NotNull(email);
+            Assert.Null(email.Attachment);
         }
 
         [Fact]
@@ -118,7 +119,7 @@ namespace Tests
             Assert.Equal(Status.Approved, _sub.Status);
 
             //HAS approval doc
-            Assert.Equal("response.pdf", _sub.FinalApprovalFileName);
+            Assert.Equal("response.pdf", _sub.ResponseDocumentFileName);
 
             //internal comment
             Assert.Equal(1, _sub.Comments.Count);
@@ -131,6 +132,7 @@ namespace Tests
             Assert.Equal(1, _email.Emails.Count);
             TestEmail.Email email = _email.Emails.First(e => e.Recipient.Equals("Test@gmail.com"));
             Assert.NotNull(email);
+            Assert.Equal("response.pdf", email.Attachment);
         }
 
         [Fact]
@@ -172,12 +174,13 @@ namespace Tests
             Assert.Equal(Status.Approved, _sub.Status);
 
             //HAS approval doc
-            Assert.Equal("response.pdf", _sub.FinalApprovalFileName);
+            Assert.Equal("response.pdf", _sub.ResponseDocumentFileName);
 
             //email to homeowner
             Assert.Equal(1, _email.Emails.Count);
             TestEmail.Email email = _email.Emails.First(e => e.Recipient.Equals("Test@gmail.com"));
             Assert.NotNull(email);
+            Assert.Equal("response.pdf", email.Attachment);
         }
     }
 }

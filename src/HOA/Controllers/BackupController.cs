@@ -128,8 +128,8 @@ namespace HOA.Controllers
                     SubmissionDate = sub.SubmissionDate,
                     PrecedentSetting = sub.PrecedentSetting,
                     
-                    FinalApprovalBlob = sub.FinalApprovalBlob,
-                    FinalApprovalFileName = sub.FinalApprovalFileName,
+                    FinalApprovalBlob = sub.ResponseDocumentBlob,
+                    FinalApprovalFileName = sub.ResponseDocumentFileName,
                 };
 
                 //comments
@@ -381,8 +381,8 @@ namespace HOA.Controllers
                 StatusChangeTime = oldSub.StatusChangeTime,
                 SubmissionDate = oldSub.SubmissionDate,
                 PrecedentSetting = oldSub.PrecedentSetting,
-                FinalApprovalBlob = oldSub.FinalApprovalBlob,
-                FinalApprovalFileName = oldSub.FinalApprovalFileName,
+                ResponseDocumentBlob = oldSub.FinalApprovalBlob,
+                ResponseDocumentFileName = oldSub.FinalApprovalFileName,
                 Reviews = new List<Review>(),
                 Audits = new List<History>(),
                 Responses = new List<Response>(),

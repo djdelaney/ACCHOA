@@ -15,10 +15,11 @@
 <br />
 @Model.Submission.Description<br />
 <br />
+Return Status: @Model.Submission.ReturnStatus
 
 <hr />
 
-@using (Html.BeginForm())
+@using (Html.BeginForm("CommunityMgrReturn", "Submission", FormMethod.Post, new { @class = "form-horizontal", enctype = "multipart/form-data" }))
 {
     @Html.AntiForgeryToken()
 
@@ -38,6 +39,16 @@
     @Html.LabelFor(model => model.UserFeedback)@: <br />
     @Html.TextAreaFor(model => model.UserFeedback, new { @class = "form-control", @maxlength = "512" })<br />
     <br />
+
+    if (Model.Submission.ReturnStatus == ReturnStatus.Reject)
+    {
+         @:Response document (<b>Required</b>)<br/>
+         <input type="file" name="Files" id="Files"/>
+         <br/>
+
+         <br/>
+         <br/>
+     }
 
     <input type="submit" value="Submit" class="btn btn-primary" />
 

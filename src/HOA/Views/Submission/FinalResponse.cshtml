@@ -15,6 +15,9 @@
 <br />
 @Model.Submission.Description<br />
 <br />
+Return Status: @Model.Submission.ReturnStatus
+<br/>
+<br />
 
 @using (Html.BeginForm("FinalResponse", "Submission", FormMethod.Post, new { @class = "form-horizontal", enctype = "multipart/form-data" }))
 {
@@ -36,14 +39,13 @@
 
     @:User feedback (email): <br />    
     @Html.TextAreaFor(model => model.UserFeedback, new { @class = "form-control", @maxlength = "512" })<br />
-
-    if (Model.Submission.Status == Status.Approved || Model.Submission.Status == Status.ConditionallyApproved)
-    {
+    
+    
         @:Final approval file <br/>
         <input type="file" name="Files" id="Files"/>
         <br/>
         <br />
-    }
+    
 
 
     <br />

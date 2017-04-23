@@ -34,11 +34,11 @@
             }
             </ul>
 
-            @if (Model.Submission.FinalApprovalFileName != null)
+            @if (Model.Submission.ResponseDocumentFileName != null)
             {
                 <br />
                 <h5><strong>Final Response</strong></h5>
-                @:<a href="/Submission/ResponseFile/@Model.Submission.Id">@Model.Submission.FinalApprovalFileName</a>
+                @:<a href="/Submission/ResponseFile/@Model.Submission.Id">@Model.Submission.ResponseDocumentFileName</a>
             }
 
             @if (Model.Submission.PrecedentSetting)
@@ -187,7 +187,7 @@
     }
     else if (Model.Submission.Status == Status.HOALiasonReview && (User.IsInRole(RoleNames.HOALiaison) || User.IsInRole(RoleNames.Administrator)))
     {
-        <a href="/Submission/FinalCheck/@Model.Submission.Id">Final check</a>
+        <a href="/Submission/FinalCheck/@Model.Submission.Id">Final liason check</a>
     }
     else if (Model.Submission.Status == Status.FinalResponse && User.IsInRole(RoleNames.CommunityManager))
     {
@@ -243,7 +243,7 @@
      }
 
     @if ((Model.Submission.Status == Status.Approved || Model.Submission.Status == Status.ConditionallyApproved)
-        && User.IsInRole(RoleNames.CommunityManager) && Model.Submission.FinalApprovalBlob == null)
+        && User.IsInRole(RoleNames.CommunityManager) && Model.Submission.ResponseDocumentBlob == null)
     {
         <br />
         <a href="/Submission/AddApprovalDoc/@Model.Submission.Id" role="button">Add approval document</a><br />
