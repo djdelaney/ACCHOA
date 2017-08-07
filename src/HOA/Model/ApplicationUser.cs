@@ -33,6 +33,9 @@ namespace HOA.Model
         public bool Enabled { get; set; }
 
         [Required]
+        public bool LandscapingMember { get; set; }
+
+        [Required]
         public bool DisableNotification { get; set; }
 
         [NotMapped]

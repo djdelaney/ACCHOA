@@ -520,8 +520,8 @@ namespace HOA.Controllers
 
             return RedirectToAction(nameof(View), new { id = submission.Id });
         }
-
-        [AuthorizeRoles(RoleNames.Administrator)]
+        
+        [AuthorizeRoles(RoleNames.CommunityManager, RoleNames.Administrator)]
         public IActionResult Delete(int id)
         {
             var submission = _applicationDbContext.Submissions.Include(s => s.Reviews)

@@ -35,6 +35,7 @@ namespace HOA.Model.ViewModel
         public bool DisableNotification { get; set; }
         public string Roles { get; set; }
         public string UserId { get; set; }
+        public bool LandscapingMember { get; set; }
     }
 
     public class CreateUserViewModel
@@ -55,6 +56,10 @@ namespace HOA.Model.ViewModel
 
         [Required]
         public string Role { get; set; }
+
+        [Required]
+        [Display(Name = "Landscaping reviewer")]
+        public bool IsLandscaping { get; set; }
 
         [Required]
         [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 6)]
@@ -103,6 +108,10 @@ namespace HOA.Model.ViewModel
         [Required]
         [Display(Name = "Last  Name")]
         public string LastName { get; set; }
+
+        [Required]
+        [Display(Name = "Landscaping Member")]
+        public bool IsLandscaping { get; set; }
     }
 
     public class ForgotPasswordViewModel

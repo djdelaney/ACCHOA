@@ -30,7 +30,12 @@
         <tr @if (!user.Enabled) { @Html.Raw("class=\"danger\"") } >
             <td>@user.Email</td>
             <td>@user.FullName</td>
-            <td>@user.Roles</td>
+            <td>@user.Roles
+                @if (user.LandscapingMember)
+                {
+                    @Html.Raw(" (Landscaping)")
+                }
+            </td>
             <td>
                 @Html.ActionLink(user.Enabled ? "Disable" : "Enable", "Disable", new { id = user.UserId, disable = user.Enabled })
             </td>

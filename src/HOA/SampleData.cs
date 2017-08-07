@@ -138,6 +138,14 @@ namespace HOA
                 await _userManager.AddToRoleAsync(user, RoleNames.ARBBoardMember);
             }
 
+            user = await _userManager.FindByEmailAsync("tom.mcclung@verizon.net");
+            if (user == null)
+            {
+                user = new ApplicationUser { UserName = "tom.mcclung@verizon.net", Email = "tom.mcclung@verizon.net", FirstName = "Tom", LastName = "McClung", Enabled = true, LandscapingMember = true };
+                await _userManager.CreateAsync(user, "Password");
+                await _userManager.AddToRoleAsync(user, RoleNames.ARBBoardMember);
+            }
+
             user = await _userManager.FindByEmailAsync("kkrama06@gmail.com");
             if (user == null)
             {

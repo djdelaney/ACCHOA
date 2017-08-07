@@ -13,7 +13,7 @@ namespace HOA.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
             modelBuilder
-                .HasAnnotation("ProductVersion", "1.1.1")
+                .HasAnnotation("ProductVersion", "1.1.2")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("HOA.Model.ApplicationUser", b =>
@@ -38,6 +38,8 @@ namespace HOA.Migrations
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasMaxLength(20);
+
+                    b.Property<bool>("LandscapingMember");
 
                     b.Property<string>("LastName")
                         .IsRequired()
@@ -237,6 +239,8 @@ namespace HOA.Migrations
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasMaxLength(32);
+
+                    b.Property<bool>("LandscapingRelated");
 
                     b.Property<DateTime>("LastModified");
 

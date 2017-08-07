@@ -215,7 +215,7 @@
         <br />
     }
 
-    @if (User.IsInRole(RoleNames.Administrator))
+    @if (User.IsInRole(RoleNames.Administrator) || User.IsInRole(RoleNames.CommunityManager))
     {
         <br />
         <a href="/Submission/Delete/@Model.Submission.Id" onclick="if (!confirm('Are you sure?')) return false;">Delete</a>

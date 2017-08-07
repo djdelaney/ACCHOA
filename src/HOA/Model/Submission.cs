@@ -85,6 +85,9 @@ namespace HOA.Model
         [Required]
         public bool PrecedentSetting { get; set; }
 
+        [Required]
+        public bool LandscapingRelated { get; set; }
+
         public virtual IList<Review> Reviews { get; set; }
 
         public virtual IList<History> Audits { get; set; }

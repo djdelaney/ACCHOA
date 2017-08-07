@@ -213,7 +213,8 @@ namespace HOA.Controllers
                     FullName = user.FullName,
                     Roles = string.Join(", ", roles),
                     UserId = user.Id,
-                    Email = identityUsers.FirstOrDefault(iu => iu.Id == user.Id).Email
+                    Email = identityUsers.FirstOrDefault(iu => iu.Id == user.Id).Email,
+                    LandscapingMember = user.LandscapingMember
                 };
 
                 model.Users.Add(u);
@@ -414,7 +415,8 @@ namespace HOA.Controllers
                     Email = model.Email,
                     FirstName = model.FirstName,
                     LastName = model.LastName,
-                    Enabled = true
+                    Enabled = true,
+                    LandscapingMember = model.IsLandscaping
                 };
                 await _userManager.CreateAsync(user, model.Password);
                 await _userManager.AddToRoleAsync(user, model.Role);
@@ -442,7 +444,8 @@ namespace HOA.Controllers
                 UserId = user.Id,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
-                Email = user.Email
+                Email = user.Email,
+                IsLandscaping = user.LandscapingMember
             };
 
             return View(model);
@@ -468,6 +471,7 @@ namespace HOA.Controllers
                 user.FirstName = model.FirstName;
                 user.LastName = model.LastName;
                 user.Email = model.Email;
+                user.LandscapingMember = model.IsLandscaping;
 
                 await _userManager.UpdateAsync(user);
                 
