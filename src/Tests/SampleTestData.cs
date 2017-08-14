@@ -74,6 +74,26 @@ namespace Tests
             };
             db.Users.Add(admin);
 
+            ApplicationUser tom = new ApplicationUser()
+            {
+                FirstName = "Admin",
+                LastName = "McClung",
+                Email = "tom.mcclung@verizon.net",
+                Enabled = true,
+                LandscapingMember = true
+            };
+            db.Users.Add(tom);
+
+            ApplicationUser tom2 = new ApplicationUser()
+            {
+                FirstName = "Admin",
+                LastName = "Krewatch",
+                Email = "tskrewatch@verizon.net",
+                Enabled = true,
+                LandscapingMember = true
+            };
+            db.Users.Add(tom2);
+
             //Setup roles
             IdentityRole adminRole = new IdentityRole(RoleNames.Administrator);
             db.Roles.Add(adminRole);
@@ -104,7 +124,9 @@ namespace Tests
             AddUserToRole(db, deana, arbMemberRole);
             AddUserToRole(db, sergio, arbMemberRole);
             AddUserToRole(db, melissa, liaisonRole);
-            
+            AddUserToRole(db, tom, arbMemberRole);
+            AddUserToRole(db, tom2, arbMemberRole);
+
             db.SaveChanges();
         }
 

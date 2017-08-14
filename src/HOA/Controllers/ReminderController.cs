@@ -85,8 +85,11 @@ namespace HOA.Controllers
         [AllowAnonymous]
         public IActionResult CheckQuorum()
         {
-            int totalReviewers = SubmissionController.GetReviewerCount(_applicationDbContext);
-            int quorum = (int)Math.Ceiling((double)totalReviewers / (double)2);
+            int totalReviewersLandscaping = SubmissionController.GetReviewerCount(_applicationDbContext, true);
+            int quorumWithLandscaping = (int)Math.Ceiling((double)totalReviewersLandscaping / (double)2);
+
+            int totalReviewersNoLandscaping = SubmissionController.GetReviewerCount(_applicationDbContext, false);
+            int quorumWithoutLandscaping = (int)Math.Ceiling((double)totalReviewersNoLandscaping / (double)2);
 
             var allOpen = _applicationDbContext.Submissions.Where(s => s.Status == Status.CommitteeReview).Include(s => s.Reviews)
                     .Include(s => s.Audits)
@@ -96,6 +99,8 @@ namespace HOA.Controllers
                     .Include(s => s.Comments).ToList();
             foreach (Submission submission in allOpen)
             {
+                int quorum = submission.LandscapingRelated ? quorumWithLandscaping : quorumWithoutLandscaping;
+
                 if (submission.Reviews.Count >= quorum && DateTime.Now > submission.StatusChangeTime.Add(Quorum_Final))
                 {
                     submission.Status = Status.ARBTallyVotes;

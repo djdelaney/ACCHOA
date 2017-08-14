@@ -27,7 +27,7 @@ namespace HOA.Controllers
         private RoleManager<IdentityRole> _roleManager;
         private readonly ILogger<SubmissionController> _logger;
 
-        private const int maxSizeBytes = 10 * 1024 * 1024; //10MB
+        private const int maxSizeBytes = 15 * 1024 * 1024; //10MB
 
         public SubmissionController(ApplicationDbContext applicationDbContext,
                                     UserManager<ApplicationUser> userManager,
@@ -44,11 +44,13 @@ namespace HOA.Controllers
             _logger = logger;
         }
 
-        public static int GetReviewerCount(ApplicationDbContext context)
+        public static int GetReviewerCount(ApplicationDbContext context, bool includeLandscaping)
         {
             var role = context.Roles.Include(r => r.Users).FirstOrDefault(r => r.Name.Equals(RoleNames.ARBBoardMember));
             List<string> userIds = role.Users.Select(u => u.UserId).ToList();
-            var users = context.Users.Where(u => userIds.Contains(u.Id) && u.Enabled);
+            var users = context.Users.Where(u => userIds.Contains(u.Id) && u.Enabled &&
+                (!u.LandscapingMember || includeLandscaping)
+            );
             return users.Count();
         }
 
@@ -371,6 +373,11 @@ namespace HOA.Controllers
                     var user = _userManager.GetUserAsync(HttpContext.User).Result;
                     subs = subs.Where(s => !s.Reviews.Any(r => r.Reviewer.Id == user.Id && r.SubmissionRevision == s.Revision));
 
+                    //Filter non landscaping requests
+                    if (user.LandscapingMember)
+                    {
+                        subs = subs.Where(s => s.LandscapingRelated);
+                    }
                 }
                 else if (User.IsInRole(RoleNames.HOALiaison))
                 {
@@ -432,12 +439,15 @@ namespace HOA.Controllers
             submission.Comments = submission.Comments.OrderByDescending(c => c.Created).ToList();
             submission.Audits = submission.Audits.OrderByDescending(a => a.DateTime).ToList();
 
+            var user = _userManager.GetUserAsync(HttpContext.User).Result;
+
             var model = new ViewSubmissionViewModel()
             {
                 Submission = submission,
-                ReviewerCount = GetReviewerCount(_applicationDbContext),
+                ReviewerCount = GetReviewerCount(_applicationDbContext, submission.LandscapingRelated),
                 CurrentReviewCount = submission.Reviews.Count(r => r.SubmissionRevision == submission.Revision),
-                Reviewed = submission.Reviews.Any(r => r.Reviewer.Id == _userManager.GetUserId(User) && r.SubmissionRevision == submission.Revision)
+                Reviewed = submission.Reviews.Any(r => r.Reviewer.Id == _userManager.GetUserId(User) && r.SubmissionRevision == submission.Revision),
+                HideReviewOption = !submission.LandscapingRelated && user.LandscapingMember
             };
 
             return View(model);
@@ -738,7 +748,8 @@ namespace HOA.Controllers
             CheckCompletenessViewModel model = new CheckCompletenessViewModel
             {
                 Submission = submission,
-                SubmissionId = submission.Id
+                SubmissionId = submission.Id,
+                LandscapingRelated = submission.LandscapingRelated
             };
 
             return View(model);
@@ -760,6 +771,8 @@ namespace HOA.Controllers
                     .FirstOrDefault(s => s.Id == model.SubmissionId);
                 if (submission == null)
                     return NotFound("Submission not found");
+
+                submission.LandscapingRelated = model.LandscapingRelated;
 
                 if (model.Approve)
                 {
@@ -818,7 +831,8 @@ namespace HOA.Controllers
                 return NotFound("Submission not found");
 
             var user = await _userManager.GetUserAsync(HttpContext.User);
-            if (submission.Reviews != null && submission.Reviews.Any(r => r.Reviewer.Id == user.Id && r.SubmissionRevision == submission.Revision))
+            if (submission.Reviews != null && submission.Reviews.Any(r => r.Reviewer.Id == user.Id && r.SubmissionRevision == submission.Revision) ||
+                (!submission.LandscapingRelated && user.LandscapingMember))
             {
                 return RedirectToAction(nameof(View), new { id = submission.Id });
             }
@@ -865,6 +879,12 @@ namespace HOA.Controllers
                     throw new Exception("Already reviewed!");
                 }
 
+                //Check landscaping
+                if (!submission.LandscapingRelated && user.LandscapingMember)
+                {
+                    throw new Exception("NOT landscaping");
+                }
+
                 var review = new Review
                 {
                     Reviewer = user,
@@ -884,7 +904,7 @@ namespace HOA.Controllers
                 _applicationDbContext.Reviews.Add(review);
 
                 //Final review!
-                if (submission.Reviews.Where(r => r.SubmissionRevision == submission.Revision).Count() == GetReviewerCount(_applicationDbContext))
+                if (submission.Reviews.Where(r => r.SubmissionRevision == submission.Revision).Count() == GetReviewerCount(_applicationDbContext, submission.LandscapingRelated))
                 {
                     submission.Status = Status.ARBTallyVotes;
                     submission.LastModified = DateTime.UtcNow;
@@ -1326,7 +1346,8 @@ namespace HOA.Controllers
                 LastName = submission.LastName,
                 Address = submission.Address,
                 Email = submission.Email,
-                Description = submission.Description
+                Description = submission.Description,
+                LandscapingRelated = submission.LandscapingRelated
             };
 
             return View(model);
@@ -1381,6 +1402,7 @@ namespace HOA.Controllers
                 submission.LastName = model.LastName;
                 submission.Email = model.Email;
                 submission.Description = model.Description;
+                submission.LandscapingRelated = model.LandscapingRelated;
 
                 AddHistoryEntry(submission, user.FullName, "Edited submission details");
                 submission.LastModified = DateTime.UtcNow;

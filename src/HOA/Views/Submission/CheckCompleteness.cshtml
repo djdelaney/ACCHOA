@@ -53,6 +53,14 @@
     ),
     new { @class = "form-control" })
     <br />
+    <div class="form-group">
+        <label class="control-label col-xs-3">
+            @Html.LabelFor(model => model.LandscapingRelated)
+        </label>
+        <div class="col-xs-9">
+            @Html.CheckBoxFor(model => model.LandscapingRelated, new { @class = "form-control" })
+        </div>
+    </div>
     <br />
 
     <input type="submit" value="Submit" class="btn btn-primary" />

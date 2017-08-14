@@ -112,10 +112,19 @@ namespace Tests
 
             _reminder.Process();
 
-            //Only send email to missing reviews
+            //Only send email to missing reviews (NOT landscaping members)
             Assert.Equal(1, _email.Emails.Count);
             TestEmail.Email email = _email.Emails.First(e => e.Recipient.Equals("dletscher@brenntag.com"));
             Assert.NotNull(email);
+
+            //Try again with landscaping submission
+            _email.Emails.Clear();
+            _sub.LandscapingRelated = true;
+            _db.SaveChanges();
+
+            _reminder.Process();
+
+            Assert.Equal(3, _email.Emails.Count);
         }
     }
 }

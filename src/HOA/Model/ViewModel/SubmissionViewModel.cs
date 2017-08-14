@@ -21,6 +21,7 @@ namespace HOA.Model.ViewModel
         public int ReviewerCount { get; set; }
         public int CurrentReviewCount { get; set; }
         public bool Reviewed { get; set; }
+        public bool HideReviewOption { get; set; }
     }
 
     public class CheckCompletenessViewModel : IValidatableObject
@@ -37,6 +38,9 @@ namespace HOA.Model.ViewModel
         [Display(Name = "Internal Comments")]
         [MaxLength(512)]
         public string Comments { get; set; }
+
+        [Required]
+        public bool LandscapingRelated { get; set; }
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
@@ -230,6 +234,9 @@ namespace HOA.Model.ViewModel
         [Required]
         [MaxLength(10240)]
         public string Description { get; set; }
+
+        [Required]
+        public bool LandscapingRelated { get; set; }
 
         public IList<IFormFile> Files { get; set; }
     }

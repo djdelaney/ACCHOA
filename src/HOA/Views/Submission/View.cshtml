@@ -16,6 +16,10 @@
         
         
             <strong>Code</strong>: @Model.Submission.Code<br />
+            @if (Model.Submission.LandscapingRelated)
+            {
+                <h5><strong>Landscaping Related</strong></h5>
+            }
             <br />
             @Model.Submission.FirstName @Model.Submission.LastName<br />
             @Model.Submission.Email <br />
@@ -25,6 +29,8 @@
                 @Model.Submission.Description
             </span>
             <br />
+            
+            
 
             <h5><strong>Files</strong></h5>
             <ul>
@@ -170,7 +176,7 @@
         <a href="/Submission/CheckCompleteness/@Model.Submission.Id">Check for completeness</a><br />
         <br />
     }
-    else if (Model.Submission.Status == Status.CommitteeReview && User.IsInRole(RoleNames.ARBBoardMember))
+    else if (Model.Submission.Status == Status.CommitteeReview && User.IsInRole(RoleNames.ARBBoardMember) && !Model.HideReviewOption)
     {
         if (!Model.Reviewed)
         {
@@ -179,7 +185,7 @@
         else
         {
             @: Already reviewed
-    }
+        }
     }
     else if (Model.Submission.Status == Status.ARBTallyVotes && (User.IsInRole(RoleNames.BoardChairman) || User.IsInRole(RoleNames.Administrator)))
     {

@@ -133,7 +133,20 @@ Please reset your password by clicking here:<br>
                 throw new Exception("Unknown status");
             }
 
-            List<string> emails = GetRoleMembers(context, roleToNofity);
+            List<string> emails = new List<string>();
+
+            //special case for under review (check status of landscaping comittee)
+            if (roleToNofity.Equals(RoleNames.ARBBoardMember))
+            {
+                var role = context.Roles.Include(r => r.Users).FirstOrDefault(r => r.Name.Equals(RoleNames.ARBBoardMember));
+                List<string> userIds = role.Users.Select(u => u.UserId).ToList();
+                emails = context.Users.Where(u => userIds.Contains(u.Id) && u.Enabled && !u.DisableNotification && (submission.LandscapingRelated || !u.LandscapingMember)).Select(u => u.Email).ToList();
+            }
+            else
+            {
+                emails = GetRoleMembers(context, roleToNofity);
+            }
+
             if (emails == null || emails.Count() == 0)
                 return;
 
@@ -239,7 +252,7 @@ Please reset your password by clicking here:<br>
                 var board = context.Users.Where(u => userIds.Contains(u.Id) && u.Enabled && !u.DisableNotification).Select(u => u.Id).ToList();
                 var alreadyReviewed = context.Reviews.Where(r => r.Submission.Id == submission.Id && r.SubmissionRevision == submission.Revision).Select(r => r.Reviewer.Id).ToList();
                 var toReview = board.Except(alreadyReviewed);
-                emails = context.Users.Where(u => toReview.Contains(u.Id) && u.Enabled && !u.DisableNotification).Select(u => u.Email).ToList();
+                emails = context.Users.Where(u => toReview.Contains(u.Id) && u.Enabled && !u.DisableNotification && (submission.LandscapingRelated || !u.LandscapingMember)).Select(u => u.Email).ToList();
             }
             else
             {
