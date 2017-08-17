@@ -174,7 +174,7 @@ namespace HOA.Controllers
         [Authorize(Roles = RoleNames.Administrator)]
         public IActionResult ManageUsers(string returnUrl = null)
         {
-            var users = _applicationDbContext.Users.Include(u => u.Roles).ToList();
+            var users = _applicationDbContext.Users.ToList();
 
             var model = new ManageViewModel
             {
@@ -187,10 +187,12 @@ namespace HOA.Controllers
             {
                 List<string> roles = new List<string>();
 
+                List<IdentityRole> identityRoles = DBUtil.GetUserRoles(_applicationDbContext, user);
                 
-                foreach (var role in user.Roles)
+                foreach (var role in identityRoles)
                 {
-                    var roleName = _roleManager.FindByIdAsync(role.RoleId).Result.Name;
+                    //var roleName = _roleManager.FindByIdAsync(role.Name).Result.Name;
+                    var roleName = role.Name;
 
                     if (roleName.Equals(RoleNames.Administrator))
                         roleName = "Administrator";

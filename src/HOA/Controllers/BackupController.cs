@@ -13,6 +13,7 @@ using Newtonsoft.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using System.Text;
+using HOA.Util;
 
 // For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -243,16 +244,18 @@ namespace HOA.Controllers
         private List<UserV1> GetUserBackup()
         {
             List<UserV1> result = new List<UserV1>();
-            var users = _applicationDbContext.Users.Include(u => u.Roles).ToList();
+            var users = _applicationDbContext.Users.ToList();
             var identityUsers = _userManager.Users.ToList();
 
             foreach (var user in users)
             {
                 List<string> roles = new List<string>();
+                List<IdentityRole> identityRoles = DBUtil.GetUserRoles(_applicationDbContext, user);
 
-                foreach (var role in user.Roles)
+                foreach (var role in identityRoles)
                 {
-                    var roleName = _roleManager.FindByIdAsync(role.RoleId).Result.Name;
+                    //var roleName = _roleManager.FindByIdAsync(role.Id).Result.Name;
+                    var roleName = role.Name;
 
                     if (roleName.Equals(RoleNames.Administrator))
                         roleName = "Administrator";

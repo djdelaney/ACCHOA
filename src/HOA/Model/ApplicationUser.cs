@@ -5,7 +5,8 @@ using System.Threading.Tasks;
 
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+
 
 namespace HOA.Model
 {
@@ -19,7 +20,7 @@ namespace HOA.Model
         public const string HOABoardMember      = "HOABoardMember";
     }
 
-    public class ApplicationUser : IdentityUser
+    public class ApplicationUser : Microsoft.AspNetCore.Identity.IdentityUser
     {
         [Required]
         [MaxLength(20)]

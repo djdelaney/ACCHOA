@@ -1,4 +1,7 @@
-﻿@using HOA.Model
+﻿@using System.Collections.Generic
+@using HOA.Model
+@using Microsoft.AspNetCore.Mvc.Rendering
+@model HOA.Model.ViewModel.ViewSubmissionsViewModel
 @*
     For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 *@
@@ -51,7 +54,7 @@
             @for (var page = Model.Pager.StartPage; page <= Model.Pager.EndPage; page++)
                 {
                 <li class="@(page == Model.Pager.CurrentPage ? "active" : "")">
-                    <a href="/Submission/List/?filter=@(Model.Filter)&page=@page">@page</a>
+                    <a href="/Submission/List/?filter=@(Model.Filter)&page=@(page)"> @(page) </a>
                 </li>
             }
 

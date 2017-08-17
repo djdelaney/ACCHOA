@@ -138,9 +138,8 @@ Please reset your password by clicking here:<br>
             //special case for under review (check status of landscaping comittee)
             if (roleToNofity.Equals(RoleNames.ARBBoardMember))
             {
-                var role = context.Roles.Include(r => r.Users).FirstOrDefault(r => r.Name.Equals(RoleNames.ARBBoardMember));
-                List<string> userIds = role.Users.Select(u => u.UserId).ToList();
-                emails = context.Users.Where(u => userIds.Contains(u.Id) && u.Enabled && !u.DisableNotification && (submission.LandscapingRelated || !u.LandscapingMember)).Select(u => u.Email).ToList();
+                emails = DBUtil.GetRoleMembers(context, RoleNames.ARBBoardMember)
+                    .Where(u => u.Enabled && !u.DisableNotification && (submission.LandscapingRelated || !u.LandscapingMember)).Select(u => u.Email).ToList();
             }
             else
             {
@@ -168,9 +167,7 @@ Please reset your password by clicking here:<br>
 
         private static List<String> GetRoleMembers(ApplicationDbContext context, string roleName)
         {
-            var role = context.Roles.Include(r => r.Users).FirstOrDefault(r => r.Name.Equals(roleName));
-            List<string> userIds = role.Users.Select(u => u.UserId).ToList();
-            return context.Users.Where(u => userIds.Contains(u.Id) && u.Enabled && !u.DisableNotification).Select(u => u.Email).ToList();
+            return DBUtil.GetRoleMembers(context, roleName).Where(u => u.Enabled && !u.DisableNotification).Select(u => u.Email).ToList();
         }
 
         private static void NotifyHomeowner(ApplicationDbContext context, Submission submission, IEmailSender mail, Stream file, string attachmentName)
@@ -247,9 +244,7 @@ Please reset your password by clicking here:<br>
 
             if (submission.Status == Status.CommitteeReview)
             {
-                var role = context.Roles.Include(r => r.Users).FirstOrDefault(r => r.Name.Equals(RoleNames.ARBBoardMember));
-                List<string> userIds = role.Users.Select(u => u.UserId).ToList();
-                var board = context.Users.Where(u => userIds.Contains(u.Id) && u.Enabled && !u.DisableNotification).Select(u => u.Id).ToList();
+                var board = DBUtil.GetRoleMembers(context, RoleNames.ARBBoardMember).Where(u => u.Enabled && !u.DisableNotification).Select(u => u.Id).ToList();
                 var alreadyReviewed = context.Reviews.Where(r => r.Submission.Id == submission.Id && r.SubmissionRevision == submission.Revision).Select(r => r.Reviewer.Id).ToList();
                 var toReview = board.Except(alreadyReviewed);
                 emails = context.Users.Where(u => toReview.Contains(u.Id) && u.Enabled && !u.DisableNotification && (submission.LandscapingRelated || !u.LandscapingMember)).Select(u => u.Email).ToList();

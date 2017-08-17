@@ -46,11 +46,8 @@ namespace HOA.Controllers
 
         public static int GetReviewerCount(ApplicationDbContext context, bool includeLandscaping)
         {
-            var role = context.Roles.Include(r => r.Users).FirstOrDefault(r => r.Name.Equals(RoleNames.ARBBoardMember));
-            List<string> userIds = role.Users.Select(u => u.UserId).ToList();
-            var users = context.Users.Where(u => userIds.Contains(u.Id) && u.Enabled &&
-                (!u.LandscapingMember || includeLandscaping)
-            );
+            var users = DBUtil.GetRoleMembers(context, RoleNames.ARBBoardMember)
+                .Where(u => u.Enabled && (!u.LandscapingMember || includeLandscaping));
             return users.Count();
         }
 

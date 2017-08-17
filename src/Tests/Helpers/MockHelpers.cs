@@ -86,11 +86,9 @@ namespace Tests.Helpers
             store = store ?? new Mock<IRoleStore<TRole>>().Object;
             var roles = new List<IRoleValidator<TRole>>();
             roles.Add(new RoleValidator<TRole>());
-            return new RoleManager<TRole>(store, roles,
-                new UpperInvariantLookupNormalizer(),
-                new IdentityErrorDescriber(),
-                null,
-                null);
+
+            return new RoleManager<TRole>(store, roles, new UpperInvariantLookupNormalizer(),
+                new IdentityErrorDescriber(), null);
         }
 
     }

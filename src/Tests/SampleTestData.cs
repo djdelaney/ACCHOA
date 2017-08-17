@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using HOA.Model;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace Tests
@@ -137,7 +138,7 @@ namespace Tests
                 UserId = user.Id,
                 RoleId = role.Id
             };
-            role.Users.Add(membership);
+            //role.Users.Add(membership);
             db.UserRoles.Add(membership);
         }
         
