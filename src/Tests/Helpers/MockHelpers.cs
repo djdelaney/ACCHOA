@@ -28,7 +28,9 @@ namespace Tests.Helpers
             store = store ?? new Mock<IRoleStore<TRole>>().Object;
             var roles = new List<IRoleValidator<TRole>>();
             roles.Add(new RoleValidator<TRole>());
-            return new Mock<RoleManager<TRole>>(store, roles, null, null, null, null);
+            return new Mock<RoleManager<TRole>>(store, roles, null, null, null);
+
+            //public RoleManager(IRoleStore<TRole> store, IEnumerable<IRoleValidator<TRole>> roleValidators, ILookupNormalizer keyNormalizer, IdentityErrorDescriber errors, ILogger<RoleManager<TRole>> logger);
         }
 
         public static Mock<ILogger<T>> MockILogger<T>(StringBuilder logStore = null) where T : class

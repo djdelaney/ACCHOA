@@ -28,7 +28,7 @@ namespace HOA.Util
 
         public static List<ApplicationUser> GetRoleMembers(ApplicationDbContext db, string roleName)
         {
-            IdentityRole role = db.Roles.Where(r => r.Name.Equals(RoleNames.ARBBoardMember)).FirstOrDefault();
+            IdentityRole role = db.Roles.Where(r => r.Name.Equals(roleName)).FirstOrDefault();
             List<string> userIds = db.UserRoles.Where(r => r.RoleId.Equals(role.Id)).Select(u => u.UserId).ToList();
             return db.Users.Where(u => userIds.Contains(u.Id)).ToList();
         }
