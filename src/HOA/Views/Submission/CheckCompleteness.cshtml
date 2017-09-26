@@ -8,6 +8,22 @@
     ViewBag.Title = "Check completeness";
 }
 
+@section HeaderExtras
+{
+    <script>
+
+        function AreYouSureKirk()
+        {
+            if ($('#Approve').val() == "false") {
+                return confirm('Are you sure?');
+            }
+
+            return true;
+        }
+
+    </script>
+}
+
 <h3>Submission</h3>
 @Model.Submission.FirstName @Model.Submission.LastName<br />
 @Model.Submission.Email <br />
@@ -63,6 +79,6 @@
     </div>
     <br />
 
-    <input type="submit" value="Submit" class="btn btn-primary" />
+    <input type="submit" value="Submit" class="btn btn-primary" onclick="return AreYouSureKirk();" />
 
 }
