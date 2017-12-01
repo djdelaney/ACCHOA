@@ -95,6 +95,16 @@ namespace Tests
             };
             db.Users.Add(tom2);
 
+            ApplicationUser bonnie = new ApplicationUser()
+            {
+                FirstName = "Bonnie",
+                LastName = "Nye",
+                Email = "bonnienyemd@gmail.com",
+                Enabled = true,
+                LandscapingMember = false
+            };
+            db.Users.Add(bonnie);
+
             //Setup roles
             IdentityRole adminRole = new IdentityRole(RoleNames.Administrator);
             db.Roles.Add(adminRole);
@@ -127,6 +137,7 @@ namespace Tests
             AddUserToRole(db, melissa, liaisonRole);
             AddUserToRole(db, tom, arbMemberRole);
             AddUserToRole(db, tom2, arbMemberRole);
+            AddUserToRole(db, bonnie, boardMemberRole);
 
             db.SaveChanges();
         }
