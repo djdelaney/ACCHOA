@@ -41,7 +41,7 @@ namespace HOA
         {
             // Add Entity Framework services to the services container.
             services.AddDbContext<ApplicationDbContext>(options =>
-                    options.UseSqlServer(Configuration["Data:DefaultConnection:ConnectionString"]));
+                    options.UseSqlServer(Configuration["SqlConnectionString"]));
 
             // Add Identity services to the services container.
             services.AddIdentity<ApplicationUser, IdentityRole>
@@ -64,7 +64,7 @@ namespace HOA
             services.AddMvc();
 
             //Storage
-            var azureCon = Configuration["Data:AzureStorage:ConnectionString"];
+            var azureCon = Configuration["AzureStorageConnectionString"];
             if (string.IsNullOrEmpty(azureCon))
                 services.AddTransient<IFileStore, MockFileStore>();
             else
@@ -74,9 +74,9 @@ namespace HOA
             }
 
             //Email
-            EmailHelper.BaseHost = Configuration["Data:Email:LinkHost"];
-            var sendGridKey = Configuration["Data:Email:SendGridKey"];
-            var emailSource = Configuration["Data:Email:EmailSource"];
+            EmailHelper.BaseHost = Configuration["EmailLinkHost"];
+            var sendGridKey = Configuration["EmailKey"];
+            var emailSource = Configuration["EmailSource"];
             if (string.IsNullOrEmpty(sendGridKey) || string.IsNullOrEmpty(emailSource))
                 services.AddTransient<IEmailSender, MockEmail>();
             else
