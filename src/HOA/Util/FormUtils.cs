@@ -13,7 +13,7 @@ namespace HOA.Util
         public static bool IsValidFileType(string fileName)
         {
             string extension = System.IO.Path.GetExtension(fileName);
-            return (allowedExtensions.Any(ext => ext.Equals(extension, StringComparison.Ordinal)));
+            return (allowedExtensions.Any(ext => ext.Equals(extension, StringComparison.OrdinalIgnoreCase)));
         }
 
         public static string GetUploadedFilename(IFormFile file)
