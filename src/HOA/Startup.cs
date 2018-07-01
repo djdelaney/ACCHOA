@@ -11,6 +11,8 @@ using Microsoft.EntityFrameworkCore;
 using HOA.Services;
 using HOA.Util;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 
 namespace HOA
 {
@@ -39,6 +41,13 @@ namespace HOA
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<CookiePolicyOptions>(options =>
+            {
+                // This lambda determines whether user consent for non-essential cookies is needed for a given request.
+                options.CheckConsentNeeded = context => false;
+                options.MinimumSameSitePolicy = SameSiteMode.None;
+            });
+
             // Add Entity Framework services to the services container.
             services.AddDbContext<ApplicationDbContext>(options =>
                     options.UseSqlServer(Configuration["SqlConnectionString"]));
@@ -61,7 +70,7 @@ namespace HOA
             services.AddResponseCompression();
 
             // Add MVC services to the services container.
-            services.AddMvc();
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             //Storage
             var azureCon = Configuration["AzureStorageConnectionString"];
@@ -100,14 +109,15 @@ namespace HOA
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseBrowserLink();
             }
             else
             {
                 app.UseExceptionHandler("/Home/Error");
+                app.UseHsts();
             }
 
             // Add static files to the request pipeline.
+            app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             // Add cookie-based authentication to the request pipeline.
