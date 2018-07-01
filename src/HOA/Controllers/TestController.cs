@@ -287,7 +287,17 @@ namespace HOA.Controllers
             else if (status == Status.CommunityMgrReturn)
             {
                 SetStatus(sub, Status.HOALiasonReview);
-                sub.ReturnStatus = ReturnStatus.MissingInformation;
+
+                ReturnStatus[] options = new ReturnStatus[]
+                {
+                    ReturnStatus.Reject,
+                    ReturnStatus.MissingInformation,
+                };
+
+                var r = new Random();
+                sub.ReturnStatus = options[r.Next(4)];
+
+                //sub.ReturnStatus = ReturnStatus.MissingInformation;
                 sub.Status = Status.CommunityMgrReturn;
             }
             else if (status == Status.Rejected)
