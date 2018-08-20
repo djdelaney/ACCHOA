@@ -37,7 +37,7 @@ Return Status: @Model.Submission.ReturnStatus
     @Html.HiddenFor(model => model.SubmissionId)
 
     @Html.LabelFor(model => model.UserFeedback)@: <br />
-    @Html.TextAreaFor(model => model.UserFeedback, new { @class = "form-control", @maxlength = "512" })<br />
+    @Html.TextAreaFor(model => model.UserFeedback, new { @class = "form-control", @maxlength = "1024" })<br />
     <br />
 
     if (Model.Submission.ReturnStatus == ReturnStatus.Reject)

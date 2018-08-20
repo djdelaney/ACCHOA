@@ -36,7 +36,7 @@ namespace HOA.Model.ViewModel
         public bool Approve { get; set; }
         
         [Display(Name = "Internal Comments")]
-        [MaxLength(512)]
+        [MaxLength(1024)]
         public string Comments { get; set; }
 
         [Required]

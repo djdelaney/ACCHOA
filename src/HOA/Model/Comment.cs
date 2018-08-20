@@ -17,7 +17,7 @@ namespace HOA.Model
         [Required]
         public DateTime Created { get; set; }
 
-        [MaxLength(512)]
+        [MaxLength(1024)]
         public string Comments { get; set; }
 
         [Required]
