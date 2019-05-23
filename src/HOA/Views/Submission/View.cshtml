@@ -213,7 +213,7 @@
         @: None
     }
 
-    @if ((Model.Submission.Status == Status.CommunityMgrReview || Model.Submission.Status == Status.ARBChairReview) &&
+    @if ((Model.Submission.Status != Status.Approved && Model.Submission.Status != Status.ConditionallyApproved && Model.Submission.Status != Status.Rejected) &&
                                     (User.IsInRole(RoleNames.CommunityManager) || User.IsInRole(RoleNames.Administrator)))
     {
         
