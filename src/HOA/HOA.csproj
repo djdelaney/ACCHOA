@@ -19,7 +19,7 @@
     <PackageReference Include="Microsoft.AspNetCore.App" />    
     <PackageReference Include="Sendgrid" Version="9.11.0" />
     <PackageReference Include="WindowsAzure.Storage" Version="9.3.3" />
-    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.6.1" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.12.0" />
   </ItemGroup>
 
 </Project>
