@@ -39,7 +39,9 @@ The following submission(s) are overdue:<br>
 <br>
 Your submission {2}. Your access code to check your submission status is {3}. Use the link below to view your submission and any comments.<br>
 <br>
-<a href='{4}'>{4}</a><br>";
+<a href='{4}'>{4}</a><br>
+<br>
+We recommend that you do <b>NOT</b> order materials or schedule work until you have received your official approval letter.<br>";
 
         private static string m_homeownerFinalEmail = @"
 {0} {1},<br>
