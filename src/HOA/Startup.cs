@@ -18,6 +18,7 @@ namespace HOA
 {
     public class Startup
     {
+        public IConfiguration Configuration { get; }
         public Startup(IHostingEnvironment env)
         {
             var builder = new ConfigurationBuilder()
@@ -35,8 +36,6 @@ namespace HOA
             }
             Configuration = builder.Build();
         }
-
-        public IConfigurationRoot Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -94,6 +93,7 @@ namespace HOA
                 SendGridEmail.EmailSource = emailSource;
                 services.AddTransient<IEmailSender, SendGridEmail>();
             }
+            services.AddApplicationInsightsTelemetry(Configuration["APPINSIGHTS_CONNECTIONSTRING"]);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
