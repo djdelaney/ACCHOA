@@ -295,7 +295,7 @@ namespace HOA.Controllers
                 };
 
                 var r = new Random();
-                sub.ReturnStatus = options[r.Next(4)];
+                sub.ReturnStatus = options[r.Next(2)];
 
                 //sub.ReturnStatus = ReturnStatus.MissingInformation;
                 sub.Status = Status.CommunityMgrReturn;

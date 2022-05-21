@@ -19,22 +19,9 @@ namespace HOA
     public class Startup
     {
         public IConfiguration Configuration { get; }
-        public Startup(IHostingEnvironment env)
+        public Startup(IConfiguration configuration)
         {
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
-                .AddEnvironmentVariables();
-
-            if (env.IsDevelopment())
-            {
-                // This will push telemetry data through Application Insights 
-                // pipeline faster, allowing you to view results immediately.
-                builder.AddApplicationInsightsSettings(developerMode: true);
-                builder.AddUserSecrets("aspnet-HOANEW-b9a2d01d-ce96-40a1-8b4a-fc668192a400");
-            }
-            Configuration = builder.Build();
+            Configuration = configuration;
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -67,9 +54,7 @@ namespace HOA
                 .AddDefaultTokenProviders();
 
             services.AddResponseCompression();
-
-            // Add MVC services to the services container.
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddControllersWithViews();
 
             //Storage
             var azureCon = Configuration["AzureStorageConnectionString"];
@@ -97,16 +82,21 @@ namespace HOA
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            loggerFactory.AddConsole(Configuration.GetSection("Logging"));
-            loggerFactory.AddDebug();
-            
+            app.UseStaticFiles();
+
+            app.UseRouting();
+
+            app.UseAuthentication();
+            app.UseAuthorization();
+
+
             app.UseStatusCodePages();
 
             app.UseResponseCompression();
 
-            if (env.IsDevelopment())
+            if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
             {
                 app.UseDeveloperExceptionPage();
             }
@@ -116,18 +106,10 @@ namespace HOA
                 app.UseHsts();
             }
 
-            // Add static files to the request pipeline.
             app.UseHttpsRedirection();
-            app.UseStaticFiles();
 
-            // Add cookie-based authentication to the request pipeline.
-            app.UseAuthentication();
-
-            app.UseMvc(routes =>
-            {
-                routes.MapRoute(
-                    name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
+            app.UseEndpoints(endpoints => {
+                endpoints.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}");
             });
         }
     }
