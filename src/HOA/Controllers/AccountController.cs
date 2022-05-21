@@ -27,7 +27,6 @@ namespace HOA.Controllers
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly ApplicationDbContext _applicationDbContext;
         private RoleManager<IdentityRole> _roleManager;
-        private IHostingEnvironment _env;
         private readonly IEmailSender _email;
 
         public AccountController(
@@ -35,14 +34,12 @@ namespace HOA.Controllers
             SignInManager<ApplicationUser> signInManager,
             ApplicationDbContext applicationDbContext,
             RoleManager<IdentityRole> roleManager,
-            IHostingEnvironment env,
             IEmailSender email)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _applicationDbContext = applicationDbContext;
             _roleManager = roleManager;
-            _env = env;
             _email = email;
         }
         
@@ -113,7 +110,8 @@ namespace HOA.Controllers
         {
             //Setup default admin user and roles
             var sampleData = new SampleData(_applicationDbContext, _userManager, _roleManager);
-            sampleData.InitializeData(_env.IsDevelopment());
+            bool isDevEnv = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
+            sampleData.InitializeData(isDevEnv);
 
             if (string.IsNullOrEmpty(returnUrl))
                 returnUrl = "/Submission/List";

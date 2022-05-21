@@ -28,7 +28,6 @@ namespace HOA.Controllers
         private readonly ApplicationDbContext _applicationDbContext;
         private readonly IEmailSender _email;
         private readonly IFileStore _storage;
-        private IHostingEnvironment _env;
         private RoleManager<IdentityRole> _roleManager;
 
         private Random _rand;
@@ -37,8 +36,7 @@ namespace HOA.Controllers
                             UserManager<ApplicationUser> userManager,
                             IEmailSender emailSender,
                             IFileStore fileStore,
-                            RoleManager<IdentityRole> roleManager,
-                            IHostingEnvironment env)
+                            RoleManager<IdentityRole> roleManager)
         {
             _applicationDbContext = applicationDbContext;
             _userManager = userManager;
@@ -46,7 +44,6 @@ namespace HOA.Controllers
             _roleManager = roleManager;
             _storage = fileStore;
             _rand = new Random();
-            _env = env;
         }
 
         [Authorize(Roles = RoleNames.Administrator)]
@@ -93,8 +90,10 @@ namespace HOA.Controllers
         [Authorize(Roles = RoleNames.Administrator)]
         public IActionResult DeleteAll()
         {
-            if (!_env.IsDevelopment())
+            if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") != "Development")
+            {
                 throw new Exception("Hell no.");
+            }
 
             DeleteAllViewModel model = new DeleteAllViewModel()
             {
@@ -107,8 +106,10 @@ namespace HOA.Controllers
         [Authorize(Roles = RoleNames.Administrator)]
         public async Task<IActionResult> DeleteAll(DeleteAllViewModel model)
         {
-            if (!_env.IsDevelopment())
+            if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") != "Development")
+            {
                 throw new Exception("Hell no.");
+            }
 
             if (ModelState.IsValid)
             {
