@@ -27,7 +27,9 @@
 
     @foreach (var user in Model.Users)
     {
-        <tr @if (!user.Enabled) { @Html.Raw("class=\"danger\"") } >
+        @if (user.Enabled)
+        {
+        <tr>
             <td>@user.Email</td>
             <td>@user.FullName</td>
             <td>@user.Roles
@@ -46,10 +48,56 @@
                 @Html.ActionLink("Edit", "Edit", new { id = user.UserId})
             </td>
         </tr>
+        }
     }
     </table>
 </div>
 
 <a href="/Account/CreateUser" class="btn btn-default">Add new user <span class="glyphicon glyphicon-plus" aria-hidden="true"></span></a>
+<br />
+<br />
 
+<div class="panel panel-default">
+    <!-- Default panel contents -->
+    <div class="panel-heading">Inactive Users</div>
 
+    <!-- Table -->
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Email</th>
+                <th>Name</th>
+                <th>Role</th>
+                <th>Active</th>
+                <th>Notifications</th>
+                <th>Edit</th>
+            </tr>
+        </thead>
+
+    @foreach (var user in Model.Users)
+    {
+        @if (!user.Enabled)
+        {
+            <tr class="danger" >
+                <td>@user.Email</td>
+                <td>@user.FullName</td>
+                <td>@user.Roles
+                    @if (user.LandscapingMember)
+                    {
+                        @Html.Raw(" (Landscaping)")
+                    }
+                </td>
+            <td>
+                @Html.ActionLink(user.Enabled ? "Disable" : "Enable", "Disable", new { id = user.UserId, disable = user.Enabled })
+            </td>
+            <td>
+                N/A
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { id = user.UserId})
+            </td>
+        </tr>
+        }
+    }
+    </table>
+</div>
