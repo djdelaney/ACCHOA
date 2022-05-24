@@ -1426,7 +1426,9 @@ namespace HOA.Controllers
         {
             if (ModelState.IsValid)
             {
-                IQueryable<Submission> subs = _applicationDbContext.Submissions;
+                //Force client side evaluation of this query
+                IList<Submission> allSubmissions = _applicationDbContext.Submissions.Include(s => s.Audits).OrderBy(s => s.LastModified).ToList();
+                IQueryable<Submission> subs = allSubmissions.AsQueryable();
 
                 if (!string.IsNullOrEmpty(model.Code))
                 {
@@ -1445,7 +1447,7 @@ namespace HOA.Controllers
 
                 var resultModel = new SearchResultsViewModel()
                 {
-                    Submissions = subs.Take(20).Include(s => s.Audits).OrderBy(s => s.LastModified).ToList()
+                    Submissions = subs.Take(20).ToList()
                 };
 
                 return View("SearchResults", resultModel);
