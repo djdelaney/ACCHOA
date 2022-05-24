@@ -110,8 +110,32 @@ namespace HOA.Model.ViewModel
         public string LastName { get; set; }
 
         [Required]
+        [Display(Name = "Admin")]
+        public bool IsAdmin { get; set; }
+
+        [Required]
         [Display(Name = "Landscaping Member")]
         public bool IsLandscaping { get; set; }
+
+        [Required]
+        [Display(Name = "ARB Member")]
+        public bool IsARBMember { get; set; }
+
+        [Required]
+        [Display(Name = "ARB Chair")]
+        public bool IsArbChair { get; set; }
+
+        [Required]
+        [Display(Name = "Community Manager")]
+        public bool IsCommunityManager { get; set; }
+
+        [Required]
+        [Display(Name = "HOA Liaison")]
+        public bool IsHoaLiaison { get; set; }
+
+        [Required]
+        [Display(Name = "HOA Member")]
+        public bool IsHoaMember { get; set; }
     }
 
     public class ForgotPasswordViewModel

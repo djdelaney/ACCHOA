@@ -448,6 +448,27 @@ namespace HOA.Controllers
                 IsLandscaping = user.LandscapingMember
             };
 
+            List<IdentityRole> identityRoles = DBUtil.GetUserRoles(_applicationDbContext, user);
+
+            foreach (var role in identityRoles)
+            {
+                //var roleName = _roleManager.FindByIdAsync(role.Name).Result.Name;
+                var roleName = role.Name;
+
+                if (roleName.Equals(RoleNames.Administrator))
+                    model.IsAdmin = true;
+                else if (roleName.Equals(RoleNames.CommunityManager))
+                    model.IsCommunityManager = true;
+                else if (roleName.Equals(RoleNames.BoardChairman))
+                    model.IsArbChair = true;
+                else if (roleName.Equals(RoleNames.ARBBoardMember))
+                    model.IsARBMember = true;
+                else if (roleName.Equals(RoleNames.HOALiaison))
+                    model.IsHoaLiaison = true;
+                else if (roleName.Equals(RoleNames.HOABoardMember))
+                    model.IsHoaMember = true;
+            }
+
             return View(model);
         }
 
@@ -474,7 +495,64 @@ namespace HOA.Controllers
                 user.LandscapingMember = model.IsLandscaping;
 
                 await _userManager.UpdateAsync(user);
+
+                //Update roles?
+                List<IdentityRole> identityRoles = DBUtil.GetUserRoles(_applicationDbContext, user);
                 
+                if(model.IsAdmin && !identityRoles.Any(r => r.Name.Equals(RoleNames.Administrator)))
+                {
+                    await _userManager.AddToRoleAsync(user, RoleNames.Administrator);
+                }
+                if(!model.IsAdmin && identityRoles.Any(r => r.Name.Equals(RoleNames.Administrator)))
+                {
+                    await _userManager.RemoveFromRoleAsync(user, RoleNames.Administrator);
+                }
+
+                if (model.IsARBMember && !identityRoles.Any(r => r.Name.Equals(RoleNames.ARBBoardMember)))
+                {
+                    await _userManager.AddToRoleAsync(user, RoleNames.ARBBoardMember);
+                }
+                if (!model.IsARBMember && identityRoles.Any(r => r.Name.Equals(RoleNames.ARBBoardMember)))
+                {
+                    await _userManager.RemoveFromRoleAsync(user, RoleNames.ARBBoardMember);
+                }
+
+                if (model.IsArbChair && !identityRoles.Any(r => r.Name.Equals(RoleNames.BoardChairman)))
+                {
+                    await _userManager.AddToRoleAsync(user, RoleNames.BoardChairman);
+                }
+                if (!model.IsArbChair && identityRoles.Any(r => r.Name.Equals(RoleNames.BoardChairman)))
+                {
+                    await _userManager.RemoveFromRoleAsync(user, RoleNames.BoardChairman);
+                }
+
+                if (model.IsCommunityManager && !identityRoles.Any(r => r.Name.Equals(RoleNames.CommunityManager)))
+                {
+                    await _userManager.AddToRoleAsync(user, RoleNames.CommunityManager);
+                }
+                if (!model.IsCommunityManager && identityRoles.Any(r => r.Name.Equals(RoleNames.CommunityManager)))
+                {
+                    await _userManager.RemoveFromRoleAsync(user, RoleNames.CommunityManager);
+                }
+
+                if (model.IsHoaLiaison && !identityRoles.Any(r => r.Name.Equals(RoleNames.HOALiaison)))
+                {
+                    await _userManager.AddToRoleAsync(user, RoleNames.HOALiaison);
+                }
+                if (!model.IsHoaLiaison && identityRoles.Any(r => r.Name.Equals(RoleNames.HOALiaison)))
+                {
+                    await _userManager.RemoveFromRoleAsync(user, RoleNames.HOALiaison);
+                }
+
+                if (model.IsHoaMember && !identityRoles.Any(r => r.Name.Equals(RoleNames.HOABoardMember)))
+                {
+                    await _userManager.AddToRoleAsync(user, RoleNames.HOABoardMember);
+                }
+                if (!model.IsHoaMember && identityRoles.Any(r => r.Name.Equals(RoleNames.HOABoardMember)))
+                {
+                    await _userManager.RemoveFromRoleAsync(user, RoleNames.HOABoardMember);
+                }
+
                 return RedirectToAction(nameof(AccountController.ManageUsers), "Account");
             }
 
