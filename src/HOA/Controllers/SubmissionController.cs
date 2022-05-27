@@ -556,13 +556,18 @@ namespace HOA.Controllers
             foreach (var f in submission.Files)
             {
                 _storage.DeleteFile(f.BlobName);
+                _applicationDbContext.Files.Remove(f);
             }
             foreach (var c in submission.StateHistory)
             {
                 _applicationDbContext.StateChanges.Remove(c);
             }
+            foreach (var c in submission.Comments)
+            {
+                _applicationDbContext.Comments.Remove(c);
+            }
 
-            if(!string.IsNullOrEmpty(submission.ResponseDocumentBlob))
+            if (!string.IsNullOrEmpty(submission.ResponseDocumentBlob))
                 _storage.DeleteFile(submission.ResponseDocumentBlob);
 
             _applicationDbContext.Submissions.Remove(submission);
