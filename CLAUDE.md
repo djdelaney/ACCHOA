@@ -23,7 +23,7 @@ dotnet publish -c Release
 
 ## Architecture Overview
 
-This is an ASP.NET Core 6.0 MVC application for managing HOA Architectural Review Board (ARB) submissions. The system tracks submissions through a multi-stage approval workflow.
+This is an ASP.NET Core 10.0 MVC application for managing HOA Architectural Review Board (ARB) submissions. The system tracks submissions through a multi-stage approval workflow.
 
 ### Project Structure
 
