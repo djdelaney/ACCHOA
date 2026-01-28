@@ -19,6 +19,16 @@ dotnet run --project src/HOA/HOA.csproj
 
 # Publish for deployment
 dotnet publish -c Release
+
+# Run the export tool
+dotnet run --project src/HOA.Export/HOA.Export.csproj -- [options]
+
+# Export tool options:
+#   -o, --output <path>       Output directory (default: ./export)
+#   -s, --status <status>     Filter by status (e.g., Approved, Rejected)
+#   -a, --address <text>      Filter by address (partial match)
+#   -id, --submission-id <id> Export specific submission by ID
+#   -v, --verbose             Show detailed output
 ```
 
 ## Architecture Overview
@@ -28,6 +38,7 @@ This is an ASP.NET Core 10.0 MVC application for managing HOA Architectural Revi
 ### Project Structure
 
 - `src/HOA/` - Main web application
+- `src/HOA.Export/` - Console app for exporting submissions to files and PDFs
 - `src/Tests/` - xUnit test project (uses in-memory EF Core database and Moq)
 
 ### Submission Workflow States
