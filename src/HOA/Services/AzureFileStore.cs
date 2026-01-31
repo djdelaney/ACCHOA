@@ -1,9 +1,6 @@
-﻿using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Blob;
+using Azure.Storage.Blobs;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace HOA.Services
@@ -12,50 +9,36 @@ namespace HOA.Services
     {
         public static string ConnectionString;
 
-        public Task DeleteFile(string id)
+        private BlobContainerClient GetContainerClient()
         {
-            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(ConnectionString);
-            CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
-            CloudBlobContainer container = blobClient.GetContainerReference("arb");
-            CloudBlockBlob blockBlob = container.GetBlockBlobReference(id);
-            return blockBlob.DeleteAsync();
+            var blobServiceClient = new BlobServiceClient(ConnectionString);
+            return blobServiceClient.GetBlobContainerClient("arb");
+        }
+
+        public async Task DeleteFile(string id)
+        {
+            var containerClient = GetContainerClient();
+            var blobClient = containerClient.GetBlobClient(id);
+            await blobClient.DeleteIfExistsAsync();
         }
 
         public async Task<Stream> RetriveFile(string id)
         {
-            // Retrieve storage account from connection string.
-            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(ConnectionString);
-
-            // Create the blob client.
-            CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
-
-            // Retrieve a reference to a container.
-            CloudBlobContainer container = blobClient.GetContainerReference("arb");
-
-            CloudBlockBlob blockBlob = container.GetBlockBlobReference(id);
-
-            return await blockBlob.OpenReadAsync();
+            var containerClient = GetContainerClient();
+            var blobClient = containerClient.GetBlobClient(id);
+            var response = await blobClient.DownloadAsync();
+            return response.Value.Content;
         }
 
         public async Task<string> StoreFile(string code, Stream data)
         {
             var id = string.Format("{0}={1}", code, Guid.NewGuid().ToString());
 
-            // Retrieve storage account from connection string.
-            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(ConnectionString);
+            var containerClient = GetContainerClient();
+            await containerClient.CreateIfNotExistsAsync();
 
-            // Create the blob client.
-            CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
-
-            // Retrieve a reference to a container.
-            CloudBlobContainer container = blobClient.GetContainerReference("arb");
-
-            // Create the container if it doesn't already exist.
-            await container.CreateIfNotExistsAsync();
-
-            // Retrieve reference to a blob named "myblob".
-            CloudBlockBlob blockBlob = container.GetBlockBlobReference(id);
-            await blockBlob.UploadFromStreamAsync(data);
+            var blobClient = containerClient.GetBlobClient(id);
+            await blobClient.UploadAsync(data, overwrite: true);
 
             return id;
         }

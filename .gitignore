@@ -279,3 +279,9 @@ __pycache__/
 
 #ASP publish settings
 PublishProfiles/
+
+# Export tool output
+export/
+
+# macOS
+.DS_Store
