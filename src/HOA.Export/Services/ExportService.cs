@@ -71,6 +71,7 @@ public class ExportService
             .Include(s => s.Audits)
             .Include(s => s.Responses)
             .Include(s => s.StateHistory)
+            .AsSplitQuery()
             .AsQueryable();
 
         // Apply filters

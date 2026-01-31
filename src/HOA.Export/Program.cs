@@ -42,7 +42,7 @@ class Program
 
         // Set up DbContext
         var dbOptions = new DbContextOptionsBuilder<ApplicationDbContext>()
-            .UseSqlServer(sqlConnection)
+            .UseSqlServer(sqlConnection, opts => opts.CommandTimeout(300))
             .Options;
 
         // Set up AzureFileStore
