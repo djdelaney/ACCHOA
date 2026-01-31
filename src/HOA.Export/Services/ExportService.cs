@@ -26,7 +26,7 @@ public class ExportService
     {
         var result = new ExportResult();
 
-        var submissions = await GetSubmissionsAsync();
+        var submissions = SortSubmissions(await GetSubmissionsAsync());
 
         if (submissions.Count == 0)
         {
@@ -39,8 +39,9 @@ public class ExportService
         // Create output directory
         Directory.CreateDirectory(_options.OutputPath!);
 
-        // Group by address
-        var groupedByAddress = submissions.GroupBy(s => s.Address);
+        // Group by normalized address so variants like "241 Sills Ln" and
+        // "241 Sills Lane" end up in the same folder.
+        var groupedByAddress = submissions.GroupBy(s => AddressNormalizer.Normalize(s.Address));
 
         foreach (var addressGroup in groupedByAddress)
         {
@@ -90,7 +91,19 @@ public class ExportService
             query = query.Where(s => s.Status == _options.StatusFilter.Value);
         }
 
-        return await query.OrderBy(s => s.Address).ThenBy(s => s.Id).ToListAsync();
+        return await query.ToListAsync();
+    }
+
+    /// <summary>
+    /// Sorts submissions by normalized address then by ID so that the in-memory
+    /// grouping produces a stable, predictable order.
+    /// </summary>
+    private static List<Submission> SortSubmissions(List<Submission> submissions)
+    {
+        return submissions
+            .OrderBy(s => AddressNormalizer.Normalize(s.Address))
+            .ThenBy(s => s.Id)
+            .ToList();
     }
 
     private async Task ExportSubmissionAsync(

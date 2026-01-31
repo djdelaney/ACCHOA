@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\HOA\HOA.csproj" />
+    <ProjectReference Include="..\HOA.Export\HOA.Export.csproj" />
   </ItemGroup>
 
   <ItemGroup>
