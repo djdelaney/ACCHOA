@@ -96,6 +96,9 @@ namespace HOA.Controllers
         {
             List<SubmissionV1> results = new List<SubmissionV1>();
 
+            var previousTimeout = _applicationDbContext.Database.GetCommandTimeout();
+            _applicationDbContext.Database.SetCommandTimeout(300);
+
             List<Submission> subs = _applicationDbContext.Submissions
                 .Include(s => s.Audits)
                 .Include(s => s.Comments).ThenInclude(c => c.User)
@@ -103,7 +106,10 @@ namespace HOA.Controllers
                 .Include(s => s.Files)
                 .Include(s => s.Responses)
                 .Include(s => s.StateHistory)
+                .AsSplitQuery()
                 .OrderBy(s => s.SubmissionDate).ToList();
+
+            _applicationDbContext.Database.SetCommandTimeout(previousTimeout);
 
             foreach(var sub in subs)
             {
